@@ -22,7 +22,16 @@
    the owner to reconnect; never proceed from memory on canonical content.
 8. **Surgical fixes.** Owner feedback arrives as numbered, per-item corrections;
    respond with targeted fixes to exactly those items, not rebuilds.
-9. **Research live.** Platform/framework facts for a new target are verified by
+9. **Source-sync invariant.** The canon store is only authoritative if the work
+   actually landed there. Work done in another surface (a separate agent
+   session, a local checkout, a handoff to another tool) can leave canon
+   several versions stale while looking current. Before trusting a version
+   number, verify it against the artefacts themselves, and treat any
+   unsynced-source discovery as an issue to raise, not a detail to absorb.
+10. **Research live.** Platform/framework facts for a new target are verified by
    live search at decision time, never from memory.
-10. **No floating questions.** Every open question has a Q id, an owner-facing
+11. **No floating questions.** Every open question has a Q id, an owner-facing
     flag, and a documented interim assumption. Session close leaves nothing untracked.
+
+See `skill-baseline.md` for the work loop, the MCP-first rule, and the
+five-point checklist every generated skill must satisfy.
