@@ -25,6 +25,14 @@ description: <what it does> + pushy trigger contexts specific to this project
 <Project-discovered connector quirks, phrased defensively: if a tool isn't
 connected, ask the owner to reconnect rather than proceeding from memory.>
 
+## Work loop & MCP use
+<Verbatim from skill-baseline.md sections 1-2, with this skill's own VERIFY
+checks named explicitly.>
+
+## Tunable vs locked
+<What this skill may change, what it may only report on, and whether it fixes
+or reports when a gate fails.>
+
 ## Working rules
 <Copied from working-rules.md, trimmed to what applies to this skill's class.>
 
@@ -36,6 +44,9 @@ render pipeline: data source → generator → verify counts → proof → sync.
 <Named list — e.g. pdf, xlsx, frontend-design, engineering:testing-strategy —
 with when to invoke each. This skill orchestrates; it does not duplicate them.>
 ```
+
+Every generated skill is checked against the five-point baseline in
+`skill-baseline.md` before it is packaged. Missing any point = fails review.
 
 Class notes:
 - **Canon skill**: mostly the Canon block, style system, naming, spec tables. No procedures beyond verification.
