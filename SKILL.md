@@ -68,17 +68,54 @@ Use the **skill-creator** skill's authoring and packaging machinery (read its SK
 4. **Working rules** — from `references/working-rules.md`: modular design (re-author and test one module, never whole-package rebuilds), proof gates on visual output (owner approves proofs before build continues), staleness propagation (a changed decision flags downstream items stale in the tracker), leverage-existing-skills-first, local-first prototyping for code lines.
 5. **Decision gates** — anything the owner controls (e.g. deck composition, scope changes) changes only via a logged decision, which auto-flags dependents.
 
+Every generated skill additionally carries the **work loop**
+(`DRAFT → VERIFY → PROOF → REVISE → REGISTER`), the **MCP-first rule**, and an
+explicit **tunable vs locked** boundary — all specified in
+`references/skill-baseline.md`, which also holds the five-point checklist a new
+skill must satisfy before packaging. The studio enforces this on its own growth:
+a skill missing any point fails creation review and the tracker raises it as an
+issue. Claude cannot install skills — a `REINSTALL` status means re-present the
+packaged file for the owner to save.
+
 Keep each generated SKILL.md under ~500 lines; push bulk detail into that skill's own `references/`.
 
 ### Phase 4 — Tracker dashboard (optional but standard)
 
-If the user wants a dashboard, follow `references/dashboard-standard.md`. Non-negotiables from the proven pattern:
-- Plain **black-on-white, high-contrast** HTML. No brand theming on owner-facing dashboards.
-- Items default to **pending**; untouched items need no action.
-- Each actionable item carries the **EXPLAIN / PROCEED / IMPROVE** trio (no HOLD button — untouched = held).
-- One single **Create prompt** button that compiles all marked edits into a ready-to-paste sync prompt for the next Claude session. Never separate Save/Export buttons that do the same thing.
-- Code-line dashboards may add **REFRESH BUILD** (full clean pipeline) and **CANON SYNC** (diff build vs canon) actions.
-- The dashboard is a static HTML artifact regenerated from `PROJECT_TRACKER.json` — the JSON is the truth, the HTML is a view.
+If the user wants a dashboard, build it to the **Tracker Shell spec v1.0** in
+`references/dashboard-standard.md`. Conformance is enforced at skill creation:
+any skill that emits a non-conforming dashboard fails creation review. The shell
+is **data-driven — swap the DATA block only**; a project's own shell is the
+authoritative copy-from source and this skill's
+`references/tracker-shell-reference.html` is a plain-HTML approximation for
+projects with no component runtime. The non-negotiables:
+
+- **Static bake, mobile-first** — all content baked into the HTML so the page
+  renders with JS disabled; JS is enhancement only. 44px touch targets.
+- **Fixed status vocabulary** — `✓ PASS` / `✕ FAIL` / `~ PEND` / `■ BLOCK` /
+  `– N/A`, each as glyph + label + tint, never colour alone. Labels are
+  abbreviated so a mark fits a narrow grid cell. Domain labels alias these; the
+  set is not extended.
+- **Badge axis = build state** (`INTEGRATED / TESTED / BUILDING / PROTOTYPE`,
+  plus `PROPOSED / OPEN` for queues), on its own axis from the checks. A row can
+  read TESTED while its checks still say PEND — that is the point of splitting
+  them. Versions render as muted mono text, never as a status colour.
+- **Six checks** on build lines: `TYP UNI GLD MUL SEC PII`.
+- **Trio per item**: `!` EXPLAIN · `✓` PROCEED · `+` IMPROVE. Untouched stays
+  pending; no HOLD action exists.
+- **Five bar flags**: CREATE PROMPT (primary, the single sync action), RESET,
+  REFRESH BUILD, CANON SYNC, REFRESH DATA. Never separate Save/Export buttons
+  duplicating CREATE PROMPT.
+- **Fixed section order** and three typography slots (display serif / UI sans /
+  mono for evidence), plus an in-page scheme switcher layered over the baked
+  default.
+- **Evidence discipline** — every non-pending status carries a string saying what
+  was actually run. Absent evidence, an item is pending, not pass.
+- **Four colour schemes** (Ink default, Parchment, Mono HC, Slate dark), all
+  verified to WCAG AA numerically rather than by eye. Run
+  `references/dashboard-sample-generator.py` after changing any token.
+- **Print-safe** — every control carries `noprint` and is hidden under
+  `@media print`, so the page prints as a clean status report.
+- The dashboard is regenerated from the tracker JSON — the JSON is truth.
 
 ### Phase 5 — Package, version, deliver
 
@@ -104,5 +141,8 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/session-state-template.md` — SESSION_STATE.md template
 - `references/tracker-schema.md` — PROJECT_TRACKER.json schema
 - `references/generated-skill-template.md` — skeleton every generated skill follows
+- `references/skill-baseline.md` — work loop, MCP-first rule, five-point new-skill checklist, install boundary
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
-- `references/dashboard-standard.md` — dashboard spec + interaction standard
+- `references/dashboard-standard.md` — Tracker Shell spec v1.0 (status vocab, trio, bar flags, evidence rule, four schemes)
+- `references/tracker-shell-reference.html` — the shipped reference dashboard: copy from this, don't rebuild the shell
+- `references/dashboard-sample-generator.py` — regenerates the reference HTML + four scheme PNGs, prints the WCAG contrast table
