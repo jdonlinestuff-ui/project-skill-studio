@@ -23,6 +23,8 @@
   "currency": "AUD",
   "revision": 1,
   "generatedAt": "2026-07-26T08:49:36+00:00",
+  "evidenceBaseline": "portfolio-2026-07-26",
+  "subjectVersion": "portfolio-2026-07-26",
   "baselinedAt": "2026-07-26",
   "maintainer": "Claude"
  },

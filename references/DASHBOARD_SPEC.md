@@ -1,7 +1,7 @@
-# Status Dashboard Shell — reusable dashboard spec v3.0
+# Status Dashboard Shell — reusable dashboard spec v3.3
 
 Project-agnostic. This is the visual and data contract for every dashboard built with the
-`status-dashboard` skill. Sections 6–11 are literal and apply verbatim to any project.
+`status-dashboard` skill. Sections 6–10 are literal and apply verbatim to any project.
 Where the text says "canon", read "the project's source-of-truth folder"; where it names a
 `cra-*` skill, read "the skill that owns that delivery line". Section 8 is an EXAMPLE
 roster from the project this shell was designed on — replace it with the host project's own lines, keeping the pattern (one JSON source per line, six check columns, six sizes).
@@ -10,12 +10,25 @@ Reference implementation: `online-dev-tracker-dashboard_v8.html` (live-fetch bui
 `Tracker Dashboard.dc.html` (design source).
 **This spec is a visual contract, not a style suggestion.** A dashboard built from it must
 be pixel-comparable to the reference: same type sizes, same chip shape, same round action
-buttons, same spacing. Sections 9–11 give the literal CSS and markup — copy them, do not
-re-derive them. If a value is not listed here, take it from the reference file.
+buttons, same spacing. Sections 9 and 10 give the literal CSS and markup — copy them, do
+not re-derive them. If a value is not listed here, take it from the reference file.
+§11 is the conformance checklist to run before shipping; §12 covers delivery.
 
 **v3.0 changes the data model.** The dashboard is a VIEW over a canon JSON source that it
 fetches at run time (§3). Status data is never baked into the HTML — an embedded snapshot
-exists only as a clearly-labelled offline fallback. Read §3 before §9–11.
+exists only as a clearly-labelled offline fallback. Read §3 before §9–10.
+
+### Version history — what each point release changed
+
+The body of this file used to cite version numbers the title had never caught up with.
+The record, stated once so no section has to guess:
+
+| version | change |
+|---|---|
+| v3.0 | the data-model split — dashboard becomes a VIEW over a fetched JSON source (§3) |
+| v3.1 | §4e Feedback & Suggestions added — the first one-time section insertion |
+| v3.2 | §4f Portfolio Roster + §4g People & Allocation — the second insertion, 14 sections → 16 |
+| v3.3 | §3.6 evidence baseline and §4h Defect & Task Register — the third insertion, 16 → 17 |
 
 Things that went wrong the last time this was rebuilt, all now specified below:
 `rem`-based font sizes, glyph-only 14px status squares, square 4px action buttons,
@@ -108,17 +121,24 @@ metric strip:
   "meta": {
     "line": "online-dev",
     "title": "Digital Dev Tracker",
-    "sourceLabel": "05_TEAMS_APP_v0.6_SOURCE",
+    "eyebrow": "CYBER RISK ASSESSMENT · ONLINE DEV",   // small caps strap above the title
+    "sourceLabel": "ONLINE_DEV_TRACKER.json",
     "checkNames": ["Typecheck","Unit","Golden files","Multi-client","Code security","Privacy"],
+    "checkAbbr":  ["TYP","UNI","GLD","MUL","SEC","PII"], // exactly 6, or the shell abbreviates
     "currency": "AUD",
     "revision": 47,                    // increments on every write by Claude
-    "generatedAt": "2026-07-25T10:12:00+10:00"
+    "generatedAt": "2026-07-25T10:12:00+10:00",
+    "maintainer": "Claude",            // who writes this file
+    "evidenceBaseline": "v0.6",        // the version the marks below were derived FROM
+    "subjectVersion": "v0.20",         // the version actually shipping NOW
+    "baselinedAt": "2026-07-25"        // when evidenceBaseline was last re-derived
   },
   "modules":     [[name, builtAgainst, badge, [6 status keys], evidenceNote], …],
   "proofs":      [[ref, name, badge, note], …],
   "gates":       [[ref, name, badge, note], …],
   "decisions":   [[ref, title, "OPEN", note], …],
   "issues":      [[ref, "High"|"Med"|"Low", note], …],
+  "defects":     [[ref, externalRef, title, "High"|"Med"|"Low", mark, targetRef, foundIn, fixedIn, note], …],
   "risks":       [[ref, "High"|"Med"|"Low", title, cause, control], …],
   "budget":      [[ref, lineItem, budgetAmount, spentAmount, note], …],
   "milestones":  [[ref, "YYYY-MM-DD", title, "done"|"next"|"pending"|"blocked", note], …],
@@ -135,6 +155,11 @@ so a second line needs a new JSON file, not a new HTML file. The row arrays are 
 and identical across lines; a skill that needs a different column set changes
 `meta.checkNames`, not the shell.
 
+`checkAbbr` is optional: supply exactly six abbreviations or the shell derives them from
+`checkNames`. `eyebrow` and `maintainer` are optional display fields. The three baseline
+fields are not optional once a tracker describes a build that ships independently of it —
+see §3.6.
+
 ### 3.4 Freshness rules
 
 - Header stamp always states BOTH the moment data was fetched and `meta.generatedAt`
@@ -146,6 +171,10 @@ and identical across lines; a skill that needs a different column set changes
 - Sections whose arrays are absent are omitted; sections present but empty render their
   heading with `— none —` in `400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif`
   muted, so the reader can tell empty from missing.
+- **`generatedAt` measures when the file was last written, not whether what it says is
+  still true.** A tracker rewritten this morning about a build from three versions ago is
+  fresh by this rule and wrong in fact. That second axis is §3.6, and it is the one that
+  actually catches a stale dashboard.
 
 ### 3.5 Content discipline (unchanged, and enforced in the JSON, not the HTML)
 
@@ -153,21 +182,75 @@ and identical across lines; a skill that needs a different column set changes
 - Totals, percentages and metric counts are DERIVED at render, never stored.
 - Statuses change only when evidence changes, and every change adds a `log` entry.
 
+### 3.6 Evidence baseline — the version the marks describe
+
+A tracker describes a subject: an app build, a print deck, a manual set. **The subject
+moves on its own schedule and the tracker does not automatically follow it.** Every mark
+in the file was derived from one particular version of that subject, and if the subject
+has since shipped past it, every mark is a claim about something that no longer exists.
+
+Freshness (§3.4) cannot see this. Rewriting the file re-stamps `generatedAt` whether or not
+a single mark was re-derived, so a tracker can be simultaneously written-today and
+describing-a-build-from-a-month-ago. That combination is the most dangerous state a
+dashboard can be in, because every visible staleness signal reads green.
+
+Three fields, all in `meta`:
+
+| field | means |
+|---|---|
+| `evidenceBaseline` | the subject version the marks below were actually derived from |
+| `subjectVersion` | the version now shipping, per canon — regardless of whether it was inspectable |
+| `baselinedAt` | the date `evidenceBaseline` was last re-derived from real evidence |
+
+**The degrade rule.** When `evidenceBaseline` ≠ `subjectVersion`, the dashboard MUST:
+
+1. Render a full-width banner above the metric strip, in the same treatment as §3.2C's
+   snapshot banner but on the `pending` tint:
+   `~ PROVISIONAL — marks derived from <evidenceBaseline>; <subjectVersion> is shipping. Re-derive before trusting status.`
+2. Append `~ PROVISIONAL` beside the header stamp, alongside any `~ STALE` chip — the two
+   are independent conditions and both can be true at once.
+3. Render every `pass` mark in the Module Grid with the `pending` tint and a `*` suffix on
+   the word (`✓ PASS*`), the footnote reading *"derived from `<evidenceBaseline>`, not
+   re-verified against `<subjectVersion>`"*. The glyph and word do not change — a reader
+   comparing two dashboards must still see the same vocabulary — but nothing evidenced
+   against a superseded version may present as unqualified truth.
+4. Leave `pending`, `blocked`, `fail` and `na` marks untouched. Degrading is only ever
+   applied to claims of success; a pending mark is already making no claim.
+
+**What it does not do.** The rule never advances or clears a mark, and never guesses what
+the newer version does. It marks the whole set as provisional and says why. Re-deriving is
+a §3.2B MCP re-issue against real evidence — the only path that can change a status.
+
+**Recording the gap properly.** A baseline mismatch is a real condition and belongs in the
+issue register too, with the id cited from the affected rows' `evidenceNote` (the
+`(I6)`/`(S8)` convention of §3.5). The banner tells a reader looking at the page; the issue
+tells anyone reading the source. Both, not either.
+
+**When the subject is the tracker itself** — a design or programme tracker whose rows are
+other trackers — set both fields to the same value and the rule is inert. Do not omit them
+to achieve the same effect: an absent baseline is indistinguishable from one nobody
+thought about.
+
 ---
 
 ## 4. Sections, in order
 
 1. Header · 2. Metric strip · 3. How-this-works panel · 4. Sticky control bar ·
 5. Prompt output · 6. Portfolio Roster · 7. People & Allocation · 8. Module grid
-(legend above) · 9. Queues (Proofs, Gates, Decisions) · 10. Open Issues · 11. Risk
-Register · 12. Budget & Cost · 13. Timeline & Milestones · 14. Next Actions ·
-15. Feedback & Suggestions · 16. Update Log
+(legend above) · 9. Queues (Proofs, Gates, Decisions) · 10. Open Issues · 11. Defect &
+Task Register · 12. Risk Register · 13. Budget & Cost · 14. Timeline & Milestones ·
+15. Next Actions · 16. Feedback & Suggestions · 17. Update Log
 
-Drop sections with no data; never reorder what remains. (v3.2 note: Portfolio Roster and
-People & Allocation are new, inserted before Module Grid because they're overview-level —
-a portfolio comes before per-line detail. This is the second one-time insertion; §4e was
-the first. Once shipped, an insertion becomes part of the fixed order like everything else
-— "never reorder" governs from here forward, not retroactively.)
+Drop sections with no data; never reorder what remains.
+
+Insertion record, so the order is auditable rather than folklore: §4e Feedback was the
+first one-time insertion (v3.1); §4f Portfolio Roster and §4g People & Allocation the
+second (v3.2), placed before Module Grid because a portfolio is overview-level and
+overview precedes per-line detail; §4h Defect & Task Register the third (v3.3), placed
+directly after Open Issues because a defect is an issue with a reproduction and a ticket
+number, and the two are read together. Once shipped, an insertion becomes part of the
+fixed order like everything else — "never reorder" governs from here forward, not
+retroactively.
 
 ### 4b. Risk register
 Issue = has happened. Risk = would hurt if it did. Never duplicate one as the other;
@@ -300,7 +383,74 @@ No seniority, role, or capacity/velocity math here — see §4e's sprint-plannin
 why capacity modelling is explicitly out of scope for this spec generally, not just for
 feedback rows. This section counts tasks per person per project. That's the whole job.
 
-## 5. Controls and the prompt protocol
+### 4h. Defect & Task Register — where numbered tickets live
+
+**Issue = a condition. Defect = a numbered, reproducible ticket against a specific
+version.** I8 "the shipping build was never synced" is an issue. "#183 table notes
+disappear when a Crisis is triggered, seen in v0.20" is a defect. Filing the second as
+the first loses the reproduction and the version; filing the first as the second invents
+a ticket number for something nobody can close.
+
+Before this section existed, a walkthrough that produced thirteen numbered tickets had
+nowhere in the tracker to put them, so they lived in whatever tool the session happened to
+use and stayed invisible to the dashboard. That is the gap this closes.
+
+**Fields**: `ref` (T1, T2… — tracker-native, unique programme-wide) · `externalRef` (the
+id in the system that actually holds the ticket — `#183`, `PROJ-412`, or blank if this
+tracker is the only home) · `title` (one line, what's wrong) · `severity`
+(`High`/`Med`/`Low`, the §2 vocabulary, no fourth word) · `mark` · `targetRef` (the module
+name or M/I/D ref it hits, blank if unattributed) · `foundIn` (the subject version it was
+observed in — the same version vocabulary as §3.6) · `fixedIn` (the version it was fixed
+in, blank while open) · `note` (reproduction, or what's blocking).
+
+**Mark** aliases the fixed marks the same way severity and §4f status do:
+`~ OPEN` (pending, the default) · `✓ FIXED` (pass) · `■ BLOCKED` (blocked) ·
+`✕ WONTFIX` (fail) · `– N/A` (na, e.g. not reproducible). Evidence-derived and read-only
+like everything except §4e's chip — `✓ FIXED` means a verified fix in a stated version,
+not a claim that someone believes it was addressed.
+
+**`foundIn` is what makes this section honest**, and it interlocks with §3.6: a defect
+found in a version *later* than `meta.evidenceBaseline` is evidence the baseline has moved
+and the module marks are provisional. A register full of `foundIn: v0.20` rows on a
+tracker baselined at `v0.6` is the mismatch banner arguing for itself. A `✓ FIXED` row
+whose `fixedIn` is newer than `evidenceBaseline` is degraded by §3.6 like any other pass.
+
+**Ref prefixes — one registry, programme-wide.** Refs are unique across every tracker in
+the programme, not just within a section, so a prompt line reading `I8 ✓` is unambiguous
+about which register it came from:
+
+| prefix | register |
+|---|---|
+| `M` | Milestones (§4d) |
+| `B` | Budget lines (§4c) |
+| `R` | Risks (§4b) |
+| `I` | Issues (§4, Open Issues) |
+| `D` | Decisions (queues) |
+| `AP` | Asset proofs (queues) |
+| `PG` | Platform / compliance gates (queues) |
+| `S` | Suggested activities (queues) |
+| `Q` | Open questions |
+| `E` | Epics and registered enhancements |
+| `T` | Defects and tasks (§4h) |
+| `F` | Feedback rows (§4e) |
+| `P` | Portfolio projects (§4f) |
+
+Two collisions are real, observed in a running programme, and named here rather than
+quietly resolved:
+
+- **`P` is also used for build phases** (`P3`, `P7`) by projects that adopted phase
+  numbering before a portfolio view existed. A tracker that needs both must prefix
+  portfolio projects `PR1`, `PR2` and say so in `meta`. Do not silently renumber the
+  phases — they are cited in changelogs and decision entries that cannot be edited.
+- **`E` covers both registered digital enhancements and backlog epics** in at least one
+  real programme. They are different things sharing a letter. Keep the ranges apart
+  (`E1`–`E9` enhancements, `E10`+ epics) or split to `EP` for epics, and record which
+  convention the programme picked.
+
+Neither is worth a migration on its own. Both are worth writing down, because the failure
+mode is a prompt line that two registers both think is theirs.
+
+---
 
 ## 5. Controls and the prompt protocol
 
@@ -438,7 +588,7 @@ your own lines.
 
 | skill | title | source JSON | a row is | `meta.checkNames` | sections that matter |
 |---|---|---|---|---|---|
-| cra-online-dev-tracker | Digital Dev Tracker | 05_TEAMS_APP_v0.6_SOURCE | an app module | TYP · UNI · GLD · MUL · SEC · PII | all (reference build) |
+| cra-online-dev-tracker | Digital Dev Tracker | ONLINE_DEV_TRACKER.json | an app module | TYP · UNI · GLD · MUL · SEC · PII | all (reference build) |
 | cra-design-tracker | Programme Tracker | DESIGN_TRACKER.json | a delivery line | CANON · DRAFT · REVIEW · QA · PRINT · SHIP | metrics, queues, risks, budget, milestones |
 | cra-card-design | Card Deck Tracker | card_data.py v6 | a card set | DATA · ART · TYPE · PROOF · WEBP · CANON | grid, proofs, issues |
 | cra-manual-design | Manual Registry | manual registry v6 | a manual / cheatsheet / supplement | COPY · LAYOUT · RULES QA · VERSION · PDF · REGISTERED | grid, decisions, milestones |
@@ -459,8 +609,14 @@ your own lines.
 | cra-collab-integrations | Surface Tracker | integration brief | a collaboration surface | SPEC · AUTH · BOT · PRIVACY · TEST · SHIPPED | grid, gates, risks |
 
 Fewer than six checks is fine — drop columns rather than invent gates nobody runs. Refs
-stay unique programme-wide (M/B/R/I/D/AP/PG prefixes). Gated skills show the gate, not a
-build grid pretending work is underway. cra-design-tracker's rows are the other trackers.
+stay unique programme-wide — the full prefix registry, and the two known collisions, are
+in §4h. Gated skills show the gate, not a build grid pretending work is underway.
+cra-design-tracker's rows are the other trackers.
+
+The `source JSON` column names one file per delivery line (§3.1). A source label naming a
+source *folder* or a build zip — `05_TEAMS_APP_v0.6_SOURCE` and the like — is the old
+pre-v3.0 habit and goes stale the moment that build is superseded; name the tracker file,
+and put the build version in `meta.evidenceBaseline` where §3.6 can act on it.
 
 ---
 
@@ -648,42 +804,6 @@ All of these sit inside the standard panel container, rows separated by
 
 ---
 
-## 12. Delivery — artifact, Publish/Share, and Cowork live artifacts
-
-Ship the dashboard as a real **artifact**, not a file handed over as a download — one
-self-contained `.html`, inline CSS/JS, no build step (already this spec's whole shape).
-That is what makes Publish/Share and an embed code possible at all.
-
-**Two sharing paths exist and are not interchangeable — verify current mechanics live
-before relying on this table, since plans and features change:**
-
-| | Regular artifact (any Claude chat) | Cowork live artifact |
-|---|---|---|
-| Data source | this spec's `fetch(TRACKER_SOURCE)` to a plain URL | Cowork's own connected-app layer (Slack, Linear, Drive…), refreshed by Cowork when opened |
-| Built where | any Claude.ai chat, Claude Code, or Cowork | inside a Cowork session on Claude Desktop only |
-| Sharing | Publish (Free/Pro/Max, public link) or Share (Team/Enterprise, org-internal) | Share only, Team/Enterprise only — unavailable on Pro/Max |
-| Runs in | any browser; no Claude account needed once published | Claude Desktop app only; viewer needs it installed |
-| **Embeddable on a website?** | **Yes** — "Get embed code" + an allowed-domains list | **No** — the share link opens in Desktop, not a browser embed |
-| Versioning | whatever this project's own tracker/log does | automatic, per Cowork session |
-| Portability | one file, works from `file://`, a repo, a Drive preview | local to the creator's machine; doesn't follow to another device |
-
-**If the actual goal is embedding on a website, the regular-artifact path is the one that
-does that.** Cowork live artifacts do not produce a web-embeddable output, full stop — so
-"build it as a Cowork artifact so it can be embedded" is not achievable as stated; the two
-halves of that request point at different features. Default to the regular-artifact path
-(this spec's existing model, Publish or Share, embed code) unless a request specifically
-needs Cowork's connector-refresh behaviour and is explicit about giving up website
-embedding and cross-device portability in exchange.
-
-**A genuine Cowork live artifact** has to be built inside an actual Cowork session on
-Claude Desktop, described in natural language with the connectors named up front ("a
-tracker pulling from Drive and Linear"). It cannot be produced by authoring a static HTML
-file outside Cowork and calling it one — the connector wiring and automatic versioning are
-Cowork's own infrastructure, not something `fetch(TRACKER_SOURCE)` replicates, and hand-
-authoring a file cannot retroactively grant it Cowork's refresh or sharing behaviour.
-
----
-
 ## 11. Conformance check before shipping a dashboard
 
 Compare against the reference at 1080px wide. All must be true:
@@ -728,3 +848,51 @@ Compare against the reference at 1080px wide. All must be true:
 - [ ] Portfolio Roster's `people`/`tasks` counts come from the People roster when one
       exists for that tracker instance, and from the row's own fields when it doesn't —
       never both at once for the same project
+- [ ] `meta.evidenceBaseline`, `meta.subjectVersion` and `meta.baselinedAt` are all
+      present; a tracker whose subject is itself sets baseline and subject equal rather
+      than omitting them
+- [ ] with `evidenceBaseline` ≠ `subjectVersion`, the `~ PROVISIONAL` banner renders, the
+      stamp carries the chip, and every `pass` mark degrades to the pending tint with the
+      `*` suffix — verify by editing one field and reloading, with no other change
+- [ ] the degrade rule leaves `pending`/`blocked`/`fail`/`na` marks visually untouched, and
+      advances nothing
+- [ ] Defect rows render with `externalRef`, `targetRef` and `fixedIn` blank without layout
+      breakage; an empty `defects` array omits the section per §3.4
+- [ ] every ref in the file matches the §4h prefix registry, and no two registers in the
+      programme issue the same ref
+
+---
+
+## 12. Delivery — artifact, Publish/Share, and Cowork live artifacts
+
+Ship the dashboard as a real **artifact**, not a file handed over as a download — one
+self-contained `.html`, inline CSS/JS, no build step (already this spec's whole shape).
+That is what makes Publish/Share and an embed code possible at all.
+
+**Two sharing paths exist and are not interchangeable — verify current mechanics live
+before relying on this table, since plans and features change:**
+
+| | Regular artifact (any Claude chat) | Cowork live artifact |
+|---|---|---|
+| Data source | this spec's `fetch(TRACKER_SOURCE)` to a plain URL | Cowork's own connected-app layer (Slack, Linear, Drive…), refreshed by Cowork when opened |
+| Built where | any Claude.ai chat, Claude Code, or Cowork | inside a Cowork session on Claude Desktop only |
+| Sharing | Publish (Free/Pro/Max, public link) or Share (Team/Enterprise, org-internal) | Share only, Team/Enterprise only — unavailable on Pro/Max |
+| Runs in | any browser; no Claude account needed once published | Claude Desktop app only; viewer needs it installed |
+| **Embeddable on a website?** | **Yes** — "Get embed code" + an allowed-domains list | **No** — the share link opens in Desktop, not a browser embed |
+| Versioning | whatever this project's own tracker/log does | automatic, per Cowork session |
+| Portability | one file, works from `file://`, a repo, a Drive preview | local to the creator's machine; doesn't follow to another device |
+
+**If the actual goal is embedding on a website, the regular-artifact path is the one that
+does that.** Cowork live artifacts do not produce a web-embeddable output, full stop — so
+"build it as a Cowork artifact so it can be embedded" is not achievable as stated; the two
+halves of that request point at different features. Default to the regular-artifact path
+(this spec's existing model, Publish or Share, embed code) unless a request specifically
+needs Cowork's connector-refresh behaviour and is explicit about giving up website
+embedding and cross-device portability in exchange.
+
+**A genuine Cowork live artifact** has to be built inside an actual Cowork session on
+Claude Desktop, described in natural language with the connectors named up front ("a
+tracker pulling from Drive and Linear"). It cannot be produced by authoring a static HTML
+file outside Cowork and calling it one — the connector wiring and automatic versioning are
+Cowork's own infrastructure, not something `fetch(TRACKER_SOURCE)` replicates, and hand-
+authoring a file cannot retroactively grant it Cowork's refresh or sharing behaviour.

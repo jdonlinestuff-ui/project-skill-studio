@@ -1,8 +1,9 @@
 # Dashboard contract — pointer
 
-**`DASHBOARD_SPEC.md` (v3.0) in this folder is the authority.** Read it, not this
+**`DASHBOARD_SPEC.md` (v3.3) in this folder is the authority.** Read it, not this
 file. This page exists only to record what changed and to stop anyone building
-from the superseded rules below.
+from the superseded rules below. The spec's own version history table records
+what each point release since v3.0 changed.
 
 Reference build: **`dashboard-reference.html`** — copy it, point `TRACKER_SOURCE`
 at the line's JSON, replace the `EMBEDDED` seed. Building from spec prose instead
@@ -46,10 +47,17 @@ announce itself — never by pretending baked data is current.
 Metric counts, budget totals and percentages are **derived at render, never
 stored**. A missing array omits its section; an empty array renders the heading
 with `— none —`, so the reader can tell empty from missing. An **issue** has
-happened; a **risk** would hurt if it did. Exactly one milestone is `next`, and a
-blocked row names what blocks it. Refs are unique project-wide: M, B, R, I, D.
-Placeholder numbers must say so in the note and raise a next action asking for
-the real ones.
+happened; a **risk** would hurt if it did; a **defect** is a numbered,
+reproducible ticket against a stated version (§4h). Exactly one milestone is
+`next`, and a blocked row names what blocks it. Refs are unique programme-wide
+against the §4h prefix registry. Placeholder numbers must say so in the note and
+raise a next action asking for the real ones.
+
+**Freshness is two axes, not one.** `generatedAt` says when the file was written;
+`evidenceBaseline` vs `subjectVersion` says whether what it claims is still about
+the thing that ships (§3.6). A tracker can be fresh on the first and wrong on the
+second, and that combination shows green everywhere unless the baseline pair is
+present.
 
 ## Prompt protocol
 
