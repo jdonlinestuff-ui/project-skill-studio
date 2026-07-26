@@ -37,17 +37,13 @@ Just describe your project and ask for a skill studio:
 
 > "Run project skill studio on my [project name] — [one-line description]."
 
-It will interview you (short selection prompts, not an essay), propose a roster for your confirmation, then build and package the suite.
-
-If you already have a studio pattern from another project, say so — it will search for and carry over conventions explicitly rather than starting from scratch.
-
 Refer to [How to use project‐skill‐studio](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/How-to-use--project%E2%80%90skill%E2%80%90studio)
 
 ## Sample dashboards
 
-Refer to the Wiki [Tracker Sample](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/Tracker-Shell-Samples)\
+Refer to the Wiki [The Tracker Dashboard is so MUCH more](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/The-Tracker-Dashboard-is-so-MUCH-more)
 
-ALso how to get the most out of your tracker dashboard [The Tracker Dashboard is so MUCH more](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/The-Tracker-Dashboard-is-so-MUCH-more)
+Some more samples [Tracker Sample](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/Tracker-Shell-Samples)\
 
 
 ## Structure
