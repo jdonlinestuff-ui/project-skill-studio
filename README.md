@@ -14,8 +14,6 @@ Point it at a project and it will:
 - **Scaffold trackers**: `SESSION_STATE.md`, `PROJECT_TRACKER.json`, a decision log, and (optionally) a plain black-and-white sync dashboard
 - **Bake in working rules** into every generated skill: canon discipline, decision logging with staleness propagation, modular re-authoring instead of rebuilds, proof gates on visual output, defensive tool-connection checks
 
-Refer to the [Wiki](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki)
-
 ## Install
 
 ### Claude.ai
@@ -37,27 +35,83 @@ Just describe your project and ask for a skill studio:
 
 > "Run project skill studio on my [project name] — [one-line description]."
 
-Refer to [How to use project‐skill‐studio](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/How-to-use--project%E2%80%90skill%E2%80%90studio)
+It will interview you (short selection prompts, not an essay), propose a roster for your confirmation, then build and package the suite.
+
+If you already have a studio pattern from another project, say so — it will search for and carry over conventions explicitly rather than starting from scratch.
 
 ## Sample dashboards
 
-Refer to the Wiki [The Tracker Dashboard is so MUCH more](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/The-Tracker-Dashboard-is-so-MUCH-more)
+Every dashboard the studio emits conforms to [`references/DASHBOARD_SPEC.md`](references/DASHBOARD_SPEC.md)
+(v3.0) — that file is the authority, not this README. Full worked samples, screenshots,
+and a regeneration script live in [`docs/samples/`](docs/samples); a ready-to-paste wiki
+page with the same material is in [`docs/wiki/`](docs/wiki).
 
-Some more samples [Tracker Sample](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/Tracker-Shell-Samples)\
+These are real screenshots of the actual [`references/dashboard-reference.html`](references/dashboard-reference.html)
+running its real code, in each of its four real schemes — not a separate mockup generator.
+An earlier SVG-based generator was retired for exactly that reason: it had its own scheme
+names that had already drifted from the reference build's real ones.
 
+**Feedback & Suggestions, across all four schemes** — a facilitator-recorded capture
+surface for live reviews, not a vote count:
+
+![Feedback section, Canon scheme](docs/samples/screenshots/feedback_canon.png)
+
+| Slate | Dark | Mono |
+|---|---|---|
+| ![Slate](docs/samples/screenshots/feedback_slate.png) | ![Dark](docs/samples/screenshots/feedback_dark.png) | ![Mono](docs/samples/screenshots/feedback_mono.png) |
+
+**Resource Tracker — a third archetype, same shell.** Portfolio-level status across every
+project, not one line's build detail — two more sections, same file:
+
+![Portfolio Roster](docs/samples/resource-tracker/resource_portfolio.png)
+
+What the samples demonstrate:
+
+- **Status marks** as glyph + word + tint — `✓ PASS`, `✕ FAIL`, `~ PEND`, `■ BLOCK`,
+  `– N/A` — never colour alone, so they survive greyscale and colour-blind reading.
+- **Two independent axes**, always. Build state (`INTEGRATED / TESTED / BUILDING /
+  PROTOTYPE`) is separate from the six per-check marks (`TYP UNI GLD MUL SEC PII`) on a
+  module row; project status is separate from a person's task count on a portfolio row.
+  A row can read TESTED while its checks still say PEND — that's the reason the axes split.
+- **Evidence beside every claim.** "golden files vs matrix: 2/3 tiers reproduce" rather
+  than a bare status. Absent evidence, an item is pending, not pass.
+- **Derived, never stored.** A person's task total, a project's people/task count when a
+  roster exists — computed at render from the underlying rows, never a separately typed
+  number that can drift from what it's supposed to describe.
+- **The trio on every actionable row** — `!` explain, `✓` proceed, `+` improve. Untouched
+  rows stay pending; there is no HOLD. Feedback rows carry one additional, deliberately
+  exceptional control: a clickable interest mark — the only status chip on the whole page
+  that isn't evidence-derived and read-only.
+- **The sync contract stated in the UI**: Claude cannot see edits made in the page, so
+  marks are compiled by CREATE PROMPT and pasted back into chat.
+
+Regenerate with `python3 docs/samples/shoot.py` (Playwright; screenshots the real
+reference build, four schemes) from the `docs/samples/` directory.
 
 ## Structure
 
 ```
 project-skill-studio/
 ├── SKILL.md                              # main workflow
-└── references/
-    ├── intake.md                         # intake question set
-    ├── session-state-template.md         # SESSION_STATE.md template
-    ├── tracker-schema.md                 # PROJECT_TRACKER.json schema
-    ├── generated-skill-template.md       # skeleton every generated skill follows
-    ├── working-rules.md                  # working-rule set embedded in generated skills
-    └── dashboard-standard.md             # dashboard spec + interaction standard
+├── references/
+│   ├── intake.md                         # intake question set
+│   ├── session-state-template.md         # SESSION_STATE.md template
+│   ├── tracker-schema.md                 # PROJECT_TRACKER.json schema
+│   ├── generated-skill-template.md       # skeleton every generated skill follows
+│   ├── working-rules.md                  # working-rule set embedded in generated skills
+│   ├── skill-baseline.md                 # work loop, MCP-first rule, new-skill checklist
+│   ├── canon-first-workflow.md           # search-canon-first sequence for generation requests
+│   ├── DASHBOARD_SPEC.md                 # the dashboard authority (v3.0)
+│   ├── dashboard-reference.html          # working live-fetch reference build — copy this
+│   ├── dashboard-standard.md             # pointer: what v3.0 changed from the retired v1.0 rules
+│   └── dashboard-sample-generator.py     # regenerates the four scheme mockups + contrast table
+└── docs/
+    ├── wiki/
+    │   └── Tracker-Shell-Samples.md      # ready to paste into a GitHub wiki
+    └── samples/
+        ├── shoot.py                       # Playwright screenshots of the real reference build
+        ├── screenshots/                   # Feedback & Suggestions, all four schemes
+        └── resource-tracker/              # full worked Resource Tracker example (JSON + HTML)
 ```
 
 ## Requires
