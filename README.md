@@ -11,8 +11,8 @@ Point it at a project and it will:
 - **Interview** the project (pulling from chat context, connected tools, and past sessions first — asking you only what it can't find)
 - **Design a skill roster**: one canon skill (locked sources of truth), one build skill per *active* delivery line, plus studio-ops skills (tracker, QA, etc.) — never speculative skills for platforms that aren't real yet
 - **Author and package** each skill as a `.skill` file, using Anthropic's `skill-creator`
-- **Scaffold trackers**: `SESSION_STATE.md`, `PROJECT_TRACKER.json`, a decision log, and (optionally) a plain black-and-white sync dashboard
-- **Bake in working rules** into every generated skill: canon discipline, decision logging with staleness propagation, modular re-authoring instead of rebuilds, proof gates on visual output, defensive tool-connection checks
+- **Scaffold trackers**: `SESSION_STATE.md`, one tracker JSON per delivery line, a decision log, and (optionally) a plain black-and-white sync dashboard per line
+- **Bake in working rules** into every generated skill: canon discipline, decision logging, evidence baselines that flag a tracker describing a build it no longer matches, modular re-authoring instead of rebuilds, proof gates on visual output, defensive tool-connection checks
 
 ## Install
 
@@ -42,7 +42,7 @@ If you already have a studio pattern from another project, say so — it will se
 ## Sample dashboards
 
 Every dashboard the studio emits conforms to [`references/DASHBOARD_SPEC.md`](references/DASHBOARD_SPEC.md)
-(v3.0) — that file is the authority, not this README. Full worked samples, screenshots,
+(v3.3) — that file is the authority, not this README. Full worked samples, screenshots,
 and a regeneration script live in [`docs/samples/`](docs/samples); a ready-to-paste wiki
 page with the same material is in [`docs/wiki/`](docs/wiki).
 
@@ -75,6 +75,10 @@ What the samples demonstrate:
   A row can read TESTED while its checks still say PEND — that's the reason the axes split.
 - **Evidence beside every claim.** "golden files vs matrix: 2/3 tiers reproduce" rather
   than a bare status. Absent evidence, an item is pending, not pass.
+- **A baseline, so freshness can't lie.** The tracker records the version its marks were
+  derived from next to the version now shipping. When they diverge, every pass goes
+  provisional and says why — otherwise a file rewritten this morning about a three-version-old
+  build shows green on every signal it has.
 - **Derived, never stored.** A person's task total, a project's people/task count when a
   roster exists — computed at render from the underlying rows, never a separately typed
   number that can drift from what it's supposed to describe.
@@ -96,12 +100,13 @@ project-skill-studio/
 ├── references/
 │   ├── intake.md                         # intake question set
 │   ├── session-state-template.md         # SESSION_STATE.md template
-│   ├── tracker-schema.md                 # PROJECT_TRACKER.json schema
+│   ├── memory-tiers.md                   # SESSION_STATE.md + optional 2nd/3rd tier, precedence rule
+│   ├── tracker-schema.md                 # per-line tracker JSON schemas + evidence baseline
 │   ├── generated-skill-template.md       # skeleton every generated skill follows
 │   ├── working-rules.md                  # working-rule set embedded in generated skills
 │   ├── skill-baseline.md                 # work loop, MCP-first rule, new-skill checklist
 │   ├── canon-first-workflow.md           # search-canon-first sequence for generation requests
-│   ├── DASHBOARD_SPEC.md                 # the dashboard authority (v3.0)
+│   ├── DASHBOARD_SPEC.md                 # the dashboard authority (v3.3)
 │   ├── dashboard-reference.html          # working live-fetch reference build — copy this
 │   ├── dashboard-standard.md             # pointer: what v3.0 changed from the retired v1.0 rules
 │   └── dashboard-sample-generator.py     # regenerates the four scheme mockups + contrast table

@@ -15,7 +15,9 @@ Goal: fill the profile with minimum owner burden. Order of evidence:
 **Canon**
 - Where does canon live? (Drive folder / git repo / local folder / "nowhere yet — create it")
 - What are the single sources of truth? (data files, style specs, scoring sheets, brand tokens)
-- Which of these are LOCKED (never change silently) vs DESIGN-CONTROLLED (change via logged decision with staleness flags)?
+- Which of these are LOCKED (never change silently) vs DESIGN-CONTROLLED (change via logged decision, with affected tracker rows re-marked and the decision id cited)?
+- Does a second memory tier already exist — a coding agent's project-memory file, a condensed per-line state file? If so, what does each own, and which wins on a version-specific fact? (`memory-tiers.md`)
+- What version vocabulary does each line's subject use (`v0.20`, `v6`, a date)? That becomes `evidenceBaseline` / `subjectVersion`.
 - Any values that are documented assumptions, not confirmed? → these become the studio's open-questions list
 
 **Lines**
@@ -23,7 +25,7 @@ Goal: fill the profile with minimum owner burden. Order of evidence:
 - Which are aspirational? → backlog with decision gates, not skills
 
 **Ops**
-- Tracker: always yes. Dashboard wanted? (default yes, black-on-white standard)
+- Tracker: always yes — one JSON per active delivery line, named for the line. Dashboard wanted? (default yes, black-on-white standard, one per line)
 - QA/review loop? Playtest/validation loop? Client engagement lifecycle? Tuning/balancing?
 
 **Tools**

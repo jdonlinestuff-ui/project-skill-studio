@@ -6,8 +6,10 @@
    Divergence between a derivative (e.g. digital version) and canon is either fixed
    or documented as an explicit additive enhancement.
 2. **Decision logging.** Anything design-controlled changes only via a dated
-   decision-log entry. The decision lists what it flags stale; the tracker
-   propagates staleness to dependents automatically.
+   decision-log entry. The decision names what it invalidates, and each affected
+   row is re-marked with the decision id cited in its evidence note. This is a
+   deliberate write, not an automatic cascade — an item is only re-marked by
+   someone who looked at it.
 3. **Modular design (build lines).** Every concept is an independently
    re-authorable module with its own contract and tests. Changes are re-authored
    and tested at module level — never whole-package rebuilds. Cross-module
@@ -28,11 +30,17 @@
    several versions stale while looking current. Before trusting a version
    number, verify it against the artefacts themselves, and treat any
    unsynced-source discovery as an issue to raise, not a detail to absorb.
-10. **Research live.** Platform/framework facts for a new target are verified by
+10. **Evidence baseline.** Every tracker records the version its marks were
+   derived from alongside the version now shipping. When they differ, passing
+   marks are provisional and the dashboard says so — a file rewritten today
+   about a build from three versions ago is fresh by date and wrong in fact.
+   Re-deriving requires real evidence; nothing advances on the assumption that
+   a newer version probably fixed it. See `DASHBOARD_SPEC.md` §3.6.
+11. **Research live.** Platform/framework facts for a new target are verified by
    live search at decision time, never from memory.
-11. **No floating questions.** Every open question has a Q id, an owner-facing
+12. **No floating questions.** Every open question has a Q id, an owner-facing
     flag, and a documented interim assumption. Session close leaves nothing untracked.
-12. **Canon-first generation.** Before generating any task, design, code, or
+13. **Canon-first generation.** Before generating any task, design, code, or
     documentation, search the project's connected canon store and treat what's
     found there as authoritative — never assume when canonical information
     exists. If assets conflict, surface the conflict rather than inventing a

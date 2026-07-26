@@ -13,13 +13,18 @@ description: <what it does> + pushy trigger contexts specific to this project
 - Canon root: <location + id>
 - Sources of truth: <files + ids>. Content flows FROM these THROUGH the pipeline.
   Never hand-type, duplicate, or invent canonical content.
+- This line's tracker: <LINE>_TRACKER.json at canon root — one JSON per delivery line.
+- Memory tiers: SESSION_STATE.md, plus <tier 2 / tier 3 files, or "none">. Precedence per
+  `memory-tiers.md`: most version-specific file wins for version-specific facts; the
+  locked-architecture tier wins for locked ones.
 - Locked: <list>. Design-controlled (change via logged decision only): <list>.
 - Open questions <Q ids>: flag, don't invent.
 
 ## Session loop
 - Open: read SESSION_STATE.md at canon root → resume the stated next step. No preamble.
-- Close / `/consolidate`: write decision-log entry → update SESSION_STATE.md and
-  PROJECT_TRACKER.json (statuses, stale flags, suite_version if skills changed).
+- Close / `/consolidate`: write decision-log entry → update SESSION_STATE.md and this
+  line's tracker JSON (statuses, evidence baseline, issues, suite_version if skills
+  changed). Bump `meta.revision` and append a `log` entry on every tracker write.
 
 ## Tool constraints
 <Project-discovered connector quirks, phrased defensively: if a tool isn't
