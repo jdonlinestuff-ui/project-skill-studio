@@ -14,6 +14,8 @@ Point it at a project and it will:
 - **Scaffold trackers**: `SESSION_STATE.md`, `PROJECT_TRACKER.json`, a decision log, and (optionally) a plain black-and-white sync dashboard
 - **Bake in working rules** into every generated skill: canon discipline, decision logging with staleness propagation, modular re-authoring instead of rebuilds, proof gates on visual output, defensive tool-connection checks
 
+Refer to the [Wiki](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki)
+
 ## Install
 
 ### Claude.ai
@@ -39,44 +41,14 @@ It will interview you (short selection prompts, not an essay), propose a roster 
 
 If you already have a studio pattern from another project, say so — it will search for and carry over conventions explicitly rather than starting from scratch.
 
+Refer to [How to use project‐skill‐studio](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/How-to-use--project%E2%80%90skill%E2%80%90studio)
+
 ## Sample dashboards
 
-Every dashboard the studio emits conforms to the Tracker Shell spec in
-[`references/dashboard-standard.md`](references/dashboard-standard.md). Four
-schemes ship; all four are verified to WCAG 2.1 AA numerically, not by eye.
+Refer to the Wiki [Tracker Sample](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/Tracker-Shell-Samples)\
 
-**Ink** — the default
-![Ink scheme](docs/samples/tracker-ink.svg)
+ALso how to get the most out of your tracker dashboard [The Tracker Dashboard is so MUCH more](https://github.com/jdonlinestuff-ui/project-skill-studio/wiki/The-Tracker-Dashboard-is-so-MUCH-more)
 
-**Parchment** — warm, lower glare for long sessions
-![Parchment scheme](docs/samples/tracker-parchment.svg)
-
-**Mono print** — hue-independent, survives greyscale printing
-![Mono print scheme](docs/samples/tracker-mono-print.svg)
-
-**Dark console**
-![Dark console scheme](docs/samples/tracker-dark-console.svg)
-
-What the samples demonstrate:
-
-- **Status marks** as glyph + label + tint — `✓ PASS`, `✕ FAIL`, `~ PEND`,
-  `■ BLOCK`, `– N/A` — never colour alone, so they survive greyscale and
-  colour-blind reading.
-- **Two independent axes.** Build state (`INTEGRATED / TESTED / BUILDING /
-  PROTOTYPE`) is separate from the six per-module checks (`TYP UNI GLD MUL SEC
-  PII`). A module can be TESTED while its checks still read PEND — that
-  combination is the reason the axes are split.
-- **Evidence beside every claim.** "golden files vs matrix: 2/3 tiers reproduce"
-  rather than a bare status. Absent evidence, an item is pending, not pass.
-- **The trio on every actionable row** — `!` explain, `✓` proceed, `+` improve.
-  Untouched rows stay pending; there is no HOLD.
-- **The sync contract stated in the UI**: Claude cannot see edits made in the
-  page, so marks are compiled by CREATE PROMPT and pasted back into chat.
-
-Regenerate with [`docs/samples/`](docs/samples) via
-`references/dashboard-sample-generator.py`. The generator asserts the AA
-threshold and refuses to emit a scheme whose worst pair falls below 4.5:1 —
-it caught the dark scheme's N/A mark at 4.07 on the first run.
 
 ## Structure
 
