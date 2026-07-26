@@ -2,6 +2,96 @@
 
 All notable changes to this skill are documented here.
 
+## [1.9.0] - 2026-07-26
+
+Reconciliation release. The pattern was checked against the reference programme it was
+generalised from — two real trackers, the real dashboard shell, the real memory files —
+and the docs were corrected to match what that programme actually runs. Where the repo and
+production disagreed, production was treated as the validated party.
+
+**Changed — one tracker per delivery line**
+- Retired the single `PROJECT_TRACKER.json` mandate. A studio keeps **one tracker JSON per
+  delivery line** (`DESIGN_TRACKER.json`, `ONLINE_DEV_TRACKER.json`, …), which is what
+  `DASHBOARD_SPEC.md` §3.1 has specified since v3.0 and what the reference programme has
+  always done. `SKILL.md`, `tracker-schema.md` and `generated-skill-template.md` said
+  otherwise and now don't; the spec needed no change.
+- `tracker-schema.md` rewritten against the two shapes actually in production: the
+  **line tracker** (positional arrays, feeds the dashboard directly) and the **programme
+  tracker** (object-keyed — `canon_versions`, `pipeline`, `assets`, `teams_app`,
+  `open_questions`, `decisions_required`, `suggested_activities`, `expansions`,
+  `digital{}`, `digital_enhancements`, `backlog_epics`, `superseded_skills`).
+- Retired with it: `items[]`, `depends_on`, `lines[]`, `backlog[]` and automatic staleness
+  propagation. Nothing ever used them. Working rule 2 now describes what real trackers do
+  — a decision names what it invalidates and affected rows are re-marked deliberately, by
+  someone who looked at them, rather than by a declared dependency cascade.
+- `suite_version` is recorded once, in the programme tracker, not per line.
+
+**Added — evidence baseline (`DASHBOARD_SPEC.md` §3.6)**
+- `meta.evidenceBaseline` / `meta.subjectVersion` / `meta.baselinedAt`: the version the
+  marks were derived from, the version now shipping, and when the baseline was last taken.
+- The degrade rule: on mismatch, a `~ PROVISIONAL` banner renders, the stamp carries the
+  chip alongside any `~ STALE`, and every `pass` in the Module Grid degrades to the pending
+  tint with a `*` suffix and a footnote naming both versions. `pending`/`blocked`/`fail`/`na`
+  are untouched — degrading applies only to claims of success — and the rule never advances
+  a mark or guesses what the newer version does.
+- This closes the gap that made a stale dashboard invisible: `generatedAt` measures when the
+  file was written, not whether what it says is still true, so a tracker rewritten this
+  morning about a build from three versions ago reads green on every existing signal. New
+  working rule 10 states the same thing for generated skills.
+
+**Added — Defect & Task Register (`DASHBOARD_SPEC.md` §4h)**
+- Numbered, reproducible tickets now have a home in the tracker instead of living in
+  whatever tool the session happened to use and staying invisible to the dashboard.
+  Fields: `ref` · `externalRef` (the id in the system that actually holds the ticket) ·
+  `title` · `severity` · `mark` (`~ OPEN` / `✓ FIXED` / `■ BLOCKED` / `✕ WONTFIX` / `– N/A`,
+  aliasing the fixed marks as §4e and §4f already do) · `targetRef` · `foundIn` · `fixedIn` ·
+  `note`.
+- `foundIn` interlocks with §3.6: defects found in a version later than `evidenceBaseline`
+  are evidence the baseline has moved, and a `✓ FIXED` row is degraded like any other pass.
+- **Issue vs defect stated plainly**: an issue is a condition ("the build was never synced"),
+  a defect is a numbered ticket against a version ("#183 notes disappear on Crisis, v0.20").
+- **One programme-wide ref-prefix registry**: M · B · R · I · D · AP · PG · S · Q · E · T ·
+  F · P. Two real collisions are documented rather than silently resolved — `P` is also used
+  for build phases by projects that numbered phases before a portfolio view existed, and `E`
+  covers both registered enhancements and backlog epics. Both get a stated convention
+  instead of a migration that would break refs already cited in changelogs.
+- Section order 16 → 17, inserted after Open Issues; the insertion record in §4 now names
+  all three one-time insertions and why each landed where it did.
+
+**Added — memory tiers (`references/memory-tiers.md`)**
+- Documents the second and third memory tier that real projects grow — a coding agent's
+  project-memory file (conventionally `CLAUDE.md`) and a condensed per-line state file
+  (e.g. `PROJECT_STATE.md`) — instead of pretending `SESSION_STATE.md` is always alone.
+  One tier stays the default; a tier is added when a real second reader exists.
+- **Precedence rule**: for version-specific facts, the most version-specific file wins
+  (tier 3 → 1 → 2); for locked facts the order inverts and the locked-architecture tier
+  wins, with any state file contradicting it reporting a drift rather than a change.
+  Session open still reads `SESSION_STATE.md` first — it holds the next step.
+- Four rules that keep tiers honest: every tier names the others and states the precedence
+  rule; knowingly-superseded content carries a supersession header above it; no tier
+  duplicates another's owned fact; one copy of each tier file.
+- `session-state-template.md` reconciled with the sections a real one carries — canonical
+  sources (one file per line, with ids and connector quirks), decisions awaiting owner,
+  an issues register with severity, housekeeping for superseded files. The unused "Stale
+  items" section is gone.
+
+**Fixed — spec defects found during the reconciliation**
+- Version label: the file was titled v3.0 while §4 cited "v3.2". Now titled **v3.3**, with
+  a version-history table stating what v3.0/3.1/3.2/3.3 each changed, so no section has to
+  guess again.
+- Duplicate `## 5. Controls and the prompt protocol` heading removed (it appeared twice,
+  consecutively).
+- §12 Delivery physically preceded §11 Conformance. Conformance now comes first, matching
+  its numbering and the actual order of work — check before ship, then ship.
+- §3.3's documented payload omitted four fields the reference build reads or ships:
+  `checkAbbr`, `eyebrow`, `baselinedAt`, `maintainer`. All four are now documented.
+- §8.1's example row cited `05_TEAMS_APP_v0.6_SOURCE` — a build folder three versions stale.
+  Example rows and both reference builds now name the tracker file; a new note explains why
+  a `sourceLabel` naming a build folder is the pre-v3.0 habit and where the build version
+  belongs instead (`meta.evidenceBaseline`, where §3.6 can act on it).
+- Six conformance-checklist items added for the baseline pair, the degrade rule, defect-row
+  rendering and ref-prefix uniqueness.
+
 ## [1.8.0] - 2026-07-26
 
 New tracker archetype: **Resource Tracker** — portfolio-level status across every project, not one line's build detail. Same shell, same file, no parallel system: two new optional sections, populated by a different JSON shape, everything else absent per the existing omission rule.
