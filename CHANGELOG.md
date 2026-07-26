@@ -2,6 +2,30 @@
 
 All notable changes to this skill are documented here.
 
+## [1.4.0] - 2026-07-26
+
+Absorbs the owner's `status-dashboard` skill. **`references/DASHBOARD_SPEC.md` (v3.0) is now the dashboard authority** and supersedes the Tracker Shell v1.0 rules.
+
+**Changed — a deliberate reversal**
+- **Static bake is out; live fetch is in.** v1.0 mandated that dashboards bake their content into the HTML and render with JavaScript disabled. v3.0 inverts this: a dashboard is a **view over a JSON source**, fetched at run time with `{cache:'no-store'}`, because the moment a status is typed into markup it starts lying and nobody can tell how stale it is. Offline use is served by an `EMBEDDED` snapshot that must announce itself with a banner and a `SNAPSHOT` stamp — never by presenting baked data as current.
+- Default surface is black on **cream**, not white.
+- Type is pinned to **six px sizes**, and every `font:` shorthand must end with a family — a family-less shorthand is invalid CSS that silently renders at 16px, the single biggest cause of drift.
+- `dashboard-standard.md` reduced to a pointer recording the supersession and the v1.0→v3.0 delta, so nobody builds from the retired rules.
+- `tracker-shell-reference.html` **removed** — it was a plain-HTML approximation with no load layer, superseded by the real reference build.
+
+**Fixed — the upstream reference was not spec-conformant**
+- The shipped v7 reference had `const DATA={…}` baked in and **no** `TRACKER_SOURCE`, `fetch`, `EMBEDDED` or `SNAPSHOT` anywhere; `forceRefresh()` faked a refresh with a 700ms `setTimeout` and re-stamped without a network call. It violated rule #1 of the skill it shipped inside. Retrofitted to full §3.2 conformance: real fetch, `EMBEDDED` fallback, snapshot banner, honest stamp stating both fetch time and `meta.generatedAt` with revision, `~ STALE` chip past 7 days, banner past 30, and a real in-flight `↻ REFRESHING…` state.
+- **Partial payloads crashed the reference.** Live fetch of any JSON missing a section threw `undefined.length` — a defect invisible while data was baked in, and a direct violation of §3.4. Added normalisation: an absent array omits its section, an empty array renders `— none —`, so render never sees undefined and the reader can tell empty from missing.
+- **Check columns were hardcoded in markup.** `meta.checkNames` could not drive them, so a line with different checks rendered under another line's abbreviations. Now driven by `meta.checkAbbr` with a three-letter fallback derivation.
+- The reference also hardcoded one project's CREATE PROMPT copy (source filename, check names, canon terminology); now derived from `meta`.
+- `meta` now drives title, eyebrow, source label, check names and currency, so a second line needs a new JSON file rather than a new HTML file.
+- The CREATE PROMPT block now names the revision being viewed, per §5, so a write can be re-based if the source moved on.
+- Verified by execution, not inspection: syntax-checked, then all four load paths exercised under a DOM shim — offline snapshot, fresh live fetch, 7–30 day chip, and >30 day stale banner.
+- Sample mockup footers said "swap the DATA block only", which taught the superseded model; now "live view over its JSON source · swap TRACKER_SOURCE, not the data".
+
+**Known inconsistency, carried not hidden**
+- The upstream skill body names the source constant `DASHBOARD_SOURCE`; spec §3.2 names it `TRACKER_SOURCE`. The reference defines `TRACKER_SOURCE` and aliases `DASHBOARD_SOURCE`, so either works. Pick one per project.
+
 ## [1.3.1] - 2026-07-25
 
 **Added**
