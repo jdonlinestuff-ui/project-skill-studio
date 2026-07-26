@@ -11,7 +11,7 @@ Point it at a project and it will:
 - **Interview** the project (pulling from chat context, connected tools, and past sessions first — asking you only what it can't find)
 - **Design a skill roster**: one canon skill (locked sources of truth), one build skill per *active* delivery line, plus studio-ops skills (tracker, QA, etc.) — never speculative skills for platforms that aren't real yet
 - **Author and package** each skill as a `.skill` file, using Anthropic's `skill-creator`
-- **Scaffold trackers**: `SESSION_STATE.md`, one tracker JSON per delivery line, a decision log, and (optionally) a plain black-and-white sync dashboard per line
+- **Scaffold trackers**: `SESSION_STATE.md`, one tracker JSON per delivery line, a decision log, and **a set of three dashboards** over them — Skill builder, Facilitator, Resources — then ask, per surface, whether you want any of them hosted as live artifacts (files by default; hosting is a real choice, not an assumption)
 - **Bake in working rules** into every generated skill: canon discipline, decision logging, evidence baselines that flag a tracker describing a build it no longer matches, modular re-authoring instead of rebuilds, proof gates on visual output, defensive tool-connection checks
 
 ## Install
@@ -40,6 +40,11 @@ It will interview you (short selection prompts, not an essay), propose a roster 
 If you already have a studio pattern from another project, say so — it will search for and carry over conventions explicitly rather than starting from scratch.
 
 ## Sample dashboards
+
+A run emits three surfaces — **Skill builder**, **Facilitator** and **Resources**
+([`references/dashboard-set.md`](references/dashboard-set.md)). The samples below are the
+full tracker shell, which the Skill builder uses; the other two are read-only derived views
+over the same trackers, exempt from the shell's controls but bound by its honesty rules.
 
 Every dashboard the studio emits conforms to [`references/DASHBOARD_SPEC.md`](references/DASHBOARD_SPEC.md)
 (v3.3) — that file is the authority, not this README. Full worked samples, screenshots,
@@ -102,6 +107,7 @@ project-skill-studio/
 │   ├── session-state-template.md         # SESSION_STATE.md template
 │   ├── memory-tiers.md                   # SESSION_STATE.md + optional 2nd/3rd tier, precedence rule
 │   ├── tracker-schema.md                 # per-line tracker JSON schemas + evidence baseline
+│   ├── dashboard-set.md                  # the three surfaces + the live-artifact consent step
 │   ├── generated-skill-template.md       # skeleton every generated skill follows
 │   ├── working-rules.md                  # working-rule set embedded in generated skills
 │   ├── skill-baseline.md                 # work loop, MCP-first rule, new-skill checklist

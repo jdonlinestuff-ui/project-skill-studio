@@ -896,3 +896,30 @@ tracker pulling from Drive and Linear"). It cannot be produced by authoring a st
 file outside Cowork and calling it one — the connector wiring and automatic versioning are
 Cowork's own infrastructure, not something `fetch(TRACKER_SOURCE)` replicates, and hand-
 authoring a file cannot retroactively grant it Cowork's refresh or sharing behaviour.
+
+**Hosting is a decision the owner makes, not a default.** A studio run emits three
+surfaces (`dashboard-set.md`) and asks per surface whether to host. Hosting exposes the
+page's contents to whoever holds the link and opens the §5 write-back channel — still
+manual, still prompted, still explicitly approved before any write, but newly available.
+Ask, record the answer as a logged decision, and take "no" as complete.
+
+---
+
+## 13. Derived views — the read-only surfaces
+
+Two of the three surfaces in `dashboard-set.md` — Facilitator and Resources — are
+**read-only derived views**. They render tracker data for a specific audience and have no
+write-back loop, so the machinery that serves that loop does not apply to them.
+
+**Exempt**: the action trio (§10.7), CREATE PROMPT and the prompt protocol (§5), the
+scheme switcher (§10.5), the sticky control bar (§10.4), the module-grid geometry (§10.8).
+
+**Binding, without exception**: the status vocabulary and glyph+word+tint rule (§2);
+evidence discipline and derived-never-stored (§3.5); the freshness stamp and evidence
+baseline (§3.4, §3.6), including saying `Not live-synced` in words when the surface is a
+snapshot; and the print rules — a facilitator surface is printed or held on a second
+screen more often than any other page this spec produces.
+
+A derived view may use a simpler visual system than the shell, since it carries none of
+the shell's controls. It may not use a simpler standard of truth. Dropping the controls
+makes it a briefing card; dropping the honesty rules makes it a poster.

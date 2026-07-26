@@ -25,7 +25,9 @@ Goal: fill the profile with minimum owner burden. Order of evidence:
 - Which are aspirational? → backlog with decision gates, not skills
 
 **Ops**
-- Tracker: always yes — one JSON per active delivery line, named for the line. Dashboard wanted? (default yes, black-on-white standard, one per line)
+- Tracker: always yes — one JSON per active delivery line, named for the line.
+- Dashboards: the standard set is three (Skill builder, Facilitator, Resources — see `dashboard-set.md`). Confirm the set, and ask what the project's *live operation* actually is, since that's what the Facilitator surface describes (a workshop, a session, a production run, a release procedure — or none, in which case say so and drop it).
+- Hosting: ask separately, after the set is built, per surface. Never assume — it exposes the pages by link and opens the write-back channel. Default is files.
 - QA/review loop? Playtest/validation loop? Client engagement lifecycle? Tuning/balancing?
 
 **Tools**

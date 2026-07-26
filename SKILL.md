@@ -1,6 +1,6 @@
 ---
 name: project-skill-studio
-description: Bootstrap and maintain a complete Claude skill suite for ANY project — a generic "skill studio" that interviews the project, identifies its canonical sources of truth, designs a skill roster (canon skill + one build skill per active delivery line + studio-ops skills), authors and packages the .skill files, and installs the tracking discipline (SESSION_STATE.md, one tracker JSON per delivery line, decision log, black-on-white HTML dashboard with Create-prompt sync). Use whenever the user wants to create a skill suite for a project, "skill up" a project, make their project repeatable/consistent, enforce canon compliance across sessions, add project trackers, or says things like "project skill studio", "build skills for this project", "make this project a studio", or wants to clone the pattern used on a previous project onto a new one.
+description: Bootstrap and maintain a complete Claude skill suite for ANY project — a generic "skill studio" that interviews the project, identifies its canonical sources of truth, designs a skill roster (canon skill + one build skill per active delivery line + studio-ops skills), authors and packages the .skill files, and installs the tracking discipline (SESSION_STATE.md, one tracker JSON per delivery line, decision log, and a set of three dashboards — skills-creation, facilitator and resources — with Create-prompt sync and an explicit ask before anything is hosted as a live artifact). Use whenever the user wants to create a skill suite for a project, "skill up" a project, make their project repeatable/consistent, enforce canon compliance across sessions, add project trackers, or says things like "project skill studio", "build skills for this project", "make this project a studio", or wants to clone the pattern used on a previous project onto a new one.
 ---
 
 # Project Skill Studio
@@ -19,7 +19,7 @@ Every studio has four parts:
    - **Line skills** (one per *active* delivery line): build/production skills for each real workstream (e.g. print production, a Teams app, a marketing line). Never create a line skill for a platform that isn't in scope yet — that is scope drift.
    - **Studio-ops skills**: tracker, QA/review, playtesting/validation, client engagement — whatever cross-cutting operations the project actually runs.
    Large classes get an **orchestrator skill** that routes to the class members.
-3. **Trackers** — `SESSION_STATE.md` (where are we, what's next), **one tracker JSON per delivery line** (`DESIGN_TRACKER.json`, `ONLINE_DEV_TRACKER.json`, …), a decision log folder, and optionally an HTML dashboard per line. Optionally a second memory tier (`memory-tiers.md`) where a coding agent reads a different file from the design sessions.
+3. **Trackers** — `SESSION_STATE.md` (where are we, what's next), **one tracker JSON per delivery line** (`DESIGN_TRACKER.json`, `ONLINE_DEV_TRACKER.json`, …), a decision log folder, and **a set of three dashboards** over them (`dashboard-set.md`): Skill builder, Facilitator, Resources. Optionally a second memory tier (`memory-tiers.md`) where a coding agent reads a different file from the design sessions.
 4. **Working rules** — canon discipline, decision logging, evidence baselines, proof gates. Baked into every generated skill, not documented separately.
 
 ## Workflow
@@ -89,9 +89,35 @@ packaged file for the owner to save.
 
 Keep each generated SKILL.md under ~500 lines; push bulk detail into that skill's own `references/`.
 
-### Phase 4 — Tracker dashboard (optional but standard)
+### Phase 4 — The dashboard set (three surfaces, standard)
 
-Build it to **`references/DASHBOARD_SPEC.md` (v3.3)** — that file is the authority.
+A studio run emits **three dashboards, not one** — three audiences reading the same
+trackers. `references/dashboard-set.md` is the authority on what each contains and
+what the two derived surfaces are exempt from; build in this order:
+
+1. **Skill builder** (skills-creation) — the full tracker shell, rows are the studio's
+   own skills: roster, class, install state, staleness verdict. Existing behaviour.
+2. **Facilitator** — the live-operation briefing: operating sequence, the rules people
+   look up mid-session, exception reference, actions available, and **today's open
+   defects filtered from the register** (§4h) at the current `subjectVersion`.
+3. **Resources** — orientation: what exists by line with versions and state, version
+   skew called out, the tracker/dashboard inventory including retired ones, open
+   decisions, and where canon and the memory tiers live.
+
+Surfaces 2 and 3 are **read-only derived views** (spec §13): no trio, no CREATE PROMPT,
+no scheme switcher, no module grid — but the status vocabulary, evidence discipline,
+derived-never-stored, freshness stamp, evidence baseline and print rules all still bind.
+Dropping the controls makes it a briefing card; dropping the honesty rules makes it a
+poster. All three regenerate from the trackers; none is ever hand-edited to fix a fact.
+
+**Then ask about hosting — do not assume it.** Delivered as files the set is inert.
+Hosted as live artifacts, the pages become reachable by whoever holds the link and the
+§5 write-back channel opens: still manual, still prompted, still explicitly approved
+before any write, but newly available. Ask per surface (a project may want Resources
+shared and Facilitator local), record the answer as a logged decision, and treat "no"
+as a complete answer. Full wording and rationale in `dashboard-set.md`.
+
+Build the shell to **`references/DASHBOARD_SPEC.md` (v3.3)** — that file is the authority.
 Copy `references/dashboard-reference.html`, point `TRACKER_SOURCE` at the line's
 JSON, replace the `EMBEDDED` seed. Copying the reference is faster and far more
 accurate than building from the spec text.
@@ -184,7 +210,8 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/skill-baseline.md` — work loop, MCP-first rule, five-point new-skill checklist, install boundary
 - `references/canon-first-workflow.md` — the mandatory search-canon-first sequence for generation requests; task-orchestrator and the project's own skills as the two checks before acting
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
-- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.3): data contract and load modes, evidence baseline, status marks, defect register and ref-prefix registry, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist
+- `references/dashboard-set.md` — the three surfaces a run emits (Skill builder, Facilitator, Resources), what each derives, the read-only carve-out, and the live-artifact consent step
+- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.3): data contract and load modes, evidence baseline, status marks, defect register and ref-prefix registry, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist, derived-view rules
 - `references/dashboard-reference.html` — the working live-fetch build: copy this, don't build from prose
 - `references/dashboard-standard.md` — pointer + record of what v3.0 changed from the superseded static-bake rules
 - `references/dashboard-sample-generator.py` — regenerates the four scheme mockups and prints the WCAG contrast table

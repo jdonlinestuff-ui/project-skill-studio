@@ -2,6 +2,62 @@
 
 All notable changes to this skill are documented here.
 
+## [1.10.0] - 2026-07-27
+
+A standard run now emits **three dashboards, not one**, and asks before hosting any of
+them. Generalised from the reference programme, which had already built exactly this set
+by hand — a skills-creation dashboard plus separate Facilitator and Resources surfaces —
+and retired its earlier per-line dashboards in the process.
+
+**Added — the dashboard set (`references/dashboard-set.md`)**
+- **Skill builder** (existing behaviour, unchanged): the full tracker shell, rows are the
+  studio's own skills — roster, class, install state, staleness verdict.
+- **Facilitator**: the live-operation briefing. Operating sequence, the rules people look
+  up mid-session, exception reference, actions available to the operator, and **today's
+  open defects filtered from the §4h register** at the current `subjectVersion`. This
+  panel is why the defect register and this surface ship together — a numbered ticket
+  nobody can see during the session it affects may as well not exist.
+- **Resources**: orientation. What exists by line with versions and state, version skew
+  called out, the tracker and dashboard inventory including retired ones, open decisions,
+  and where canon and the memory tiers live. The one page that answers "where do I start".
+- Build order is Skill builder → Facilitator → Resources: the surface that tracks the
+  studio's own growth exists before the ones describing the work.
+- All three regenerate from the trackers. Editing a dashboard to correct a fact is the
+  failure the whole discipline exists to prevent — fix the tracker, re-emit.
+
+**Added — derived views (`DASHBOARD_SPEC.md` §13)**
+- Facilitator and Resources are read-only derived views, **exempt** from the machinery
+  that serves the write-back loop: the action trio, CREATE PROMPT and the prompt protocol,
+  the scheme switcher, the sticky control bar, the module-grid geometry.
+- **Binding without exception**: status vocabulary and the glyph+word+tint rule, evidence
+  discipline, derived-never-stored, the freshness stamp and evidence baseline — including
+  saying `Not live-synced` in words when the surface is a snapshot — and the print rules,
+  since a facilitator surface is printed or held on a second screen more than any other
+  page this spec produces.
+- Stated plainly: dropping the controls makes it a briefing card; dropping the honesty
+  rules makes it a poster.
+
+**Added — the live-artifact consent step**
+- Hosting is now an explicit question asked after the set is built, **per surface** (a
+  project may well want Resources shared and Facilitator kept local), with the answer
+  recorded as a logged decision.
+- The question states the three consequences rather than selling the feature: the page
+  becomes reachable by whoever holds the link and its contents leave the owner's storage;
+  the §5 write-back channel opens — still manual, still prompted, still explicitly
+  approved before any write, but newly available where it was not; and a hosted page that
+  stops being re-emitted is a stale page with a URL, which travels further and is trusted
+  more than a stale file on a disk.
+- Files are the default. "No" is a complete answer and gets no follow-up pitch.
+- `DASHBOARD_SPEC.md` §12 continues to govern *how* to host if the answer is yes.
+
+**Changed**
+- `SKILL.md` Phase 4 rewritten from "tracker dashboard (optional but standard)" to the
+  three-surface set plus the hosting ask; core model, frontmatter description and the
+  references list updated to match.
+- `intake.md` now asks what the project's *live operation* actually is, since that is what
+  the Facilitator surface describes — and says to drop that surface, explicitly, for a
+  project that has no live operation rather than inventing one.
+
 ## [1.9.0] - 2026-07-26
 
 Reconciliation release. The pattern was checked against the reference programme it was
