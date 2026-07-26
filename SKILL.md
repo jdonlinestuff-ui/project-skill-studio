@@ -81,41 +81,50 @@ Keep each generated SKILL.md under ~500 lines; push bulk detail into that skill'
 
 ### Phase 4 — Tracker dashboard (optional but standard)
 
-If the user wants a dashboard, build it to the **Tracker Shell spec v1.0** in
-`references/dashboard-standard.md`. Conformance is enforced at skill creation:
-any skill that emits a non-conforming dashboard fails creation review. The shell
-is **data-driven — swap the DATA block only**; a project's own shell is the
-authoritative copy-from source and this skill's
-`references/tracker-shell-reference.html` is a plain-HTML approximation for
-projects with no component runtime. The non-negotiables:
+Build it to **`references/DASHBOARD_SPEC.md` (v3.0)** — that file is the authority.
+Copy `references/dashboard-reference.html`, point `TRACKER_SOURCE` at the line's
+JSON, replace the `EMBEDDED` seed. Copying the reference is faster and far more
+accurate than building from the spec text.
 
-- **Static bake, mobile-first** — all content baked into the HTML so the page
-  renders with JS disabled; JS is enhancement only. 44px touch targets.
-- **Fixed status vocabulary** — `✓ PASS` / `✕ FAIL` / `~ PEND` / `■ BLOCK` /
-  `– N/A`, each as glyph + label + tint, never colour alone. Labels are
-  abbreviated so a mark fits a narrow grid cell. Domain labels alias these; the
-  set is not extended.
-- **Badge axis = build state** (`INTEGRATED / TESTED / BUILDING / PROTOTYPE`,
-  plus `PROPOSED / OPEN` for queues), on its own axis from the checks. A row can
-  read TESTED while its checks still say PEND — that is the point of splitting
-  them. Versions render as muted mono text, never as a status colour.
+**A dashboard is a VIEW over a source, never a copy.** The HTML holds no status
+data. It fetches the JSON at run time and renders whatever it finds — because the
+moment a status is typed into markup it starts lying and nobody can tell how stale
+it is. Three load modes (spec §3.2): live fetch with `{cache:'no-store'}` by
+default; Claude re-issue for anything structural, since a browser fetch can only
+re-render what the JSON already says; and an `EMBEDDED` snapshot that keeps the
+file usable offline and **must announce itself** with a full-width banner and a
+`SNAPSHOT` stamp. Never render snapshot data as if it were live.
+
+The non-negotiables — these are what drift:
+
+- **px sizes only, and every `font:` shorthand ends with a family.** A family-less
+  shorthand is invalid CSS and silently renders at 16px; it is the single biggest
+  cause of drift. Six sizes total, 12px for anything containing words.
+- **Status marks** `✓ PASS` / `~ PEND` / `✕ FAIL` / `■ BLOCK` / `– N/A` as glyph +
+  word + tint, 24px tall. The word is what survives greyscale and colour-blindness.
+- **Badge axis = build state** (`INTEGRATED / TESTED / BUILDING / PROTOTYPE`, plus
+  `PROPOSED / OPEN` for queues), separate from the checks. A row can read TESTED
+  while its checks say PEND — that is the point of splitting them.
 - **Six checks** on build lines: `TYP UNI GLD MUL SEC PII`.
-- **Trio per item**: `!` EXPLAIN · `✓` PROCEED · `+` IMPROVE. Untouched stays
-  pending; no HOLD action exists.
-- **Five bar flags**: CREATE PROMPT (primary, the single sync action), RESET,
-  REFRESH BUILD, CANON SYNC, REFRESH DATA. Never separate Save/Export buttons
-  duplicating CREATE PROMPT.
-- **Fixed section order** and three typography slots (display serif / UI sans /
-  mono for evidence), plus an in-page scheme switcher layered over the baked
-  default.
-- **Evidence discipline** — every non-pending status carries a string saying what
-  was actually run. Absent evidence, an item is pending, not pass.
-- **Four colour schemes** (Ink default, Parchment, Mono HC, Slate dark), all
-  verified to WCAG AA numerically rather than by eye. Run
-  `references/dashboard-sample-generator.py` after changing any token.
-- **Print-safe** — every control carries `noprint` and is hidden under
-  `@media print`, so the page prints as a clean status report.
-- The dashboard is regenerated from the tracker JSON — the JSON is truth.
+- **Action buttons**: 30px circles, three per actionable row — `!` EXPLAIN,
+  `✓` PROCEED, `+` IMPROVE. Selected inverts to a solid ink fill; one selection
+  per row; tapping again clears. IMPROVE opens a full-width field.
+- **Five bar flags**: CREATE PROMPT (the single sync action), RESET, REFRESH
+  BUILD, CANON SYNC, ↻ REFRESH DATA. Never a separate Save/Export.
+- **Four schemes** as swatch buttons, never a `<select>`; selection in state, not
+  the DOM. Radii 4/3/2/50%, never 8px.
+- **Freshness is visible**: stamp states both fetch time and `meta.generatedAt`
+  with revision; `generatedAt` over 7 days adds a `~ STALE` chip, over 30 days
+  escalates to the banner.
+- **Evidence discipline**: `pending` is the default and no note means no claim.
+  Never mark `pass` on code review, intent, or "it should work".
+- **Derived, never stored**: metric counts, totals and percentages computed at
+  render. Absent array omits its section; empty array renders `— none —`, so the
+  reader can tell empty from missing.
+- **Print is a first-class output** — controls carry `noprint`, and the page must
+  paginate cleanly and stay legible in greyscale.
+- One file, no dependencies: inline CSS and script, no build step, opens from
+  `file://`, a Drive preview, or an artefact viewer.
 
 ### Phase 5 — Package, version, deliver
 
@@ -143,6 +152,7 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/generated-skill-template.md` — skeleton every generated skill follows
 - `references/skill-baseline.md` — work loop, MCP-first rule, five-point new-skill checklist, install boundary
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
-- `references/dashboard-standard.md` — Tracker Shell spec v1.0 (status vocab, trio, bar flags, evidence rule, four schemes)
-- `references/tracker-shell-reference.html` — the shipped reference dashboard: copy from this, don't rebuild the shell
-- `references/dashboard-sample-generator.py` — regenerates the reference HTML + four scheme PNGs, prints the WCAG contrast table
+- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.0): data contract and load modes, status marks, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist
+- `references/dashboard-reference.html` — the working live-fetch build: copy this, don't build from prose
+- `references/dashboard-standard.md` — pointer + record of what v3.0 changed from the superseded static-bake rules
+- `references/dashboard-sample-generator.py` — regenerates the four scheme mockups and prints the WCAG contrast table
