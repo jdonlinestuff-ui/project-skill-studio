@@ -25,6 +25,12 @@ description: <what it does> + pushy trigger contexts specific to this project
 <Project-discovered connector quirks, phrased defensively: if a tool isn't
 connected, ask the owner to reconnect rather than proceeding from memory.>
 
+## Canon-first workflow
+<Verbatim from canon-first-workflow.md: search canon before generating anything;
+the six-step sequence (search, summarise, identify missing, plan, tasks,
+produce-after-approval); check task-orchestrator and the project's own
+installed skills before acting; surface conflicts, never invent a resolution.>
+
 ## Work loop & MCP use
 <Verbatim from skill-baseline.md sections 1-2, with this skill's own VERIFY
 checks named explicitly.>

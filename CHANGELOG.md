@@ -2,6 +2,70 @@
 
 All notable changes to this skill are documented here.
 
+## [1.8.0] - 2026-07-26
+
+New tracker archetype: **Resource Tracker** — portfolio-level status across every project, not one line's build detail. Same shell, same file, no parallel system: two new optional sections, populated by a different JSON shape, everything else absent per the existing omission rule.
+
+**Added**
+- `DASHBOARD_SPEC.md` §4f Portfolio Roster: one row per project — status (aliasing the fixed marks with domain words: `✓ ON TRACK` / `~ AT RISK` / `■ BLOCKED` / `✕ CANCELLED` / `– NOT STARTED`, same pattern as severity and the feedback interest mark), a people count, a task count, and `thisWeek` — one line, expected to be replaced weekly, not accumulated.
+- §4g People & Allocation: one row per person **per project** — someone on three projects gets three rows, never one hand-summed row. Every total is computed at render by summing rows for that name/project; nothing is ever stored as a total.
+- **The derive-if-roster-exists rule**: if People & Allocation has rows for a project, that project's people/task counts in the Portfolio Roster are DERIVED from them at render and marked `calc`; if no roster exists for that project, the counts are recorded directly on the project's own row instead. A tracker instance picks one mode per project, never both — verified by building an instance with three projects in derived mode and a fourth in recorded mode side by side, and confirming the sums are arithmetically correct and the `calc` badge appears only where it should.
+- Section order grows from 14 to 16: Portfolio Roster and People & Allocation inserted before Module Grid — overview before per-line detail. Second one-time insertion after §4e; the spec says explicitly this is not a precedent for reordering anything else.
+- `docs/samples/resource-tracker/`: a full worked example (4 projects, 6 people rows, both derive-modes demonstrated on different projects) as JSON + a working HTML instance + three real screenshots.
+
+## [1.7.2] - 2026-07-26
+
+**Added**
+- `DASHBOARD_SPEC.md` §4e: the Feedback & Suggestions section is also usable for lightweight sprint planning, with no schema or code change — `timeline` was already free text with zero date parsing anywhere in the reference (checked before writing this, not assumed), so a row can hold `"Sprint 14"` there exactly as it holds a date elsewhere.
+- Two things named as deliberately staying separate, not merged for convenience: `priority` stays priority, not size — sizing belongs in `note` or a documented project-specific field, never folded into `priority`; and the interest `mark` stays a stakeholder's reaction, not a planner's sprint commitment, since those are often different decisions by different people at different times.
+- Explicitly out of scope, named rather than silently added: capacity/velocity math, burndown, a dedicated Sprint view. That's Budget-sized additional work, not a quiet extension of Feedback rows — a project that needs it gets its own section and its own decision.
+- Example seed row F2 updated to demonstrate the pattern (owner, priority, and a sprint label together) rather than just describing it; screenshots regenerated and the render verified by reading the actual DOM text, not by eye.
+
+## [1.7.1] - 2026-07-26
+
+**Added**
+- `docs/samples/shoot.py` + `docs/samples/screenshots/`: real Playwright screenshots of the actual `references/dashboard-reference.html`, in all four real schemes (Canon/Slate/Dark/Mono), showing the new §4e Feedback & Suggestions section plus one full-page render.
+- `docs/wiki/Tracker-Shell-Samples.md`, ready to paste into the GitHub wiki.
+
+**Removed**
+- The v1.3.1 SVG mockup generator (`docs/samples/generate-mockups.py`, `tracker-*.svg`). It was a separate hand-coded renderer with its own scheme names — Ink / Parchment / Mono print / Dark console — that had already drifted from the reference build's real four schemes (Canon / Slate / Dark / Mono) by the time §4e shipped, and it predated the Feedback section entirely. Screenshotting the real file removes the second system to keep in sync. Files kept as `.superseded` in this working copy rather than deleted outright, so the retirement is visible in the diff.
+
+## [1.7.0] - 2026-07-26
+
+Checked live before writing anything: "Cowork live artifact" and "embeddable on a website" are two different, non-overlapping features, not two names for the same thing.
+
+**Added**
+- `DASHBOARD_SPEC.md` §12, Delivery: ship the dashboard as a real artifact (single self-contained HTML), not a handed-over file — that's what unlocks Publish/Share and an embed code. A comparison table sets out what a Cowork live artifact actually is (Team/Enterprise-only sharing, Claude Desktop only, refreshed through Cowork's own connectors, versioned automatically) against a regular artifact (Publish on Free/Pro/Max or Share on Team/Enterprise, runs in any browser, genuine iframe embed code with an allowed-domains list).
+- The explicit finding: **Cowork live artifacts do not support website embedding at all.** Sharing one produces an org-internal link that opens in Claude Desktop, not a browser embed. A request to "build it in Cowork so it can be embedded on a site" is not achievable as stated — the two halves point at different features — and the spec says so plainly rather than silently picking one interpretation.
+- Guidance: default to the regular-artifact path, since this spec's `fetch(TRACKER_SOURCE)` model already produces exactly the single-file shape that path needs. A genuine Cowork live artifact requires building inside an actual Cowork session on Claude Desktop with connectors named up front — it cannot be produced by authoring a static file outside Cowork and calling it one, since the connector wiring and automatic versioning are Cowork's own infrastructure.
+- `SKILL.md` Phase 4 gains a pointer to §12 so the distinction is discoverable without reading the whole spec.
+
+## [1.6.0] - 2026-07-26
+
+New tracked concept: **Feedback & Suggestions**, a facilitator-recorded capture surface for live reviews — not a multi-user voting system.
+
+**Added**
+- `DASHBOARD_SPEC.md` §4e: new fourteenth section, `feedback` array in the payload shape (§3.3), row grid in §10.10, two new conformance checklist items (§11). Placed after Next Actions, before Update Log.
+- **No vote tally, by design.** A running count invites gaming and implies a rigour the dashboard can't back, since it never verifies who touched it. Instead: a single status — `~ UNDECIDED` (default) / `✓ INTERESTED` / `✕ NOT INTERESTED` — aliasing the existing pass/pending/fail marks with domain words, the same pattern the spec already uses for severity. This is the **one deliberately clickable chip** in the whole dashboard; every other chip is evidence-derived and read-only, and the spec says so explicitly rather than leaving the exception to be discovered by accident.
+- `raisedBy` and `owner` are both optional free text — the section is built for a facilitator transcribing for a room as often as for named individual input.
+- Export beyond the page (email, spreadsheet) is explicitly deferred, not silently built. `DASHBOARD_SPEC.md` §4e notes that Create Prompt's plain-text output already pastes into either without new code, and that a real one-click integration is its own decision requiring its own connector.
+- Prompt grammar extended (§5): a feedback mark that changed from its row's own last-known value compiles as its own `F<n> mark:<interested|not-interested|undecided>` line, separate from the ordinary `!`/`✓`/`+` choice line — a row can carry both in the same prompt.
+- Reference build: full render path for the new section, `cycleMark()` for the clickable chip, `FEEDBACK_WORD`/`FEEDBACK_CYCLE` tables, three example seed rows in `EMBEDDED` (one anonymous, one named, one already marked). Verified by running, not reading: offline snapshot, live fetch, and the mark-cycle → Create Prompt path all exercised under a DOM shim.
+
+**Fixed — found while implementing, not part of the ask**
+- `markEmpty()` had been defined during the v1.4.0 partial-payload fix but **never actually called anywhere** — an absent array rendered a bare section heading with nothing under it, meeting neither the "omit the section" nor the "— none —" requirement of spec §3.4. Wired it into `render()` for real, wrapped every section's heading+panel in a shared `<section id="sec-*">` so both hide together, and fixed the Queues container so each of its three sub-lists (proofs/gates/decisions) is independently omitted or shown-empty rather than the whole cluster moving as one block. Verified against three payload shapes: array absent (section hidden), array present-but-empty (`— none —`), array present-with-data (rows render) — for both the new section and the ten pre-existing ones.
+- The fix that wired `applyEmptyStates()` into `render()` was itself written once and **silently failed to apply** on the first attempt — the anchor text it searched for had shifted earlier in the same edit session when `cycleMark()` was inserted, and that particular replace had no assertion to catch the non-match. Caught only by running the actual code rather than reading the diff; re-applied with an assertion.
+- `DASHBOARD_SPEC.md`'s own §4 section-order list had said "13 sections" through v1.5.0's changelog description of it as "fourteen" — that description was wrong at the time it was written. It is only accurate now that §4e exists. Noted in the spec itself so the discrepancy doesn't look like an unexplained retcon.
+
+## [1.5.0] - 2026-07-26
+
+**Added**
+- `references/canon-first-workflow.md`: mandatory sequence for any generation request (task, design, code, documentation) — search the connected canon store first, treat what's found as authoritative, never assume when canonical information exists. Six steps: search canonical assets, summarise, identify missing information, generate a plan, generate implementation tasks, produce the deliverable only after the plan is approved.
+- Conflict rule: when canonical assets disagree, surface the conflict and cite both sources rather than inventing a resolution or silently picking one side.
+- "Key skills to consider for every request": check `task-orchestrator` for bundled/repeated/multi-model work, and the project's own installed skills (canon + line/ops) before writing new logic — this studio is one of these for scaffolding and tracker duties, not a replacement for a project's own canon skill once built.
+- Wired into `generated-skill-template.md` (new template section), `working-rules.md` (rule 12), `skill-baseline.md` (tied into the Canon consistency & write-back checklist point), and `SKILL.md` (Phase 3 embedding item 6).
+- Explicitly reconciled against the existing work loop rather than left as a second, competing sequence: the six steps are the concrete canon-search instantiation of `DRAFT` (search → summarise → plan → tasks) and the `PROOF` gate (approval before producing); `VERIFY`/`REVISE`/`REGISTER` continue to apply once the deliverable exists. The mapping lives once, in `canon-first-workflow.md`, and every other reference point cites it rather than restating it.
+
 ## [1.4.0] - 2026-07-26
 
 Absorbs the owner's `status-dashboard` skill. **`references/DASHBOARD_SPEC.md` (v3.0) is now the dashboard authority** and supersedes the Tracker Shell v1.0 rules.

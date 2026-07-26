@@ -32,6 +32,12 @@
    live search at decision time, never from memory.
 11. **No floating questions.** Every open question has a Q id, an owner-facing
     flag, and a documented interim assumption. Session close leaves nothing untracked.
+12. **Canon-first generation.** Before generating any task, design, code, or
+    documentation, search the project's connected canon store and treat what's
+    found there as authoritative — never assume when canonical information
+    exists. If assets conflict, surface the conflict rather than inventing a
+    resolution. Follow the six-step sequence and check task-orchestrator plus
+    the project's own installed skills first; see `canon-first-workflow.md`.
 
 See `skill-baseline.md` for the work loop, the MCP-first rule, and the
 five-point checklist every generated skill must satisfy.

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CRA Digital Dev Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ---- tokens: Canon v6 is the default scheme (spec v2.0 §6) ---- */
+:root{
+  --bg:#F6ECD6; --panel:#FFFAEE; --ink:#101D3D; --headerBg:#101D3D; --headerFg:#F6ECD6;
+  --muted:#7A6E55; --line:#E3D2A8; --zebra:#FBF4E3; --accent:#C9A961; --onAccent:#101D3D;
+  --accentText:#A8843C; --body:#4A4535; --field:#FFFDF7; --tested:#E7D9B4; --testedFg:#101D3D;
+  --pass:#1E7A45; --passT:#E4F2E9; --fail:#B3261E; --failT:#FBE6E4;
+  --pend:#A97605; --pendT:#F8EED6; --block:#141414; --blockT:#E8E4DA;
+  --na:#9A8F75; --naT:#F1EADA;
+}
+[data-scheme="slate"]{
+  --bg:#EEF0F1; --panel:#FBFCFC; --ink:#1B2227; --headerBg:#1B2227; --headerFg:#EEF0F1;
+  --muted:#6F787D; --line:#DBE0E2; --zebra:#F4F6F6; --accent:#2F7D74; --onAccent:#FFFFFF;
+  --accentText:#2F7D74; --body:#3C464C; --field:#FFFFFF; --tested:#D6E7E4; --testedFg:#1B2227;
+  --pass:#1F6B45; --passT:#E1EFE7; --fail:#B4482F; --failT:#F9E7E2;
+  --pend:#9A6B12; --pendT:#F6EEDD; --block:#1B2227; --blockT:#E4E7E9;
+  --na:#8D969B; --naT:#EEF1F2;
+}
+[data-scheme="dark"]{
+  --bg:#14171B; --panel:#1C2127; --ink:#E7E4DC; --headerBg:#242B33; --headerFg:#E7E4DC;
+  --muted:#8B939B; --line:#2C333B; --zebra:#20262D; --accent:#E0A93A; --onAccent:#14171B;
+  --accentText:#E0A93A; --body:#C3C8CD; --field:#161A1F; --tested:#3A424B; --testedFg:#E7E4DC;
+  --pass:#4CC38A; --passT:#17301F; --fail:#F2665B; --failT:#331A19;
+  --pend:#E0A93A; --pendT:#332714; --block:#C3C8CD; --blockT:#2A2F35;
+  --na:#6B7178; --naT:#22272D;
+}
+[data-scheme="mono"]{
+  --bg:#F2F2F0; --panel:#FFFFFF; --ink:#111111; --headerBg:#111111; --headerFg:#FFFFFF;
+  --muted:#6E6E6E; --line:#DADADA; --zebra:#F7F7F5; --accent:#111111; --onAccent:#FFFFFF;
+  --accentText:#4A4A4A; --body:#333333; --field:#FFFFFF; --tested:#DDDDDD; --testedFg:#111111;
+  --pass:#111111; --passT:#E6E6E4; --fail:#111111; --failT:#CFCFCD;
+  --pend:#6E6E6E; --pendT:#EDEDEB; --block:#111111; --blockT:#C2C2C0;
+  --na:#9A9A98; --naT:#F4F4F2;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+a{color:var(--ink)} a:hover{color:var(--accentText)}
+button,textarea,select,input{font-family:inherit}
+@media print{.noprint{display:none!important}}
+
+/* ---- header ---- */
+.head{padding-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:3px solid var(--ink)}
+.eyebrow{font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.18em;color:var(--accentText)}
+.title{font:700 27px/1.15 Libre Baskerville,Georgia,serif;letter-spacing:-.01em}
+.headmeta{font:400 10px/1.5 IBM Plex Mono,monospace;text-align:right;color:var(--muted)}
+
+/* ---- metric strip ---- */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 12px 11px;display:flex;flex-direction:column;gap:4px}
+.metric .num{font:700 26px/1 Libre Baskerville,Georgia,serif}
+.metric .lbl{font:500 10px/1.3 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--muted)}
+
+/* ---- how-this-works ---- */
+.keypanel{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:16px 18px}
+.keyintro{font:400 13px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);margin-bottom:14px}
+.keygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px}
+.keyitem{display:flex;align-items:flex-start;gap:10px}
+.circ{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 14px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:var(--panel);color:var(--ink)}
+.circ.explain{border-color:var(--accent)}
+.circ.proceed{background:var(--ink);color:var(--bg)}
+.circ.improve,.circ.data{background:var(--accent);color:var(--onAccent)}
+.keyname{font:700 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+.keydesc{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);text-wrap:pretty}
+
+/* ---- sticky bar ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);margin-top:18px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.btn{border-radius:3px;height:44px;padding:0 20px;font:700 12px/1 IBM Plex Mono,monospace;letter-spacing:.08em;cursor:pointer;background:var(--ink);color:var(--bg);border:2px solid var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);font-weight:600;padding:0 16px}
+.btn.ghost.on{background:var(--ink);color:var(--bg)}
+.btn.ghost.accent-on{background:var(--accent);color:var(--onAccent)}
+.schemewrap{display:flex;align-items:center;gap:6px;margin-left:auto}
+.schemelbl{font:500 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--muted)}
+.sbtn{display:flex;align-items:center;gap:5px;height:32px;padding:0 9px;border-radius:3px;cursor:pointer;font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.06em;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.sbtn.on{background:var(--ink);color:var(--bg)}
+.dots{display:flex}
+.dots i{width:9px;height:9px;border-radius:50%;display:block}
+.dots i+i{margin-left:-3px}
+.statuswrap{display:flex;flex-direction:column;gap:3px;align-items:flex-end;font-family:IBM Plex Mono,monospace}
+.statuswrap div{font:400 10px/1.3 IBM Plex Mono,monospace;color:var(--muted)}
+#promptbox{display:none;width:100%;margin-top:10px;border:none;border-radius:4px;padding:14px;font:400 12px/1.6 IBM Plex Mono,monospace;min-height:120px;resize:vertical;background:var(--ink);color:var(--bg)}
+
+/* ---- section heading ---- */
+.sechead{display:flex;align-items:baseline;gap:12px;margin:30px 0 10px}
+.sechead h2{font:700 15px/1.2 Libre Baskerville,Georgia,serif}
+.rule{flex:1;height:1px;background:var(--line)}
+.secmeta{font:400 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--accentText)}
+
+/* ---- panels & rows ---- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.scroller{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto}
+.inner{min-width:848px}
+.row{border-top:1px solid var(--line)}
+.cells{display:grid;gap:12px;align-items:start;padding:12px 14px}
+.hdr{display:grid;gap:8px;align-items:center;padding:9px 14px;background:var(--headerBg);color:var(--headerFg);font:600 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+.gmod{grid-template-columns:104px 92px 351px minmax(140px,1fr) 104px;gap:8px}
+.gqueue{grid-template-columns:62px minmax(140px,220px) 1fr 116px}
+.gissue{grid-template-columns:52px 84px 1fr 116px}
+.gbudget{grid-template-columns:52px 1fr 96px 96px 92px 116px}
+.gmile{grid-template-columns:92px 22px 1fr 84px 116px}
+.gnext{grid-template-columns:34px 1fr 104px 116px}
+.gfeedback{grid-template-columns:52px 1fr 108px 92px 96px 116px}
+.gproj{grid-template-columns:52px 1fr 128px 76px 76px 1fr}
+.gpeople{grid-template-columns:1fr 96px 76px 1fr}
+.zebra{background:var(--zebra)}
+.name{font:600 12px/1.4 IBM Plex Mono,monospace}
+.ver{font:400 12px/1.35 IBM Plex Mono,monospace;color:var(--muted)}
+.rowtitle{font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif}
+.note{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
+.ref{font:600 12px/1.4 IBM Plex Mono,monospace;color:var(--accentText)}
+.money{font:500 12px/1.4 IBM Plex Mono,monospace;text-align:right}
+.meta{font:500 12px/1.4 IBM Plex Mono,monospace;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:4px}
+
+/* ---- status marks: glyph + word + tint ---- */
+.chk{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;align-items:center}
+.mk{display:flex;align-items:center;justify-content:center;gap:3px;height:24px;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
+.mk i{font-style:normal;font-size:13px}
+.mk.pad{padding:0 9px;gap:4px}
+.mk-pass{background:var(--passT);color:var(--pass)}
+.mk-fail{background:var(--failT);color:var(--fail)}
+.mk-pending{background:var(--pendT);color:var(--pend)}
+.mk-blocked{background:var(--blockT);color:var(--block)}
+.mk-na{background:var(--naT);color:var(--na)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:2px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em;border:1px solid var(--ink)}
+.b-integrated{background:var(--headerBg);color:var(--headerFg)}
+.b-tested{background:var(--tested);color:var(--testedFg);border-color:var(--tested)}
+.b-building,.b-proposed{background:transparent;color:var(--ink)}
+.b-prototype,.b-pending{background:transparent;color:var(--muted);border-color:var(--line)}
+
+/* ---- action trio ---- */
+.acts{display:flex;gap:6px;justify-content:flex-end}
+.abtn{width:30px;height:30px;border-radius:50%;cursor:pointer;font:600 13px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.abtn.plus{font-size:15px}
+.abtn.sel{background:var(--ink);color:var(--bg)}
+.detail{display:none;grid-column:1/-1;padding:2px 0 2px}
+.detail textarea{width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:52px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)}
+
+.nonerow{padding:10px 2px;font-weight:400;font-size:12px;line-height:1.45;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--muted)}
+.srcbanner{grid-column:1/-1;margin:0 0 14px;padding:10px 14px;border-radius:4px;
+  border:2px solid var(--fail);background:var(--failTint);color:var(--fail);
+  font-weight:600;font-size:12px;line-height:1.45;font-family:'IBM Plex Mono',monospace}
+.stale{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:2px;
+  border:1px solid var(--pending);color:var(--pending);background:var(--pendingTint);
+  font-weight:600;font-size:10px;font-family:'IBM Plex Mono',monospace}
+/* ---- budget & milestones ---- */
+.barTrack{height:5px;border-radius:3px}
+.barFill{height:100%;border-radius:3px}
+.total{display:grid;gap:12px;align-items:center;padding:11px 14px;border-top:2px solid var(--ink)}
+.rail{display:flex;flex-direction:column;align-items:center;align-self:stretch}
+.dot{width:11px;height:11px;border-radius:50%;margin-top:4px}
+.conn{flex:1;width:2px;margin-top:4px;background:var(--line)}
+.ctrl{font:600 12px/1.45 IBM Plex Mono,monospace;letter-spacing:.02em;color:var(--accentText)}
+.ctrltext{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);text-wrap:pretty}
+.logrow{display:grid;grid-template-columns:186px 1fr;gap:14px;padding:10px 14px;border-left:2px solid var(--accent);background:var(--zebra)}
+.logwhen{font:500 12px/1.45 IBM Plex Mono,monospace;color:var(--muted)}
+.foot{margin-top:28px;font:400 10px/1.5 IBM Plex Mono,monospace;text-align:center;color:var(--muted)}
+</style></head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="eyebrow">CYBER RISK ASSESSMENT · ONLINE DEV</div>
+      <div class="title">Digital Dev Tracker</div>
+    </div>
+    <div class="headmeta">Teams app source v0.6<br>baselined 2026-07-25 · maintained by Claude</div>
+  </div>
+
+  <div id="srcbanner" class="srcbanner" hidden></div>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="keypanel">
+    <div class="keyintro">Claude cannot see edits made here. Mark rows with the action buttons, then press <b>Create prompt</b> and paste the result into chat.</div>
+    <div class="keygrid" id="keygrid"></div>
+  </div>
+
+  <div class="bar noprint">
+    <button class="btn" onclick="createPrompt()">CREATE PROMPT</button>
+    <button class="btn ghost" onclick="resetAll()">RESET</button>
+    <button class="btn ghost" id="f-refresh" onclick="toggleFlag('refresh','f-refresh')">REFRESH BUILD</button>
+    <button class="btn ghost" id="f-canon" onclick="toggleFlag('canon','f-canon')">CANON SYNC</button>
+    <button class="btn ghost" id="f-data" onclick="forceRefresh()">↻ REFRESH DATA</button>
+    <div class="schemewrap">
+      <div class="schemelbl">SCHEME</div>
+      <div style="display:flex;gap:6px" id="schemes"></div>
+      <div class="statuswrap">
+        <div id="markedLbl">nothing marked yet</div>
+        <div id="stampLbl">data as at —</div>
+      </div>
+    </div>
+  </div>
+  <textarea id="promptbox" readonly></textarea>
+
+  <section id="sec-projects">
+  <div class="sechead"><h2>Portfolio Roster</h2><div class="rule"></div><div class="secmeta">STATUS ACROSS EVERY PROJECT</div></div>
+  <div class="panel" id="projects"></div>
+  </section>
+
+  <section id="sec-people">
+  <div class="sechead"><h2>People &amp; Allocation</h2><div class="rule"></div><div class="secmeta">TASKS PER PERSON PER PROJECT</div></div>
+  <div class="panel" id="people"></div>
+  </section>
+
+  <section id="sec-modules">
+  <div class="sechead"><h2>Module Grid</h2><div class="rule"></div><div class="secmeta" id="sourceLabel">05_TEAMS_APP_v0.6_SOURCE</div></div>
+  <div class="legend" id="legend"></div>
+  <div class="scroller"><div class="inner">
+    <div class="hdr gmod">
+      <div>MODULE</div><div>BUILD STATE</div>
+      <div class="chk" style="text-align:center" id="chkhdr"><div>TYP</div><div>UNI</div><div>GLD</div><div>MUL</div><div>SEC</div><div>PII</div></div>
+      <div>EVIDENCE / GAP</div><div style="text-align:right">ACTION</div>
+    </div>
+    <div id="modules"></div>
+  </div></div>
+  </section>
+
+  <div id="queues"></div>
+
+  <section id="sec-issues">
+  <div class="sechead"><h2>Open Issues</h2><div class="rule"></div><div class="secmeta">TOUCHING THE DIGITAL LINE</div></div>
+  <div class="panel" id="issues"></div>
+  </section>
+
+  <section id="sec-risks">
+  <div class="sechead"><h2>Risk Register</h2><div class="rule"></div><div class="secmeta">EXPOSURE · CAUSE · CONTROL</div></div>
+  <div class="panel" id="risks"></div>
+  </section>
+
+  <section id="sec-budget">
+  <div class="sechead"><h2>Budget &amp; Cost</h2><div class="rule"></div><div class="secmeta" id="budgetPct"></div></div>
+  <div class="panel" id="budget"></div>
+  </section>
+
+  <section id="sec-milestones">
+  <div class="sechead"><h2>Timeline &amp; Milestones</h2><div class="rule"></div><div class="secmeta">TARGET DATES · NOT COMMITMENTS</div></div>
+  <div class="panel" id="milestones"></div>
+  </section>
+
+  <section id="sec-nextActions">
+  <div class="sechead"><h2>Next Actions</h2><div class="rule"></div></div>
+  <div class="panel" id="nextActions"></div>
+  </section>
+
+  <section id="sec-feedback">
+  <div class="sechead"><h2>Feedback &amp; Suggestions</h2><div class="rule"></div><div class="secmeta">FACILITATOR-RECORDED · NOT A VOTE COUNT</div></div>
+  <div class="panel" id="feedback"></div>
+  </section>
+
+  <section id="sec-log">
+  <div class="sechead"><h2>Update Log</h2><div class="rule"></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px" id="log"></div>
+  </section>
+
+  <div class="foot">Canon v6 scheme · spec v2.0 · glyph + word + tint marks · print-safe · reusable shell: swap the DATA block only</div>
+</div>
+
+<script>
+/* ============ SOURCE — point this at the line's JSON (spec 3.1/3.2A) ============
+   Drive:    https://drive.google.com/uc?export=download&id=<FILE_ID>
+   Relative: ./DESIGN_TRACKER.json
+   Empty string = no live source; the EMBEDDED snapshot below is used and the
+   dashboard announces itself as a SNAPSHOT (spec 3.2C). Never ship a dashboard
+   that shows snapshot data as if it were live.                                  */
+const TRACKER_SOURCE='';
+const DASHBOARD_SOURCE=TRACKER_SOURCE;   /* alias: SKILL.md uses this name */
+
+/* ============ EMBEDDED — last known-good snapshot, fallback only ============
+   This is NOT the source of truth. Live data replaces it wholesale at run time.
+   A skill replaces this block only to seed a first build.                       */
+const EMBEDDED={
+meta:{line:'example-line',title:'Digital Dev Tracker',sourceLabel:'05_TEAMS_APP_v0.6_SOURCE',
+ eyebrow:'CYBER RISK ASSESSMENT · ONLINE DEV',
+ checkNames:['Typecheck','Unit','Golden files','Multi-client','Code security','Privacy'],
+ currency:'AUD',revision:0,generatedAt:'2026-07-25T00:00:00+10:00'},
+modules:[
+ ['deck-loader','card_data v6','INTEGRATED',['pass','pass','na','na','pending','na'],'deck.json (65 cards, 10/10/30/15) byte-verified vs canonical card_data.py; generate_deck.py assertions pass.'],
+ ['deal','card_data v6','INTEGRATED',['pass','pass','na','pending','pending','pending'],'8-player deal resolves real card names in smoke test. Live multi-client deal never run (I6).'],
+ ['roles-insider','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'Targeted signals, decoy padding, FORBIDDEN_KEYS tripwire built (v0.6). Privacy invariant cannot pass on code review alone (I6).'],
+ ['sabotage','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'Window auto-close on timeout and facilitator arbitration built. Live multi-client rehearsal outstanding (I6).'],
+ ['scoring','card_data v6 · scoring_matrix v3.0','BUILDING',['pass','pass','fail','na','pending','na'],'scoring.ts + stateMachine.ts built; smoke_game.mjs 8 checks + 26 assertions pass. Golden-file tests vs Scoring_Matrix v3.0 tier benchmarks NOT run — P3’s one open gap (S8).'],
+ ['timers','(none)','PROTOTYPE',['na','na','na','na','pending','na'],'Sabotage countdown lives inside the sabotage module. General round-pacing timers (US4.3) not evidenced in v0.4–v0.6 changelogs — do not assume built.'],
+ ['tables','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'2-table split verified with independent scores (v0.4). Single simulated session only, not a real Teams/Fluid meeting (I6).'],
+ ['voting','card_data v6','BUILDING',['pass','pending','na','pending','pending','pending'],'Secret-ballot signal pattern in use (P5) but response-capture completeness vs Workshop Manual v1.2 unconfirmed — hold at building.'],
+ ['reveal','card_data v6','PROTOTYPE',['na','na','na','na','pending','pending'],'No dedicated reveal-ceremony evidence (score → sabotage log → Insider → outcome, US3.3.1). Possibly covered by P6 console work; flagged, not assumed.'],
+ ['debrief','card_data v6 · scoring_matrix v3.0','PROTOTYPE',['na','na','na','na','pending','na'],'Not started. P7 debrief gap-analysis queued — no implementation in v0.4–v0.6 source.'],
+ ['export','scoring_matrix v3.0','PROTOTYPE',['na','na','na','na','pending','na'],'Not started. P7 branded PDF/XLSX export queued — no implementation found.']
+],
+proofs:[['AP1','Digital card assets v1','PROPOSED','WebP thumb/full + deck_manifest.json · designer skill cra-card-design. Blocked upstream by I5 (asset pack corrupted at source) and I4 (v6 print zip re-upload). App still renders text-only branded cards.']],
+gates:[['PG1','teams-tab','PENDING','P8 manifest hardening / WCAG audit / 10-client load test not evidenced; no cra-platform-compliance run logged against this build.']],
+decisions:[
+ ['D10','Accept SOC 2 Light Pack v0.1-draft','OPEN','6 cards + crosswalk + insert + overlay delivered; accent glyph call pending.'],
+ ['D11','Confirm risk-maturity scoring recommendation','OPEN','Separate-score basis drafted 2026-07-25 (S3); confirm to lock.'],
+ ['D12','Board supplement v1.0 — register?','OPEN','PDF rendered at v6 geometry; accept to lock v1.0 in the manual registry.'],
+ ['D13','Register digital-only mechanics (E1/E2/E3)?','OPEN','Difficulty multiplier, budget economy, GM custom crisis — none exist in physical canon. Register / park behind config flag / revert.']
+],
+issues:[
+ ['I5','High','Web Card Assets v1 pack corrupted at source — blocks AP1.'],
+ ['I6','Med','No live multi-client Teams/Fluid session has ever been run — why every privacy/multi-client mark sits pending.'],
+ ['I4','Med','print_ready_deck_v6.zip needs re-upload before WebP conversion.'],
+ ['I3','Med','GOLD on CREAM likely fails WCAG contrast — part of P8 hardening.'],
+ ['I7','Low','SESSION_STATE.md at canon root stale vs this tracker (last modified 2026-07-06).']
+],
+risks:[
+ ['R1','High','Live workshop run before any multi-client rehearsal','A paid session would be the first real Fluid test; a sync or privacy failure is client-visible.','No client booking until the I6 rehearsal passes.'],
+ ['R2','High','Insider signals leak through a Teams client','FORBIDDEN_KEYS tripwire is code-reviewed only; no runtime proof across clients.','Privacy invariant marked pass only after a logged multi-client session.'],
+ ['R3','Med','Digital-only mechanics drift from physical canon','E1/E2/E3 exist in the app with no canon decision (D13).','Config flag, default off, until D13 is called.'],
+ ['R4','Med','Card asset pipeline blocks the app build','Source pack corrupted (I5) and v6 print zip outstanding (I4).','App ships text-rendered cards; asset swap kept to a manifest change.'],
+ ['R5','Med','Teams / store validation rejects the tab app','P8 hardening, WCAG (I3) and load test unevidenced.','Run cra-platform-compliance before any submission date is promised.'],
+ ['R6','Low','Tracker drifts from canon state','SESSION_STATE.md already stale vs this tracker (I7).','↻ REFRESH DATA before every session; log every change.']
+],
+budget:[
+ ['B1','Print proofs — cards, manuals, box',900,620,'Two v6 proof rounds ordered; third expected after the publisher template pass.'],
+ ['B2','Publisher setup & template conversion',400,0,'Not committed until a publisher is chosen (cra-game-publishing).'],
+ ['B3','Teams app tooling & Azure sandbox',1200,180,'Sandbox only. Real hosting spend deferred by the local-first rule.'],
+ ['B4','Claude usage — build, content, QA',800,465,'Tracks against the cost/token discipline in cra-game-design.'],
+ ['B5','Playtest sessions — print, venue, catering',600,240,'Two sessions run; multi-client rehearsal (I6) not yet costed.'],
+ ['B6','Fonts, stock and asset licensing',300,300,'Closed — v6 brand set licensed.']
+],
+milestones:[
+ ['M1','2026-06-30','v6 canon locked','done','Card data, manuals and brand system frozen at v6; all downstream work builds against it.'],
+ ['M2','2026-07-25','Teams app v0.6 baseline','done','Source re-baselined and every module status re-derived from the v0.4–v0.6 changelogs.'],
+ ['M3','2026-08-08','Scoring golden files vs matrix v3.0','next','P3’s one open gap (S8). Nothing downstream can be called verified until this passes.'],
+ ['M4','2026-08-22','Live multi-client rehearsal','pending','Clears I6 and unlocks every privacy / multi-client mark sitting pending.'],
+ ['M5','2026-09-05','Digital card assets v1 integrated','blocked','Held by I5 (corrupted source pack) and I4 (v6 print zip re-upload).'],
+ ['M6','2026-09-19','P8 hardening + compliance gate','pending','Manifest, WCAG (I3) and 10-client load test, then a live cra-platform-compliance run.'],
+ ['M7','2026-10-10','First paid workshop delivered','pending','Gated on M4. No client date is promised before the rehearsal passes.'],
+ ['M8','2026-11-07','Publisher proof approved','pending','Physical line: proof reviewed against canon before any production run.']
+],
+nextActions:[
+ ['1','Decide D10 / D11 / D12 / D13','Dan'],
+ ['2','Re-export Web Card Assets v1 — source files corrupted (I5)','Dan'],
+ ['3','Re-upload print_ready_deck_v6.zip (I4)','Dan'],
+ ['4','P3: scoring golden files vs Scoring_Matrix v3.0 tier benchmarks (S8)','Claude'],
+ ['5','Live multi-client rehearsal before any real workshop (I6)','Dan + Claude']
+],
+feedback:[
+ ['F1','','Could the sabotage countdown also show on the facilitator\u2019s phone, not just the shared screen?','sabotage','pending','','Med',''  ,'Raised in the 2026-07-24 walkthrough, unattributed note'],
+ ['F2','Priya','Worth a difficulty toggle for exec-only sessions \u2014 fewer, simpler Events','','pass','Priya','Low','Sprint 14','Interested; self-assigned, sized ~M, pulled into Sprint 14'],
+ ['F3','','Consider a printed one-pager for participants who don\u2019t want the Teams tab open','P6','fail','','','','Table discussed, facilitator recorded as not a priority for now']
+],
+log:[
+ ['2026-07-25 · rebuild from spec v2.0','Dashboard regenerated from TRACKER_SHELL_SPEC v2.0 — literal component recipes for chips, action circles, scheme switcher and row grids. No status advanced.'],
+ ['2026-07-25 · re-baseline','Teams app v0.2 → v0.6; phase status re-derived from v0.4/v0.5/v0.6 changelogs; digital-only mechanics registered as E1–E3 pending D13; issues I5–I7 added.'],
+ ['2026-07-25 · tracker first run','Digital section added to DESIGN_TRACKER.json. No status advanced beyond evidence.']
+]};
+
+/* ============ shell — do not edit per skill ============ */
+/* live payload: EMBEDDED until a fetch succeeds (spec 3.2) */
+let DATA=EMBEDDED;
+let CHECK_NAMES=(EMBEDDED.meta&&EMBEDDED.meta.checkNames)||['Typecheck','Unit','Golden files','Multi-client','Code security','Privacy'];
+const CURRENCY_SYMBOL={AUD:'A$',USD:'US$',GBP:'£',EUR:'€',NZD:'NZ$'};
+let money=n=>(CURRENCY_SYMBOL[(DATA.meta&&DATA.meta.currency)||'AUD']||'')+Number(n).toLocaleString('en-AU');
+
+const GLYPH={pass:'✓',fail:'✕',pending:'~',blocked:'■',na:'–'};
+const WORD={pass:'PASS',fail:'FAIL',pending:'PEND',blocked:'BLOCK',na:'N/A'};
+const SEV={High:'fail',Med:'pending',Low:'na'};
+const FEEDBACK_CYCLE={pending:'pass',pass:'fail',fail:'pending'};
+const FEEDBACK_WORD={pass:'INTERESTED',pending:'UNDECIDED',fail:'NOT INTERESTED'};
+const PROJ_WORD={pass:'ON TRACK',pending:'AT RISK',blocked:'BLOCKED',fail:'CANCELLED',na:'NOT STARTED'};
+const SCHEMES=[['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
+               ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
+const state={choices:{},details:{},marks:{},refresh:false,canon:false,dataRefresh:false,scheme:'canon',
+  stamp:new Date(),live:false,fetchedAt:null,loadError:null};
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mark=(k,extra='')=>`<div class="mk ${extra} mk-${k}"><i>${GLYPH[k]}</i>${WORD[k]}</div>`;
+const acts=(sec,id)=>`<div class="acts noprint" data-k="${sec}:${id}">
+  <button class="abtn" title="Explain" onclick="pick('${sec}','${id}','explain')">!</button>
+  <button class="abtn" title="Proceed" onclick="pick('${sec}','${id}','proceed')">✓</button>
+  <button class="abtn plus" title="Improve" onclick="pick('${sec}','${id}','improve')">+</button>
+ </div>
+ <div class="detail" data-d="${sec}:${id}"><textarea placeholder="Extra direction for this item…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
+
+function render(){
+  const m=DATA.modules, cnt=s=>m.filter(r=>r[2]===s).length;
+  document.getElementById('metrics').innerHTML=[[cnt('INTEGRATED'),'INTEGRATED'],[cnt('TESTED'),'TESTED'],[cnt('BUILDING'),'BUILDING'],
+    [cnt('PROTOTYPE'),'NOT STARTED'],[DATA.proofs.length,'PROOFS AWAITING'],[DATA.gates.length,'GATES PENDING']]
+    .map(([n,l])=>`<div class="metric"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join('');
+
+  document.getElementById('keygrid').innerHTML=[
+    ['!','explain','EXPLAIN','Ask Claude for more detail on what’s needed.'],
+    ['✓','proceed','PROCEED','Implement the line item as-is.'],
+    ['+','improve','IMPROVE','Add your own extra instructions to the prompt.'],
+    ['↻','','REFRESH BUILD','Full clean pipeline across all modules, then re-stamp the baseline.'],
+    ['◇','','CANON SYNC','Re-pull canon_versions and re-verify every module’s built_against.'],
+    ['↻','data','REFRESH DATA','Force a re-read of the tracker source and re-stamp this dashboard — no build run.']
+  ].map(([g,c,n,d])=>`<div class="keyitem"><div class="circ ${c}">${g}</div><div class="stack"><div class="keyname">${n}</div><div class="keydesc">${d}</div></div></div>`).join('');
+
+  document.getElementById('schemes').innerHTML=SCHEMES.map(([k,l,a,b,c])=>
+    `<button class="sbtn${state.scheme===k?' on':''}" title="${l}" onclick="setScheme('${k}')"><span class="dots"><i style="background:${a}"></i><i style="background:${b}"></i><i style="background:${c}"></i></span>${l}</button>`).join('');
+
+  document.getElementById('legend').innerHTML=['pass','fail','pending','blocked','na'].map(k=>mark(k,'pad')).join('');
+
+  document.getElementById('modules').innerHTML=m.map(([n,v,b,checks,note],i)=>`
+   <div class="row${i%2?' zebra':''}">
+    <div class="cells gmod">
+      <div class="stack"><div class="name">${esc(n)}</div><div class="ver">${esc(v)}</div></div>
+      <div><span class="badge b-${b.toLowerCase()}">${b}</span></div>
+      <div class="chk">${checks.map((c,j)=>`<span title="${CHECK_NAMES[j]}: ${WORD[c]}">${mark(c)}</span>`).join('')}</div>
+      <div class="note">${esc(note)}</div>
+      ${acts('modules',n)}
+    </div></div>`).join('');
+
+  document.getElementById('queues').innerHTML=[
+    ['Asset Proof Queue',DATA.proofs.length+' OPEN','proofs',DATA.proofs,false],
+    ['Platform Gate Status',DATA.gates.length+' PENDING','gates',DATA.gates,false],
+    ['Decisions Pending (Dan)',DATA.decisions.length+' TO CALL','decisions',DATA.decisions,true]
+  ].filter(([,,sec])=>!state.absent[sec]).map(([t,c,sec,rows,hide])=>`
+   <div class="sechead"><h2>${t}</h2><div class="rule"></div><div class="secmeta">${c}</div></div>
+   <div class="panel">${rows.length?rows.map(([ref,name,badge,note])=>`
+     <div class="row"><div class="cells gqueue">
+       <div class="ref">${ref}</div>
+       <div class="stack"><div class="rowtitle">${esc(name)}</div>${hide?'':`<div><span class="badge b-${badge.toLowerCase()}">${badge}</span></div>`}</div>
+       <div class="note">${esc(note)}</div>
+       ${acts(sec,ref)}
+     </div></div>`).join(''):NONE}</div>`).join('');
+
+  document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,note])=>`
+   <div class="row"><div class="cells gissue" style="align-items:center">
+     <div class="ref">${ref}</div>${mark(SEV[sev]).replace(WORD[SEV[sev]],sev.toUpperCase())}
+     <div class="note">${esc(note)}</div>${acts('issues',ref)}
+   </div></div>`).join('');
+
+  document.getElementById('risks').innerHTML=DATA.risks.map(([ref,exp,title,cause,control])=>`
+   <div class="row"><div class="cells gissue">
+     <div class="ref">${ref}</div>${mark(SEV[exp]).replace(WORD[SEV[exp]],exp.toUpperCase())}
+     <div class="stack"><div class="rowtitle">${esc(title)}</div><div class="note">${esc(cause)}</div>
+       <div style="display:flex;gap:6px;align-items:baseline"><div class="ctrl">CONTROL</div><div class="ctrltext">${esc(control)}</div></div></div>
+     ${acts('risks',ref)}
+   </div></div>`).join('');
+
+  const bT=DATA.budget.reduce((a,r)=>a+r[2],0), sT=DATA.budget.reduce((a,r)=>a+r[3],0);
+  document.getElementById('budgetPct').textContent=Math.round(sT/bT*100)+'% COMMITTED';
+  document.getElementById('budget').innerHTML=
+   `<div class="hdr gbudget"><div>REF</div><div>LINE ITEM</div><div style="text-align:right">BUDGET</div><div style="text-align:right">SPENT</div><div style="text-align:center">STATE</div><div style="text-align:right">ACTION</div></div>`
+   +DATA.budget.map(([ref,item,b,s,note])=>{
+     const pct=b?Math.round(s/b*100):0, k=pct>100?'fail':pct>=85?'pending':s===0?'na':'pass';
+     const word=pct>100?'OVER':pct>=85?'WATCH':s===0?'UNSPENT':'ON TRACK';
+     return `<div class="row"><div class="cells gbudget">
+       <div class="ref">${ref}</div>
+       <div class="stack"><div class="rowtitle">${esc(item)}</div>
+         <div class="barTrack mk-${k}"><div class="barFill" style="width:${Math.min(pct,100)}%;background:currentColor"></div></div>
+         <div class="note">${esc(note)}</div></div>
+       <div class="money">${money(b)}</div><div class="money" style="color:var(--body)">${money(s)}</div>
+       ${mark(k).replace(WORD[k],word)}${acts('budget',ref)}
+     </div></div>`;}).join('')
+   +`<div class="total gbudget"><div></div><div class="ref" style="color:var(--ink)">TOTAL · ${money(bT-sT)} REMAINING</div>
+     <div class="money">${money(bT)}</div><div class="money">${money(sT)}</div><div></div><div></div></div>`;
+
+  document.getElementById('milestones').innerHTML=DATA.milestones.map(([ref,date,title,st,note],i)=>{
+    const k=st==='done'?'pass':st==='blocked'?'blocked':st==='next'?'pending':'na';
+    const word=st==='done'?'DONE':st==='next'?'NEXT':st==='blocked'?'BLOCK':'PEND';
+    const last=i===DATA.milestones.length-1;
+    return `<div class="row"><div class="cells gmile">
+      <div class="meta">${date}</div>
+      <div class="rail"><div class="dot mk-${k}" style="border:2px solid currentColor;background:${st==='done'||st==='blocked'?'currentColor':'transparent'}"></div>${last?'':'<div class="conn"></div>'}</div>
+      <div class="stack"><div style="display:flex;align-items:baseline;gap:8px"><div class="ref">${ref}</div>
+        <div class="rowtitle" style="${st==='done'?'color:var(--muted)':''}">${esc(title)}</div></div>
+        <div class="note">${esc(note)}</div></div>
+      ${mark(k).replace(WORD[k],word)}${acts('milestones',ref)}
+    </div></div>`;}).join('');
+
+  document.getElementById('nextActions').innerHTML=DATA.nextActions.map(([n,what,owner])=>`
+   <div class="row"><div class="cells gnext" style="align-items:center">
+     <div class="ref">${n}</div><div class="note">${esc(what)}</div>
+     <div class="meta" style="text-align:right">${owner}</div>${acts('next','NA'+n)}
+   </div></div>`).join('');
+
+  // People & Allocation renders first: Portfolio Roster needs its per-project
+  // totals, computed HERE, never stored (spec 4f/4g: derived if the roster exists).
+  const peopleTotals = {};   // projectRef -> {tasks, people: Set(name)}
+  (DATA.people||[]).forEach(([name,projectRef,tasks])=>{
+    const t = peopleTotals[projectRef] || (peopleTotals[projectRef] = {tasks:0, names:new Set()});
+    t.tasks += Number(tasks)||0; t.names.add(name);
+  });
+  document.getElementById('people').innerHTML=(DATA.people||[]).map(([name,projectRef,tasks,note])=>{
+    return `<div class="row"><div class="cells gpeople">
+      <div class="rowtitle">${esc(name)}</div>
+      <div class="ref">${esc(projectRef)}</div>
+      <div class="meta" style="text-align:right">${esc(String(tasks))}</div>
+      <div class="note">${note?esc(note):''}</div>
+    </div></div>`;}).join('');
+
+  document.getElementById('projects').innerHTML=(DATA.projects||[]).map(([ref,name,status,people,tasks,thisWeek])=>{
+    const derived = peopleTotals[ref];
+    const peopleCount = derived ? derived.names.size : people;
+    const taskCount   = derived ? derived.tasks      : tasks;
+    return `<div class="row"><div class="cells gproj">
+      <div class="ref">${ref}</div>
+      <div class="rowtitle">${esc(name)}</div>
+      <div class="mk mk-${status}"><i>${GLYPH[status]}</i>${PROJ_WORD[status]}</div>
+      <div class="meta" style="text-align:right">${peopleCount!==undefined&&peopleCount!==''?esc(String(peopleCount)):''}${derived?' <span class="badge" title="derived from People & Allocation">calc</span>':''}</div>
+      <div class="meta" style="text-align:right">${taskCount!==undefined&&taskCount!==''?esc(String(taskCount)):''}${derived?' <span class="badge" title="derived from People & Allocation">calc</span>':''}</div>
+      <div class="note">${thisWeek?esc(thisWeek):''}</div>
+    </div></div>`;}).join('');
+
+    document.getElementById('feedback').innerHTML=DATA.feedback.map(([ref,raisedBy,text,targetRef,mk,owner,priority,timeline,note])=>{
+    const cur = state.marks[ref]!==undefined ? state.marks[ref] : mk;
+    const chip = `<div class="mk clickable mk-${cur}" title="Click to cycle: undecided → interested → not interested" onclick="cycleMark('${ref}','${esc(mk)}')" style="cursor:pointer"><i>${GLYPH[cur]}</i>${FEEDBACK_WORD[cur]}</div>`;
+    const meta=[raisedBy?esc(raisedBy):'',targetRef?'re: '+esc(targetRef):''].filter(Boolean).join(' · ');
+    return `<div class="row"><div class="cells gfeedback">
+      <div class="ref">${ref}</div>
+      <div class="stack"><div class="rowtitle">${esc(text)}</div>${meta?`<div class="note" style="font:400 12px/1.4 IBM Plex Mono,monospace">${meta}</div>`:''}${note?`<div class="note">${esc(note)}</div>`:''}</div>
+      ${chip}
+      <div class="meta">${owner?esc(owner):''}</div>
+      <div class="stack"><div class="note">${priority?esc(priority):''}</div><div class="note" style="color:var(--muted)">${timeline?esc(timeline):''}</div></div>
+      ${acts('feedback',ref)}
+    </div></div>`;}).join('');
+
+  document.getElementById('log').innerHTML=DATA.log.map(([w,t])=>
+    `<div class="logrow"><div class="logwhen">${esc(w)}</div><div class="note">${esc(t)}</div></div>`).join('');
+
+  applyEmptyStates();
+  syncMarks();
+}
+
+function cycleMark(ref, original){
+  const cur = state.marks[ref] !== undefined ? state.marks[ref] : original;
+  state.marks[ref] = FEEDBACK_CYCLE[cur];
+  render(); syncMarks();
+}
+function syncMarks(){
+  document.querySelectorAll('.acts').forEach(g=>{
+    const k=g.dataset.k, c=state.choices[k];
+    ['explain','proceed','improve'].forEach((n,i)=>g.children[i].classList.toggle('sel',c===n));
+    const d=document.querySelector(`.detail[data-d="${CSS.escape(k)}"]`);
+    if(d){
+      d.style.display=c==='improve'?'block':'none';
+      const ta=d.querySelector('textarea'), v=state.details[k]||'';
+      if(ta&&ta.value!==v) ta.value=v;
+    }
+  });
+  const n=Object.keys(state.choices).length+(state.refresh?1:0)+(state.canon?1:0)+(state.dataRefresh?1:0);
+  document.getElementById('markedLbl').textContent=n?`${n} item${n===1?'':'s'} marked`:'nothing marked yet';
+  const d=state.stamp,p=x=>String(x).padStart(2,'0');
+  /* spec 3.4: stamp states BOTH fetch moment and meta.generatedAt + rev; SNAPSHOT when not live */
+  const mt=DATA.meta||{};
+  const src=mt.generatedAt?`source ${String(mt.generatedAt).slice(0,10)}${mt.revision!==undefined?' rev '+mt.revision:''}`:'source unknown';
+  const stale=(mt.generatedAt&&ageDays(mt.generatedAt)>7)?'<span class="stale">~ STALE</span>':'';
+  document.getElementById('stampLbl').innerHTML=state.live
+    ? `data as at ${p(d.getHours())}:${p(d.getMinutes())} · ${src}${stale}`
+    : `SNAPSHOT · ${src}${stale}`;
+}
+function pick(sec,id,c){const k=sec+':'+id; state.choices[k]===c?delete state.choices[k]:state.choices[k]=c;
+  document.getElementById('promptbox').style.display='none'; syncMarks();}
+function setDetail(sec,id,v){state.details[sec+':'+id]=v;}
+function toggleFlag(f,id){state[f]=!state[f]; document.getElementById(id).classList.toggle('on',state[f]);
+  document.getElementById('promptbox').style.display='none'; syncMarks();}
+/* ---- load modes (spec 3.2) ---- */
+const ageDays=iso=>{const t=Date.parse(iso); return isFinite(t)?(Date.now()-t)/864e5:Infinity;};
+
+/* spec 3.4: a partial payload must omit sections, never crash. Absent -> omitted;
+   present-but-empty -> heading with "— none —". Guarantees render() never sees undefined. */
+const SECTIONS=['projects','people','modules','proofs','gates','decisions','issues','risks','budget','milestones','nextActions','feedback','log'];
+function normalise(){
+  state.absent={};
+  SECTIONS.forEach(k=>{ if(!Array.isArray(DATA[k])){ state.absent[k]=true; DATA[k]=[]; } });
+}
+const NONE='<div class="nonerow">— none —</div>';
+function markEmpty(k){
+  const wrap=document.getElementById('sec-'+k), panel=document.getElementById(k);
+  if(wrap) wrap.hidden = !!state.absent[k];
+  if(state.absent[k]) return;
+  if(panel && !DATA[k].length) panel.innerHTML=NONE;
+}
+function applyEmptyStates(){
+  // 'queues' has no single panel of its own - its three sub-lists are handled inline in render()
+  SECTIONS.filter(k=>k!=='modules').forEach(k=>markEmpty(k));
+}
+
+const abbr=n=>String(n).replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase();
+function applyMeta(){
+  const m=DATA.meta||{};
+  if(m.checkNames&&m.checkNames.length===6) CHECK_NAMES=m.checkNames;
+  const ab=(m.checkAbbr&&m.checkAbbr.length===6)?m.checkAbbr:CHECK_NAMES.map(abbr);
+  const hdr=document.getElementById('chkhdr');
+  if(hdr) hdr.innerHTML=ab.map(a=>`<div>${esc(a)}</div>`).join('');
+  if(m.title)      document.querySelector('.title').textContent=m.title;
+  if(m.eyebrow)    document.querySelector('.eyebrow').textContent=m.eyebrow;
+  if(m.sourceLabel)document.getElementById('sourceLabel').textContent=m.sourceLabel;
+}
+
+function banner(){
+  const el=document.getElementById('srcbanner'), m=DATA.meta||{};
+  const age=ageDays(m.generatedAt), noMeta=!DATA.meta;
+  if(!state.live){
+    el.hidden=false;
+    el.textContent='⚠ SNAPSHOT — live source unreachable. Showing data as at '
+      +(m.generatedAt?String(m.generatedAt).slice(0,16).replace('T',' '):'unknown')+'.';
+  } else if(noMeta||age>30){
+    el.hidden=false;
+    el.textContent='⚠ SOURCE STALE — re-run REFRESH DATA before trusting this view.';
+  } else { el.hidden=true; el.textContent=''; }
+}
+
+async function loadData(){
+  const b=document.getElementById('f-data');
+  if(b){b.textContent='↻ REFRESHING…'; b.classList.add('accent-on');}
+  if(TRACKER_SOURCE){
+    try{
+      const r=await fetch(TRACKER_SOURCE,{cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      if(!j||typeof j!=='object') throw new Error('not an object');
+      DATA=j; normalise(); state.live=true; state.fetchedAt=new Date(); state.loadError=null;
+    }catch(e){ DATA=EMBEDDED; normalise(); state.live=false; state.loadError=String(e.message||e); }
+  }else{ DATA=EMBEDDED; normalise(); state.live=false; state.loadError='no TRACKER_SOURCE configured'; }
+  state.stamp=new Date();
+  applyMeta(); render(); banner();
+  if(b){b.textContent='↻ REFRESH DATA'; b.classList.remove('accent-on');}
+}
+
+function forceRefresh(){ state.dataRefresh=true; loadData().then(syncMarks); }
+function setScheme(k){state.scheme=k;
+  if(k==='canon'){delete document.documentElement.dataset.scheme;} else {document.documentElement.dataset.scheme=k;}
+  render();}
+function resetAll(){state.choices={};state.details={};state.refresh=false;state.canon=false;state.dataRefresh=false;state.scheme='canon';
+  delete document.documentElement.dataset.scheme;
+  ['f-refresh','f-canon'].forEach(i=>document.getElementById(i).classList.remove('on'));
+  document.getElementById('f-data').classList.remove('accent-on');
+  document.getElementById('promptbox').style.display='none'; render();}
+function createPrompt(){
+  const L=[];
+  const srcName=(DATA.meta&&DATA.meta.sourceLabel)||'the tracker source';
+  if(state.dataRefresh)L.push('REFRESH DATA: re-read '+srcName+' plus any module changelogs, re-derive every status from current evidence, and re-issue this dashboard with a new data stamp.');
+  if(state.refresh)L.push('REFRESH BUILD: run the full clean pipeline across ALL modules ('+CHECK_NAMES.join(', ')+'), report per-module results, and stamp the new baseline.');
+  if(state.canon)L.push('CANON SYNC: pull current canon versions from the source of truth, diff every module\u2019s built_against, re-run data-dependent tests for stale modules, update marks.');
+  Object.keys(state.choices).forEach(k=>{const id=k.split(':')[1],d=(state.details[k]||'').trim();
+    L.push(id+' '+state.choices[k]+(d?': '+d:''));});
+  const MARK_TAG={pass:'interested',fail:'not-interested',pending:'undecided'};
+  (DATA.feedback||[]).forEach(([ref,,,,mk])=>{
+    if(state.marks[ref]!==undefined && state.marks[ref]!==mk) L.push(ref+' mark:'+MARK_TAG[state.marks[ref]]);
+  });
+  const mt=DATA.meta||{}, rev=(mt.revision!==undefined?' rev '+mt.revision:''), viewing=(state.live?'live':'SNAPSHOT')+rev;
+  const line=(mt.line||'project');
+  const head='Sync the '+line+' tracker ('+new Date().toISOString().slice(0,10)+', viewing '+viewing+'):';
+  const t=L.length?head+'\n- '+L.join('\n- '):head+' no changes marked.';
+  const b=document.getElementById('promptbox'); b.style.display='block'; b.value=t; b.select();
+  try{document.execCommand('copy');}catch(e){}
+  if(navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});
+}
+normalise(); applyMeta(); render(); loadData();
+</script>
+</body></html>

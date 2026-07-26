@@ -67,6 +67,7 @@ Use the **skill-creator** skill's authoring and packaging machinery (read its SK
 3. **Tool constraints block** — the project's discovered connector quirks, phrased defensively: *if the tool isn't connected, ask the owner to reconnect rather than proceeding from memory.*
 4. **Working rules** — from `references/working-rules.md`: modular design (re-author and test one module, never whole-package rebuilds), proof gates on visual output (owner approves proofs before build continues), staleness propagation (a changed decision flags downstream items stale in the tracker), leverage-existing-skills-first, local-first prototyping for code lines.
 5. **Decision gates** — anything the owner controls (e.g. deck composition, scope changes) changes only via a logged decision, which auto-flags dependents.
+6. **Canon-first request handling** — before generating any task, design, code, or documentation, search the connected canon store and treat what's found there as authoritative; never assume when canonical information exists. Full six-step sequence and the two skills to check first in `references/canon-first-workflow.md`.
 
 Every generated skill additionally carries the **work loop**
 (`DRAFT → VERIFY → PROOF → REVISE → REGISTER`), the **MCP-first rule**, and an
@@ -125,6 +126,14 @@ The non-negotiables — these are what drift:
   paginate cleanly and stay legible in greyscale.
 - One file, no dependencies: inline CSS and script, no build step, opens from
   `file://`, a Drive preview, or an artefact viewer.
+- **Deliver it as a real artifact, not a handed-over file** — that's what makes Publish/
+  Share and an embed code possible. `references/DASHBOARD_SPEC.md` §12 distinguishes this
+  from a Cowork live artifact: Cowork's version pulls through its own connectors and is
+  desktop-only, org-share-only, and **not web-embeddable at all** — the two are not
+  interchangeable, and "build it in Cowork so it can be embedded on a site" isn't
+  achievable as stated. Default to the regular-artifact path unless a request is
+  explicitly asking for Cowork's connector-refresh behaviour in exchange for giving up
+  website embedding.
 
 ### Phase 5 — Package, version, deliver
 
@@ -151,6 +160,7 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/tracker-schema.md` — PROJECT_TRACKER.json schema
 - `references/generated-skill-template.md` — skeleton every generated skill follows
 - `references/skill-baseline.md` — work loop, MCP-first rule, five-point new-skill checklist, install boundary
+- `references/canon-first-workflow.md` — the mandatory search-canon-first sequence for generation requests; task-orchestrator and the project's own skills as the two checks before acting
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
 - `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.0): data contract and load modes, status marks, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist
 - `references/dashboard-reference.html` — the working live-fetch build: copy this, don't build from prose

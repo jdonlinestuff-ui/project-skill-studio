@@ -1,0 +1,163 @@
+"""Generate Tracker Shell sample mockups as SVG (text, so committable to git)."""
+import os
+def lum(h):
+    h=h.lstrip('#'); r,g,b=[int(h[i:i+2],16)/255 for i in (0,2,4)]
+    f=lambda c: c/12.92 if c<=0.03928 else ((c+0.055)/1.055)**2.4
+    r,g,b=f(r),f(g),f(b); return .2126*r+.7152*g+.0722*b
+def cr(a,b):
+    l1,l2=sorted([lum(a),lum(b)],reverse=True); return round((l1+.05)/(l2+.05),2)
+
+SERIF="Georgia,'Libre Baskerville',serif"; SANS="Helvetica,Arial,sans-serif"
+MONO="'IBM Plex Mono',Menlo,Consolas,monospace"
+
+S={
+"ink":dict(label="Ink",bg="#FFFFFF",panel="#FFFFFF",ink="#111418",hbg="#111418",hfg="#FFFFFF",
+  muted="#4A5158",line="#D6DAE0",zebra="#F7F8FA",accent="#1F4E79",onAcc="#FFFFFF",accTxt="#1F4E79",body="#3A4147",
+  tested="#DCE6EF",
+  m=dict(pass_=("#186A3B","#EAF5EE"),fail=("#A32020","#FBECEC"),pend=("#8A5A00","#FBF1E3"),blk=("#111418","#E4E7EA"),na=("#5C636A","#F2F4F6"))),
+"parchment":dict(label="Parchment",bg="#FAF7F0",panel="#FFFDF8",ink="#1A1A1A",hbg="#1A1A1A",hfg="#FAF7F0",
+  muted="#5A5145",line="#DED5C4",zebra="#F5F1E7",accent="#7A5E23",onAcc="#FFFDF8",accTxt="#7A5E23",body="#433E33",
+  tested="#EBE0C6",
+  m=dict(pass_=("#2F5D34","#EDF3EA"),fail=("#96261F","#F8EAE7"),pend=("#7A5210","#F7EEDC"),blk=("#1A1A1A","#E7E1D4"),na=("#5F594E","#F3EFE6"))),
+"mono_print":dict(label="Mono print",bg="#F2F2F0",panel="#FFFFFF",ink="#111111",hbg="#111111",hfg="#FFFFFF",
+  muted="#5A5A5A",line="#D2D2D2",zebra="#F7F7F5",accent="#111111",onAcc="#FFFFFF",accTxt="#3A3A3A",body="#2E2E2E",
+  tested="#DDDDDD",
+  m=dict(pass_=("#111111","#E6E6E4"),fail=("#111111","#D2D2D0"),pend=("#4A4A4A","#EDEDEB"),blk=("#111111","#C6C6C4"),na=("#5A5A5A","#F0F0EE"))),
+"dark_console":dict(label="Dark console",bg="#14171B",panel="#1C2127",ink="#E7E4DC",hbg="#242B33",hfg="#E7E4DC",
+  muted="#9AA3AB",line="#2C333B",zebra="#20262D",accent="#E0A93A",onAcc="#14171B",accTxt="#E0A93A",body="#C3C8CD",
+  tested="#3A424B",
+  m=dict(pass_=("#4CC38A","#17301F"),fail=("#F2665B","#331A19"),pend=("#E0A93A","#332714"),blk=("#C3C8CD","#2A2F35"),na=("#A3ACB4","#22272D"))),
+}
+G=dict(pass_="\u2713",fail="\u2715",pend="~",blk="\u25A0",na="\u2013")
+L=dict(pass_="PASS",fail="FAIL",pend="PEND",blk="BLOCK",na="N/A")
+CHK=["TYP","UNI","GLD","MUL","SEC","PII"]
+
+MODULES=[
+ ("deck-loader","data v6","INTEGRATED",["pass_","pass_","na","na","pend","na"],"65 items byte-verified vs canonical source"),
+ ("engine","data v6 \u00b7 matrix v3.0","BUILDING",["pass_","pass_","fail","na","pend","na"],"golden files vs matrix: 2/3 tiers reproduce"),
+ ("tables","data v6","TESTED",["pass_","pass_","na","pend","pend","pend"],"2-table split verified; no live session run"),
+ ("export","matrix v3.0","PROTOTYPE",["na","na","na","na","pend","na"],"not started \u2014 blocked on D13"),
+]
+QUEUE=[("D13","Register digital-only mechanics?","OPEN","none exist in physical canon"),
+       ("PG1","Platform validation gate","PROPOSED","hardening + audit not evidenced")]
+
+def esc(t): return t.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+
+def badge(x,y,t,status):
+    if status=="INTEGRATED": bg,fg,bd=t['hbg'],t['hfg'],t['hbg']
+    elif status=="TESTED":   bg,fg,bd=t['tested'],t['ink'],t['tested']
+    elif status=="OPEN":     bg,fg,bd=t['accent'],t['onAcc'],t['accent']
+    else:                    bg,fg,bd="none",t['ink'],t['ink']
+    w=len(status)*6.1+12
+    return (f'<rect x="{x}" y="{y}" width="{w:.0f}" height="17" rx="2" fill="{bg}" stroke="{bd}"/>'
+            f'<text x="{x+w/2:.0f}" y="{y+12}" class="m" font-size="8.5" font-weight="600" fill="{fg}" text-anchor="middle">{status}</text>')
+
+def chip(x,y,t,k,w=52):
+    c,tint=t['m'][k]
+    return (f'<rect x="{x}" y="{y}" width="{w}" height="18" rx="3" fill="{tint}"/>'
+            f'<text x="{x+w/2:.0f}" y="{y+12.5}" class="m" font-size="8" font-weight="600" fill="{c}" text-anchor="middle">{G[k]} {L[k]}</text>')
+
+def trio(x,y,t):
+    o=""
+    for i,g in enumerate(("!","\u2713","+")):
+        cx=x+i*30
+        o+=(f'<circle cx="{cx}" cy="{y}" r="12" fill="none" stroke="{t["ink"]}" stroke-width="1.6"/>'
+            f'<text x="{cx}" y="{y+4}" class="m" font-size="11" font-weight="600" fill="{t["ink"]}" text-anchor="middle">{g}</text>')
+    return o
+
+def build(key,t):
+    W=960; o=[]; y=0
+    o.append(f'<rect width="{W}" height="700" fill="{t["bg"]}"/>')
+    # 1 header
+    o.append(f'<text x="24" y="30" class="m" font-size="8.5" letter-spacing="1.8" fill="{t["accTxt"]}">SAMPLE PROJECT \u00b7 BUILD LINE</text>')
+    o.append(f'<text x="24" y="56" class="s" font-size="23" font-weight="700" fill="{t["ink"]}">Project Tracker</text>')
+    o.append(f'<text x="{W-24}" y="30" class="m" font-size="9.5" fill="{t["muted"]}" text-anchor="end">source v0.6 \u00b7 suite v3</text>')
+    o.append(f'<text x="{W-24}" y="44" class="m" font-size="9.5" fill="{t["muted"]}" text-anchor="end">baselined 2026-07-25 \u00b7 maintained by Claude</text>')
+    o.append(f'<rect x="24" y="66" width="{W-48}" height="2.5" fill="{t["ink"]}"/>')
+    # 2 metrics
+    y=82; tiles=[("1","INTEGRATED"),("1","TESTED"),("1","BUILDING"),("1","NOT STARTED"),("1","PROOFS AWAITING"),("1","GATES PENDING")]
+    tw=(W-48-50)/6
+    for i,(n,lab) in enumerate(tiles):
+        x=24+i*(tw+10)
+        o.append(f'<rect x="{x:.0f}" y="{y}" width="{tw:.0f}" height="50" rx="4" fill="{t["panel"]}" stroke="{t["line"]}"/>')
+        o.append(f'<text x="{x+tw/2:.0f}" y="{y+26}" class="s" font-size="20" font-weight="700" fill="{t["ink"]}" text-anchor="middle">{n}</text>')
+        o.append(f'<text x="{x+tw/2:.0f}" y="{y+41}" class="m" font-size="7.5" letter-spacing="0.8" fill="{t["muted"]}" text-anchor="middle">{lab}</text>')
+    # 3 sync contract
+    y=146
+    o.append(f'<rect x="24" y="{y}" width="{W-48}" height="30" rx="4" fill="{t["panel"]}" stroke="{t["line"]}"/>')
+    o.append(f'<rect x="24" y="{y}" width="4" height="30" fill="{t["accent"]}"/>')
+    o.append(f'<text x="40" y="{y+19}" font-size="10.5" font-weight="700" fill="{t["body"]}">Claude cannot see edits made here. Mark rows with the action buttons, then press CREATE PROMPT and paste the result into chat.</text>')
+    # 4 sticky bar
+    y=188; bx=24
+    for i,(lab,filled) in enumerate([("CREATE PROMPT",True),("RESET",False),("\u21ba REFRESH BUILD",False),("\u25c7 CANON SYNC",False),("\u21bb REFRESH DATA",False)]):
+        w=len(lab)*6.4+22
+        o.append(f'<rect x="{bx:.0f}" y="{y}" width="{w:.0f}" height="30" rx="3" fill="{t["ink"] if filled else "none"}" stroke="{t["ink"]}" stroke-width="1.8"/>')
+        o.append(f'<text x="{bx+w/2:.0f}" y="{y+19.5}" class="m" font-size="9" font-weight="700" letter-spacing="0.6" fill="{t["bg"] if filled else t["ink"]}" text-anchor="middle">{lab}</text>')
+        bx+=w+7
+    o.append(f'<text x="{W-24}" y="{y+13}" class="m" font-size="8.5" letter-spacing="1" fill="{t["muted"]}" text-anchor="end">SCHEME</text>')
+    o.append(f'<text x="{W-24}" y="{y+26}" class="m" font-size="9" font-weight="700" fill="{t["accTxt"]}" text-anchor="end">{t["label"].upper()}</text>')
+    o.append(f'<line x1="24" y1="{y+38}" x2="{W-24}" y2="{y+38}" stroke="{t["line"]}"/>')
+    # 5 legend
+    y=238; lx=24
+    for k in ("pass_","fail","pend","blk","na"):
+        o.append(chip(lx,y,t,k,58)); lx+=64
+    o.append(f'<text x="{lx+6}" y="{y+13}" class="m" font-size="8.5" fill="{t["muted"]}">glyph + label + tint \u2014 never colour alone</text>')
+    # 6 module grid
+    y=272
+    o.append(f'<text x="24" y="{y}" class="s" font-size="13.5" font-weight="700" fill="{t["ink"]}">Module Grid</text>')
+    o.append(f'<text x="{W-24}" y="{y}" class="m" font-size="8.5" letter-spacing="1" fill="{t["accTxt"]}" text-anchor="end">05_SOURCE_v0.6</text>')
+    y=284
+    o.append(f'<rect x="24" y="{y}" width="{W-48}" height="{28+len(MODULES)*46}" rx="4" fill="{t["panel"]}" stroke="{t["line"]}"/>')
+    o.append(f'<rect x="24" y="{y}" width="{W-48}" height="24" fill="{t["hbg"]}"/>')
+    heads=[("MODULE",34),("BUILD STATE",150),("EVIDENCE / GAP",600),("ACTION",862)]
+    for lab,hx in heads:
+        o.append(f'<text x="{hx}" y="{y+16}" class="m" font-size="8" font-weight="600" letter-spacing="1.1" fill="{t["hfg"]}">{lab}</text>')
+    for i,c in enumerate(CHK):
+        o.append(f'<text x="{258+i*54+26}" y="{y+16}" class="m" font-size="8" font-weight="600" fill="{t["hfg"]}" text-anchor="middle">{c}</text>')
+    ry=y+24
+    for i,(name,ver,status,checks,note) in enumerate(MODULES):
+        if i%2: o.append(f'<rect x="25" y="{ry}" width="{W-50}" height="46" fill="{t["zebra"]}"/>')
+        o.append(f'<line x1="25" y1="{ry}" x2="{W-25}" y2="{ry}" stroke="{t["line"]}"/>')
+        o.append(f'<text x="34" y="{ry+20}" class="m" font-size="10" font-weight="600" fill="{t["ink"]}">{esc(name)}</text>')
+        o.append(f'<text x="34" y="{ry+33}" class="m" font-size="8.5" fill="{t["muted"]}">{esc(ver)}</text>')
+        o.append(badge(150,ry+14,t,status))
+        for j,k in enumerate(checks):
+            o.append(chip(258+j*54,ry+14,t,k))
+        o.append(f'<text x="600" y="{ry+27}" font-size="9.5" fill="{t["body"]}">{esc(note[:44])}</text>')
+        o.append(trio(872,ry+23,t))
+        ry+=46
+    # 7 queue
+    y=ry+30
+    o.append(f'<text x="24" y="{y}" class="s" font-size="13.5" font-weight="700" fill="{t["ink"]}">Decisions &amp; Gates</text>')
+    o.append(f'<text x="{W-24}" y="{y}" class="m" font-size="8.5" letter-spacing="1" fill="{t["accTxt"]}" text-anchor="end">2 TO CALL</text>')
+    y+=12
+    o.append(f'<rect x="24" y="{y}" width="{W-48}" height="{len(QUEUE)*40}" rx="4" fill="{t["panel"]}" stroke="{t["line"]}"/>')
+    ry=y
+    for i,(ref,name,status,note) in enumerate(QUEUE):
+        if i: o.append(f'<line x1="25" y1="{ry}" x2="{W-25}" y2="{ry}" stroke="{t["line"]}"/>')
+        o.append(f'<text x="34" y="{ry+24}" class="m" font-size="9.5" font-weight="600" fill="{t["accTxt"]}">{ref}</text>')
+        o.append(f'<text x="86" y="{ry+20}" font-size="10" font-weight="600" fill="{t["ink"]}">{esc(name)}</text>')
+        o.append(badge(86,ry+24,t,status))
+        o.append(f'<text x="420" y="{ry+24}" font-size="9.5" fill="{t["body"]}">{esc(note)}</text>')
+        o.append(trio(872,ry+20,t))
+        ry+=40
+    # footer
+    fy=ry+26
+    o.append(f'<text x="{W/2}" y="{fy}" class="m" font-size="8.5" fill="{t["muted"]}" text-anchor="middle">{t["label"]} scheme \u00b7 glyph + tint marks \u00b7 print-safe \u00b7 live view over its JSON source \u00b7 swap TRACKER_SOURCE, not the data</text>')
+    H=fy+18
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" ><rect width="{W}" height="{H}" fill="{t["bg"]}"/>'+"".join(o[1:])+"</svg>"
+
+rows=[]
+for k,t in S.items():
+    open(f"tracker-{k.replace('_','-')}.svg","w").write(build(k,t))
+    pairs={"ink/bg":cr(t['ink'],t['bg']),"body/panel":cr(t['body'],t['panel']),"muted/bg":cr(t['muted'],t['bg']),
+           "accTxt/bg":cr(t['accTxt'],t['bg']),"hfg/hbg":cr(t['hfg'],t['hbg'])}
+    for mk,(c,tint) in t['m'].items(): pairs[mk]=cr(c,tint)
+    rows.append((t['label'],min(pairs.values()),pairs))
+fails=[r for r in rows if r[1]<4.5]
+print(f"{'scheme':14s}{'worst':>7s}  verdict")
+for n,w,p in rows:
+    print(f"{n:14s}{w:7.2f}  {'AA OK' if w>=4.5 else 'BELOW AA'}")
+    print("              "+" ".join(f"{k}={v}" for k,v in p.items()))
+assert not fails, "AA gate: " + ", ".join(f"{n} worst={w}" for n,w,_ in fails)
+print("\nAA gate passed - all schemes >= 4.5:1 on every pair")

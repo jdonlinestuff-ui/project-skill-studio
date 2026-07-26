@@ -50,6 +50,11 @@ prompt — ships with all five:
    slash-command ready and actually triggers.
 2. **Canon consistency & write-back** section: what it reads before, which style
    or format gate it passes, what it writes after, with concrete IDs or paths.
+   For any generation request (task, design, code, documentation), this section
+   follows the six-step canon-first sequence in `canon-first-workflow.md` —
+   search, summarise, identify missing, plan, tasks, produce-after-approval —
+   and checks task-orchestrator plus the project's own installed skills before
+   writing anything new.
 3. **Work loop & MCP use** section (§1 and §2 above).
 4. **Dashboard integration**: its outputs raise decision cards or suggested
    activities carrying the EXPLAIN/PROCEED/IMPROVE trio, and it registers itself
