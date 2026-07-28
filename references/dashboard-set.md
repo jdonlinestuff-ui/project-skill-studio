@@ -74,16 +74,33 @@ Contents, all derived:
 The last point is what makes this surface worth building: it is the one page that answers
 "where do I start" without a conversation.
 
-## Conformance — what these two are exempt from, and what they are not
+## Conformance — pooled, interactive, and still bound by the honesty rules
 
-The Facilitator and Resources surfaces are **read-only derived views**. They are exempt
-from the parts of `DASHBOARD_SPEC.md` that exist to serve the write-back loop:
+The Facilitator and Resources surfaces are **pooled derived views** (`DASHBOARD_SPEC.md`
+§13): every row is gathered from another tracker rather than authored here, but that does
+not make the surface read-only. As of spec v3.4, both carry the full interactive
+machinery — this reverses the original "exempt from controls" rule below, kept here with
+the reason it changed rather than silently dropped:
 
-Exempt: the action trio, CREATE PROMPT and the prompt protocol (§5), the four-scheme
-switcher, the module grid geometry, the sticky control bar. A facilitator mid-session must
-not be clicking status controls, and an orientation page has nothing to sync.
+The original rule exempted both surfaces from the action trio, CREATE PROMPT and the
+prompt protocol, the four-scheme switcher, and the sticky control bar, reasoning that a
+surface with no write-back loop had no need for the machinery that serves one. Real use
+showed the opposite: marking rows pooled from every line and compiling them into one
+CREATE PROMPT hand-off is exactly what a facilitator or resourcing review is *for* — the
+single action that makes opening either surface mid-meeting worth it. A briefing card that
+cannot mark anything is a worse fit for that moment than the standard tracker shell it was
+meant to simplify.
 
-**Not exempt**, and these are not negotiable:
+**Carried, same as the shell**: the action trio, CREATE PROMPT and the prompt protocol
+(§5), the scheme switcher, the sticky control bar.
+
+**Added, specific to a pooled surface**: a click-to-scope index (one row per tracker or
+per project line; click to filter every section below to it, click again to clear),
+independent dropdown filters (by tracker/program, by owner/person), and free-text search —
+all composable. `references/facilitator-hub-reference.html` is the canonical shell for
+both surfaces.
+
+**Not exempt from anything, and these were never negotiable:**
 
 - **Status vocabulary** (§2) — glyph, word and tint travel together; the word is what
   survives greyscale and colour-blindness. A red dot on a facilitator page is a defect.
@@ -95,8 +112,10 @@ not be clicking status controls, and an orientation page has nothing to sync.
 - **Print rules** (§10) — the facilitator surface in particular is often printed or held on
   a second screen, and must stay legible in greyscale.
 
-A surface that drops the controls but keeps the honesty rules is a conformant derived view.
-One that drops the honesty rules is just a poster.
+A pooled surface that scopes and filters its data differently from a single-line tracker
+is still a conformant derived view. One that drops the honesty rules is a poster, whether
+or not it has buttons on it — the controls were never the part actually protecting the
+reader.
 
 ## Regeneration
 

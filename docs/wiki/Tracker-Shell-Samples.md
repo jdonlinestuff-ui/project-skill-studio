@@ -5,6 +5,12 @@ build, in each of its four real colour schemes. These are not a separate mockup 
 they're Chromium screenshots of the real file running its real code, so what you see here
 is exactly what copying the reference gives you.
 
+**This page covers the single-line tracker shell.** As of v1.11.0 the Facilitator and
+Resources surfaces have their own reference build, `references/facilitator-hub-reference.html`,
+with a click-to-scope index and dropdown/search filtering the shell below doesn't have —
+see `docs/samples/resource-tracker/resource-tracker_v2.html` for the Resources instance of
+it. `resource-tracker_v1.html` below predates that pattern and is kept for history only.
+
 Generated against **v1.7.0**, which added [§4e Feedback & Suggestions](https://github.com/jdonlinestuff-ui/project-skill-studio/blob/main/references/DASHBOARD_SPEC.md#4e-feedback--suggestions--a-facilitator-dashboard-not-a-voting-app) — a facilitator-recorded capture surface for live reviews. No vote tally: a status a person sets once (`~ UNDECIDED` / `✓ INTERESTED` / `✕ NOT INTERESTED`), the **one deliberately clickable chip** in the whole dashboard. Every other status mark on the page is evidence-derived and read-only; this is the stated, single exception.
 
 ## Full dashboard — Canon scheme (default)

@@ -1,4 +1,4 @@
-# Status Dashboard Shell — reusable dashboard spec v3.3
+# Status Dashboard Shell — reusable dashboard spec v3.4
 
 Project-agnostic. This is the visual and data contract for every dashboard built with the
 `status-dashboard` skill. Sections 6–10 are literal and apply verbatim to any project.
@@ -29,6 +29,7 @@ The record, stated once so no section has to guess:
 | v3.1 | §4e Feedback & Suggestions added — the first one-time section insertion |
 | v3.2 | §4f Portfolio Roster + §4g People & Allocation — the second insertion, 14 sections → 16 |
 | v3.3 | §3.6 evidence baseline and §4h Defect & Task Register — the third insertion, 16 → 17 |
+| v3.4 | §3.7 the ISSUE·PROBLEM·NEEDED row triple and the header Function/Purpose/Objective block, both now standard; §13 reversed — Facilitator and Resources carry the action trio, CREATE PROMPT and the scheme switcher after all, plus a click-to-scope index and dropdown/search filtering unique to a pooled surface |
 
 Things that went wrong the last time this was rebuilt, all now specified below:
 `rem`-based font sizes, glyph-only 14px status squares, square 4px action buttons,
@@ -230,6 +231,59 @@ tells anyone reading the source. Both, not either.
 other trackers — set both fields to the same value and the rule is inert. Do not omit them
 to achieve the same effect: an absent baseline is indistinguishable from one nobody
 thought about.
+
+### 3.7 Row content — the ISSUE · PROBLEM · NEEDED triple, and the header purpose block
+
+Every section in §4 that documents a `note` field may render it as a flat string, as
+written throughout this file — that stays valid and is the right choice for a short,
+self-contained line (a budget variance, a milestone date). It is the wrong choice for
+anything a reader has to act on, because a single sentence conflates three different
+questions a facilitator actually needs answered separately: what is this, why does it
+matter, and what has to happen next.
+
+Where a row is something someone will decide or action on — Decisions, Open Issues, Next
+Actions, and any Facilitator/Resources row pooled from them — author it as a **triple**
+instead of a flat `note`:
+
+| field | answers |
+|---|---|
+| `issue` | what is this, stated as a fact, not a question |
+| `problem` | why it matters — the consequence of leaving it as-is |
+| `needed` | what has to happen, and who from, to close it |
+
+This is an authoring step, not a string-splitting trick — no heuristic reliably turns one
+paragraph into three parts that actually answer three different questions. A row missing
+any of the three does not get a partial triple; write it as a flat `note` instead, or flag
+it back to the source tracker as incomplete.
+
+**Rendering.** Each line is prefixed with its label in the accent colour
+(`<b>ISSUE </b>`, 10px, letter-spacing .06em, matching `.ref`), body text at the standard
+12px note size below it. All three lines clamp to one line each by default
+(`-webkit-line-clamp:1`) with a `… expand` / `– collapse` toggle per row, so a dense
+section stays scannable and a reader who needs the full text gets it without leaving the
+page. `EXPAND ALL` in the control bar (§10.4) toggles every row's clamp at once.
+
+**Empty sections still get an IMPROVE control.** A section with zero rows renders
+`— none —` plus a lone `(+)` button reusing the same action-trio wiring as every other
+row (EXPLAIN and PROCEED present but hidden, since neither means anything on an empty
+section) — so a facilitator can still open a field and say what should go there, instead
+of an empty section being a dead end.
+
+**The header purpose block.** Immediately below the title/eyebrow and above the
+how-this-works panel (§10.3), an optional three-column block states what this specific
+dashboard is for, driven by three `meta` fields:
+
+| field | answers |
+|---|---|
+| `trackerFunction` | what this dashboard tracks, one to two sentences |
+| `trackerPurpose` | why that matters — what question it lets the reader answer |
+| `trackerOutcome` | the objective — what "done" or "working" looks like for this line |
+
+Each column hides independently when its field is empty, and the whole block hides when
+all three are empty — an older `EMBEDDED` seed or a tracker JSON that predates this field
+renders exactly as it did before. This is a per-dashboard description, authored once when
+the dashboard is built and revised only when what it tracks genuinely changes — not
+regenerated content, and not a substitute for the tracker's own `sourceLabel`/`eyebrow`.
 
 ---
 
@@ -905,21 +959,47 @@ Ask, record the answer as a logged decision, and take "no" as complete.
 
 ---
 
-## 13. Derived views — the read-only surfaces
+## 13. Facilitator and Resources — interactive pooled views
 
 Two of the three surfaces in `dashboard-set.md` — Facilitator and Resources — are
-**read-only derived views**. They render tracker data for a specific audience and have no
-write-back loop, so the machinery that serves that loop does not apply to them.
+**pooled derived views**: they render tracker data gathered across every line for a
+specific audience, and author nothing of their own back into a source tracker directly.
 
-**Exempt**: the action trio (§10.7), CREATE PROMPT and the prompt protocol (§5), the
-scheme switcher (§10.5), the sticky control bar (§10.4), the module-grid geometry (§10.8).
+That used to mean read-only. v3.3 and earlier exempted both surfaces from the action
+trio, CREATE PROMPT and the scheme switcher, on the reasoning that a surface with no
+write-back loop had no need for the machinery that serves one. **This was reversed in
+v3.4** after real use showed the opposite: the moment someone marks ten rows pooled from
+every project line and hands them back as one compiled prompt is precisely a facilitator
+or resourcing review, not a single-line tracker session. A read-only briefing card removed
+the one action that made opening it mid-meeting worthwhile.
 
-**Binding, without exception**: the status vocabulary and glyph+word+tint rule (§2);
-evidence discipline and derived-never-stored (§3.5); the freshness stamp and evidence
-baseline (§3.4, §3.6), including saying `Not live-synced` in words when the surface is a
-snapshot; and the print rules — a facilitator surface is printed or held on a second
-screen more often than any other page this spec produces.
+**Carried, same as the shell, no exceptions**: the action trio (§10.7), CREATE PROMPT and
+the prompt protocol (§5), the scheme switcher (§10.5), the sticky control bar (§10.4).
 
-A derived view may use a simpler visual system than the shell, since it carries none of
-the shell's controls. It may not use a simpler standard of truth. Dropping the controls
-makes it a briefing card; dropping the honesty rules makes it a poster.
+**Added, specific to a pooled surface, not present on a single-line tracker**:
+
+- **A click-to-scope index** — one row per tracker (Facilitator) or per project line
+  (Resources), each showing its own rollup counts, computed at render. Clicking a row
+  filters every section below to that scope; clicking the same row again clears it.
+- **Independent dropdown filters** — by tracker/program and by owner/person — plus a
+  free-text search box, all three composable with the index scope and with each other.
+- Sections below the index reuse the exact row/triple/action-trio machinery of §4 and
+  §10.7-10.10 — a pooled view is still built from the same components, just fed rows
+  gathered from more than one source tracker instead of one.
+
+`references/facilitator-hub-reference.html` is the canonical shell for both surfaces —
+copy it, the same way `dashboard-reference.html` is copied for a single-line tracker.
+`docs/samples/resource-tracker/resource-tracker_v2.html` is the Resources instance of it;
+`resource-tracker_v1.html` is kept for history and is superseded — it predates the
+index/filter pattern and should not be copied for a new build.
+
+**Binding, without exception, same as every other surface**: the status vocabulary and
+glyph+word+tint rule (§2); evidence discipline and derived-never-stored (§3.5); the
+freshness stamp and evidence baseline (§3.4, §3.6), including saying `Not live-synced` in
+words when the surface is a snapshot; and the print rules — a facilitator surface is
+printed or held on a second screen more often than any other page this spec produces.
+
+A pooled view may scope and filter its data differently from a single-line tracker. It
+may not use a simpler standard of truth, and — as of v3.4 — it does not drop the controls
+either. The honesty rules were always the non-negotiable half of the old rule; dropping
+the controls turned out to be the wrong way to protect them.

@@ -1,0 +1,372 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resource Tracker</title>
+<style>
+/* ---- tokens: Canon v6 is the default scheme (spec v2.0 §6) ---- */
+:root{
+  --bg:#F6ECD6; --panel:#FFFAEE; --ink:#101D3D; --headerBg:#101D3D; --headerFg:#F6ECD6;
+  --muted:#7A6E55; --line:#E3D2A8; --zebra:#FBF4E3; --accent:#C9A961; --onAccent:#101D3D;
+  --accentText:#A8843C; --body:#4A4535; --field:#FFFDF7; --tested:#E7D9B4; --testedFg:#101D3D;
+  --pass:#1E7A45; --passT:#E4F2E9; --fail:#B3261E; --failT:#FBE6E4;
+  --pend:#A97605; --pendT:#F8EED6; --block:#141414; --blockT:#E8E4DA;
+  --na:#9A8F75; --naT:#F1EADA;
+}
+[data-scheme="slate"]{
+  --bg:#EEF0F1; --panel:#FBFCFC; --ink:#1B2227; --headerBg:#1B2227; --headerFg:#EEF0F1;
+  --muted:#6F787D; --line:#DBE0E2; --zebra:#F4F6F6; --accent:#2F7D74; --onAccent:#FFFFFF;
+  --accentText:#2F7D74; --body:#3C464C; --field:#FFFFFF; --tested:#D6E7E4; --testedFg:#1B2227;
+  --pass:#1F6B45; --passT:#E1EFE7; --fail:#B4482F; --failT:#F9E7E2;
+  --pend:#9A6B12; --pendT:#F6EEDD; --block:#1B2227; --blockT:#E4E7E9;
+  --na:#8D969B; --naT:#EEF1F2;
+}
+[data-scheme="dark"]{
+  --bg:#14171B; --panel:#1C2127; --ink:#E7E4DC; --headerBg:#242B33; --headerFg:#E7E4DC;
+  --muted:#8B939B; --line:#2C333B; --zebra:#20262D; --accent:#E0A93A; --onAccent:#14171B;
+  --accentText:#E0A93A; --body:#C3C8CD; --field:#161A1F; --tested:#3A424B; --testedFg:#E7E4DC;
+  --pass:#4CC38A; --passT:#17301F; --fail:#F2665B; --failT:#331A19;
+  --pend:#E0A93A; --pendT:#332714; --block:#C3C8CD; --blockT:#2A2F35;
+  --na:#6B7178; --naT:#22272D;
+}
+[data-scheme="mono"]{
+  --bg:#F2F2F0; --panel:#FFFFFF; --ink:#111111; --headerBg:#111111; --headerFg:#FFFFFF;
+  --muted:#6E6E6E; --line:#DADADA; --zebra:#F7F7F5; --accent:#111111; --onAccent:#FFFFFF;
+  --accentText:#4A4A4A; --body:#333333; --field:#FFFFFF; --tested:#DDDDDD; --testedFg:#111111;
+  --pass:#111111; --passT:#E6E6E4; --fail:#111111; --failT:#CFCFCD;
+  --pend:#6E6E6E; --pendT:#EDEDEB; --block:#111111; --blockT:#C2C2C0;
+  --na:#9A9A98; --naT:#F4F4F2;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
+a{color:var(--ink)} a:hover{color:var(--accentText)}
+button,textarea,select,input{font-family:inherit}
+@media print{.noprint{display:none!important}}
+
+.eyebrow{font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.18em;color:var(--accentText)}
+.title{font:700 27px/1.15 Libre Baskerville,Georgia,serif;letter-spacing:-.01em}
+.headmeta{font:400 10px/1.5 IBM Plex Mono,monospace;text-align:right;color:var(--muted)}
+
+.purpose{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px}
+.purpose .pcol{display:flex;flex-direction:column;gap:4px}
+.purpose .plbl{font:600 10px/1.3 IBM Plex Mono,monospace;letter-spacing:.12em;color:var(--accentText)}
+.purpose .ptext{font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
+
+.keypanel{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:16px 18px}
+.keyintro{font:400 13px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);margin-bottom:14px}
+.keygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px}
+.keyitem{display:flex;align-items:flex-start;gap:10px}
+.circ{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 14px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:var(--panel);color:var(--ink)}
+.circ.explain{border-color:var(--accent)}
+.circ.proceed{background:var(--ink);color:var(--bg)}
+.circ.improve,.circ.data{background:var(--accent);color:var(--onAccent)}
+.keyname{font:700 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+.keydesc{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);text-wrap:pretty}
+.stack{display:flex;flex-direction:column;gap:4px}
+
+.nonerow{padding:10px 2px;font-weight:400;font-size:12px;line-height:1.45;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--muted)}
+
+.mk{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 9px;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
+.mk i{font-style:normal;font-size:13px}
+.mk-pass{background:var(--passT);color:var(--pass)}
+.mk-pending{background:var(--pendT);color:var(--pend)}
+.mk-na{background:var(--naT);color:var(--na)}
+
+.gidxR{grid-template-columns:56px 1fr 108px 72px 72px}
+.gallocR{grid-template-columns:132px 92px 60px 1fr 116px}
+.gsumR{grid-template-columns:110px 96px 1fr}
+.gnotesR{grid-template-columns:1fr 136px}
+.cells{display:grid;gap:10px;align-items:start;padding:12px 14px;overflow-wrap:anywhere}
+.cells>*{min-width:0}
+.hdr{overflow-wrap:anywhere}
+.hdr>*{min-width:0}
+.hdr{display:grid;gap:8px;align-items:center;padding:9px 14px;background:var(--headerBg);color:var(--headerFg);font:600 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+
+.triple{font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body)}
+.trio2{display:flex;gap:5px;justify-content:flex-end}
+.trio2 button{flex:none;width:26px;height:26px;border-radius:50%;font:600 12px/1 "IBM Plex Mono",monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.trio2 button.on{background:var(--ink);color:var(--bg)}
+.trio2 button.imp{background:var(--accent);color:var(--ink)}
+.trio2 button.ghost{flex:none;width:26px;height:26px;border-radius:50%;font:600 11px/1 "IBM Plex Mono",monospace;border:1.5px solid var(--line);background:transparent;color:var(--muted)}
+.idxrow{cursor:pointer}
+.pill{display:flex;align-items:center;justify-content:center;height:24px;border-radius:3px;font:600 12px/1 "IBM Plex Mono",monospace}
+.pill0{background:var(--naT);color:var(--na)}
+.pillhot{background:var(--failT);color:var(--fail)}
+.pillwarm{background:var(--pendT);color:var(--pend)}
+.line-clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.line-open{display:block}
+
+.schemewrap{display:flex;align-items:center;gap:6px;margin-left:auto}
+.schemelbl{font:500 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--muted)}
+.sbtn{display:flex;align-items:center;gap:5px;height:32px;padding:0 9px;border-radius:3px;cursor:pointer;font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.06em;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.sbtn.on{background:var(--ink);color:var(--bg)}
+.dots{display:flex}
+.dots i{width:9px;height:9px;border-radius:50%;display:block}
+.dots i+i{margin-left:-3px}
+.foot{margin-top:28px;font:400 10px/1.5 IBM Plex Mono,monospace;text-align:center;color:var(--muted)}
+</style></head><body><div id="app"></div>
+<script>
+const TRACKER_SOURCE='';
+/* ============ EMBEDDED — canon-derived snapshot ============
+   programs[]: the 7 real project lines (P0-P6). people[]: [name, programRef, tasks, note] —
+   flat allocation rows, counted from real owner fields across both canon trackers this
+   session (see log). Totals below are DERIVED AT RENDER from people[], never stored. */
+const EMBEDDED = {
+"meta": {
+  "title": "Resource Tracker", "eyebrow": "CYBER RISK ASSESSMENT · PEOPLE & ALLOCATION",
+  "generatedAt": "2026-07-27", "maintainer": "Claude",
+  "trackerFunction": "Tracks who — Dan or Claude, the project's only two real resources — is allocated to which project line, and how many open tasks each carries right now.",
+  "trackerPurpose": "Surfaces allocation imbalance (e.g. one line quietly carrying most of the open task load) before it becomes a bottleneck, using counts derived live from the trackers rather than typed-in guesses.",
+  "trackerOutcome": "A realistic, canon-derived picture of workload across the studio, kept honest by the 'derived, never stored' rule — recount from source every refresh, never hand-edit a total."
+},
+"programs": [
+  {"k":"P0","id":"P0","name":"Programme / Tracker Ops","status":"pass","note":"Delete superseded DESIGN_TRACKER copies (I10) and the duplicate DESIGN_TRACKER (2).json; supply real B1-B6 budget figures; refresh SESSION_STATE.md (I7)."},
+  {"k":"P1","id":"P1","name":"Design & Publishing (physical line)","status":"pass","note":"Confirm/close I1 (card background templates) and Q1/Q2 against Game Manual v3.2 — both already resolved, pending formal retirement from the next-actions list."},
+  {"k":"P2","id":"P2","name":"Digital Dev / Teams App","status":"pending","note":"Re-baseline against the cra-offline-app repo (I8/I12); decide D14; resolve the scoring golden-file/prose contradiction; run the live multi-client rehearsal (I6); sequence the design-review P1-P3 sets."},
+  {"k":"P3","id":"P3","name":"Compliance Gate","status":"pending","note":"Prioritise the design-review P1 platform-fit items (T1/T3) and run the live multi-client rehearsal that also gates PG1."},
+  {"k":"P4","id":"P4","name":"Expansion — SOC 2 TSC Light Pack","status":"na","note":"No roster assigned yet — triage-only; expansion issues (I17) are tracked but no next_actions reference this line specifically."},
+  {"k":"P5","id":"P5","name":"Skill Suite","status":"pass","note":"Confirm cra-* skill install status (I9) — resolved this refresh; work through the 2026-07-26 staleness-audit follow-ups."},
+  {"k":"P6","id":"P6","name":"Cloudflare Hosting","status":"na","note":"Own the hosting planning-only gate decision (GATE1) and its live Cloudflare account check."}
+],
+"people": [
+  ["Dan","P0",3,"Delete superseded tracker copies; supply real budget figures."],
+  ["Dan","P1",2,"Confirm/close I1; confirm Q1/Q2 — both stale/already-resolved rows."],
+  ["Dan","P2",11,"Decide D14; authorise the v0.19+ source sync and re-baseline; call the live multi-client rehearsal; sequence the design-review set."],
+  ["Dan","P3",2,"Prioritise T1/T3; call the live multi-client rehearsal (shared with Claude)."],
+  ["Dan","P5",2,"Confirm cra-* skill install status (I9)."],
+  ["Dan","P6",1,"Own the hosting planning-only gate decision."],
+  ["Claude","P0",1,"Refresh SESSION_STATE.md (I7)."],
+  ["Claude","P2",8,"Resolve the scoring golden-file contradiction; re-derive module marks once source lands; build scoring golden files (S8); execute the design-review sequencing."],
+  ["Claude","P3",2,"Same P1 platform-fit / rehearsal items, Claude's side of the pairing."],
+  ["Claude","P6",1,"Ran the live Cloudflare account check this refresh — nothing provisioned."]
+],
+"log": [["2026-07-27","First build (static shell): 26 owner-bearing rows counted across DESIGN_TRACKER.next_actions (11), ONLINE_DEV_TRACKER.nextActions (11), the Compliance Gate Tracker's 2 hand-authored next actions, and Hosting's GATE1 decision + its live-check log line; each tagged to the project line (P0-P6) it is actually about. P4 (Expansion) has zero next_actions referencing it this session, so it carries no roster row — shown as an explicit 0/0, not silently omitted."],
+        ["2026-07-28","Rebuilt on the Facilitator Hub's interactive shell (index + filter + mark/expand/CREATE PROMPT), per Dan's request, replacing the static per-line dashboard shell. Same underlying data and counting method as the 2026-07-27 build — only the layout and interaction model changed. Programme Index, People & Allocation, People Summary and Resourcing Notes sections; filter by program, by person, and by search text; click an index row to scope the two detail sections to that program."]]
+};
+let DATA = EMBEDDED;
+let state = {
+  scheme:'canon', filterProgram:'ALL', filterPerson:'ALL', query:'',
+  choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'',
+  sort:{index:{key:'k',dir:1}, alloc:{key:'programRef',dir:1}},
+  live:false, loadError:null
+};
+const STATUS_WORD={pass:'ON TRACK',pending:'AT RISK',na:'NOT STARTED'};
+const SCHEMES=[['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
+               ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
+function setScheme(k){ state.scheme=k;
+  if(k==='canon'){ delete document.documentElement.dataset.scheme; } else { document.documentElement.dataset.scheme=k; }
+  render(); }
+function esc(s){ s=String(s==null?'':s); const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function pname(k){ const p=DATA.programs.find(p=>p.k===k); return p?p.name:k; }
+
+async function loadData(){
+  if(TRACKER_SOURCE){
+    try{ const r=await fetch(TRACKER_SOURCE,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status);
+      DATA=await r.json(); state.live=true; state.loadError=null; }
+    catch(e){ DATA=EMBEDDED; state.live=false; state.loadError=String(e.message||e); }
+  } else { DATA=EMBEDDED; state.live=false; state.loadError='no TRACKER_SOURCE configured'; }
+  render();
+}
+
+function allocRows(){
+  // [name, programRef, tasks, note] -> object rows, ref = name+':'+programRef (unique)
+  return DATA.people.map(p=>({name:p[0], programRef:p[1], tasks:p[2], note:p[3], ref:p[0]+':'+p[1]}));
+}
+function matches(r){
+  if(state.filterProgram!=='ALL' && r.programRef!==state.filterProgram) return false;
+  if(state.filterPerson!=='ALL' && r.name!==state.filterPerson) return false;
+  const q=state.query.trim().toLowerCase(); if(!q) return true;
+  return [r.name,r.programRef,pname(r.programRef),r.note].filter(Boolean).join(' ').toLowerCase().includes(q);
+}
+function sortRows(rows,sec){
+  const {key,dir}=state.sort[sec];
+  const val=r=>{ if(key==='programRef') return pname(r.programRef); return r[key]??''; };
+  return rows.slice().sort((a,b)=>{ const x=val(a),y=val(b); return x<y?-dir:x>y?dir:0; });
+}
+function markRow(sec,ref,choice){ const k=sec+':'+ref; if(state.choices[k]===choice) delete state.choices[k]; else state.choices[k]=choice; state.prompt=''; render(); }
+function setDetail(sec,ref,v){ state.details[sec+':'+ref]=v; }
+function toggleExpand(sec,ref){ const k=sec+':'+ref; state.expanded[k]=!state.expanded[k]; render(); }
+
+function trio(sec,ref){
+  const c=state.choices[sec+':'+ref]; const open=state.allOpen||!!state.expanded[sec+':'+ref];
+  return `<div class="trio2">
+    <button class="${c==='explain'?'on':''}" title="EXPLAIN" onclick="markRow('${sec}','${ref}','explain')">!</button>
+    <button class="${c==='proceed'?'on':''}" title="PROCEED" onclick="markRow('${sec}','${ref}','proceed')">✓</button>
+    <button class="${c==='improve'?'imp':''}" title="IMPROVE" onclick="markRow('${sec}','${ref}','improve')">+</button>
+    <button class="ghost" title="Expand" onclick="toggleExpand('${sec}','${ref}')">${open?'–':'…'}</button>
+  </div>`;
+}
+function rowBar(sec,ref){ const c=state.choices[sec+':'+ref]; return c?'box-shadow:inset 4px 0 0 var(--accent);':''; }
+
+function renderIndex(){
+  const rows = DATA.programs.filter(p=>state.filterPerson==='ALL'||DATA.people.some(r=>r[1]===p.k&&r[0]===state.filterPerson));
+  const {key,dir}=state.sort.index;
+  rows.sort((a,b)=>{ const x=a[key]??a.id, y=b[key]??b.id; return x<y?-dir:x>y?dir:0; });
+  document.getElementById('idxBody').innerHTML = rows.length ? rows.map((p,i)=>{
+    const peopleRows = DATA.people.filter(r=>r[1]===p.k && (state.filterPerson==='ALL'||r[0]===state.filterPerson));
+    const peopleCount = new Set(peopleRows.map(r=>r[0])).size;
+    const taskTotal = peopleRows.reduce((s,r)=>s+r[2],0);
+    return `
+    <div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${state.filterProgram===p.k?'box-shadow:inset 4px 0 0 var(--ink);':''}">
+     <div class="cells gidxR idxrow" style="align-items:center" onclick="state.filterProgram=state.filterProgram==='${p.k}'?'ALL':'${p.k}'; render();">
+      <div style="font:600 11px/1.4 IBM Plex Mono,monospace;color:var(--accentText)">${esc(p.k)}</div>
+      <div style="font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif">${esc(p.name)}</div>
+      <div class="mk mk-${p.status}"><i>${p.status==='pass'?'✓':p.status==='pending'?'~':'–'}</i>${STATUS_WORD[p.status]}</div>
+      <div style="font:600 12px/1.4 IBM Plex Mono,monospace;text-align:center">${peopleCount}</div>
+      <div style="font:600 12px/1.4 IBM Plex Mono,monospace;text-align:center">${taskTotal}</div>
+     </div></div>`;
+  }).join('') : '<div class="nonerow">— none —</div>';
+}
+
+function renderAlloc(){
+  const sec='alloc';
+  const filtered = sortRows(allocRows().filter(matches), sec);
+  document.getElementById('allocBody').innerHTML = filtered.length ? filtered.map((r,i)=>{
+    const c=state.choices[sec+':'+r.ref]; const open=state.allOpen||!!state.expanded[sec+':'+r.ref];
+    return `
+    <div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${rowBar(sec,r.ref)}">
+     <div class="cells gallocR" style="align-items:start">
+      <div style="font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif">${esc(pname(r.programRef))} <span style="font:500 10px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(r.programRef)}</span></div>
+      <div style="font:600 12px/1.4 IBM Plex Mono,monospace">${esc(r.name)}</div>
+      <div style="font:700 13px/1.4 Libre Baskerville,Georgia,serif;text-align:center">${r.tasks}</div>
+      <div class="triple ${open?'line-open':'line-clamp'}">${esc(r.note)}</div>
+      ${trio(sec,r.ref)}
+     </div>
+     ${c==='improve' ? `<div style="padding:0 14px 12px"><textarea style="width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:60px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)" placeholder="what to change…" oninput="setDetail('${sec}','${r.ref}',this.value)">${esc(state.details[sec+':'+r.ref]||'')}</textarea></div>` : ''}
+     </div>`;
+  }).join('') : '<div class="nonerow">— none —</div>';
+}
+
+function renderSummary(){
+  // DERIVED AT RENDER, never stored: sum per person across every program row, independent of filters.
+  const names = Array.from(new Set(DATA.people.map(r=>r[0]))).sort();
+  document.getElementById('sumBody').innerHTML = names.length ? names.map((name,i)=>{
+    const rows = DATA.people.filter(r=>r[0]===name);
+    const total = rows.reduce((s,r)=>s+r[2],0);
+    const progs = rows.map(r=>r[1]+' ('+r[2]+')').join(', ');
+    return `<div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}">
+     <div class="cells gsumR" style="align-items:center">
+      <div style="font:600 12px/1.4 IBM Plex Mono,monospace">${esc(name)}</div>
+      <div style="font:700 14px/1.2 Libre Baskerville,Georgia,serif">${total} <span style="font:500 10px/1 IBM Plex Mono,monospace;color:var(--muted)">calc</span></div>
+      <div style="font:400 11px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(progs)}</div>
+     </div></div>`;
+  }).join('') : '<div class="nonerow">— none —</div>';
+}
+
+function renderNotes(){
+  const rows = DATA.programs.filter(p=>state.filterProgram==='ALL'||p.k===state.filterProgram);
+  document.getElementById('notesBody').innerHTML = rows.length ? rows.map((p,i)=>{
+    const c=state.choices['notes:'+p.k];
+    return `<div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${c?'box-shadow:inset 4px 0 0 var(--accent);':''}">
+     <div class="cells gnotesR" style="align-items:center">
+      <div><div style="font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif">${esc(p.name)}</div>
+        <div class="triple" style="margin-top:3px">${esc(p.note)}</div></div>
+      <div class="trio2">
+        <button class="${c==='explain'?'on':''}" title="EXPLAIN" onclick="markRow('notes','${p.k}','explain')">!</button>
+        <button class="${c==='proceed'?'on':''}" title="PROCEED" onclick="markRow('notes','${p.k}','proceed')">✓</button>
+        <button class="${c==='improve'?'imp':''}" title="IMPROVE" onclick="markRow('notes','${p.k}','improve')">+</button>
+      </div>
+     </div>
+     ${c==='improve' ? `<div style="padding:0 14px 12px"><textarea style="width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:60px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)" placeholder="resourcing update for ${esc(p.name)}…" oninput="state.notes['${p.k}']=this.value">${esc(state.notes[p.k]||'')}</textarea></div>` : ''}
+     </div>`;}).join('') : '<div class="nonerow">— none —</div>';
+}
+
+function buildPrompt(){
+  const L=[];
+  allocRows().forEach(r=>{ const c=state.choices['alloc:'+r.ref]; if(!c) return;
+    const extra=(state.details['alloc:'+r.ref]||'').trim();
+    L.push('- ['+c.toUpperCase()+'] '+r.name+' × '+pname(r.programRef)+' ('+r.programRef+', '+r.tasks+' tasks)'
+      +'\n    Note: '+r.note+(extra?'\n    Extra direction: '+extra:'')); });
+  const gen=[];
+  DATA.programs.forEach(p=>{ const c=state.choices['notes:'+p.k]; const note=(state.notes[p.k]||'').trim();
+    if(!note && !c) return;
+    gen.push('- '+(c?'['+c.toUpperCase()+'] ':'')+p.name+(note?'\n    '+note:'')); });
+  const head='Resource Tracker review — '+(DATA.meta.generatedAt||'')+(state.filterProgram!=='ALL'?' — scoped to '+pname(state.filterProgram):'')
+    +'\nEXPLAIN = tell me more before I decide. PROCEED = implement as written. IMPROVE = follow the extra direction.\n';
+  if(!L.length && !gen.length) return head+'\nNothing marked.';
+  return head+(L.length?'\nMARKED ALLOCATIONS\n'+L.join('\n'):'')+(gen.length?'\n\nRESOURCING NOTES\n'+gen.join('\n'):'');
+}
+function createPrompt(){ state.prompt=buildPrompt(); render();
+  if(navigator.clipboard) navigator.clipboard.writeText(state.prompt).catch(()=>{}); }
+function resetAll(){ state={...state, choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'', filterProgram:'ALL', filterPerson:'ALL', query:'', scheme:'canon'}; delete document.documentElement.dataset.scheme; render(); }
+
+function render(){
+  const people = Array.from(new Set(DATA.people.map(r=>r[0]))).sort();
+  document.getElementById('app').innerHTML = `
+   <div style="max-width:1440px;margin:0 auto;padding:30px 24px 80px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:3px solid var(--ink)">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="eyebrow">${esc(DATA.meta.eyebrow||'PEOPLE & ALLOCATION')}</div>
+        <div class="title">${esc(DATA.meta.title||'Resource Tracker')}</div>
+      </div>
+      <div class="headmeta">
+        rollup across ${DATA.programs.length} programs<br>${state.live?'live':'SNAPSHOT'} · generated ${esc(DATA.meta.generatedAt)} · maintained by ${esc(DATA.meta.maintainer)}
+      </div>
+    </div>
+    <div class="purpose">
+      <div class="pcol"><div class="plbl">FUNCTION</div><div class="ptext">${esc(DATA.meta.trackerFunction)}</div></div>
+      <div class="pcol"><div class="plbl">PURPOSE</div><div class="ptext">${esc(DATA.meta.trackerPurpose)}</div></div>
+      <div class="pcol"><div class="plbl">OBJECTIVE / OUTCOME</div><div class="ptext">${esc(DATA.meta.trackerOutcome)}</div></div>
+    </div>
+    <div class="keypanel">
+      <div class="keyintro">Run the allocation review top to bottom. Claude cannot see edits made here — mark rows with the action buttons below, then press <b>CREATE PROMPT</b> and paste the result into chat. Nothing here writes back to canon; the prompt is the hand-off.</div>
+      <div class="keygrid">${[
+        ['!','explain','EXPLAIN','Ask Claude to walk through this allocation in more detail before deciding.'],
+        ['✓','proceed','PROCEED','Confirm the allocation or note as written.'],
+        ['+','improve','IMPROVE','Add your own extra direction — a text field opens below the row.'],
+        ['…','','EXPAND','Show the full note text instead of the one-line clamp.']
+      ].map(([g,c,n,d])=>`<div class="keyitem"><div class="circ ${c}">${g}</div><div class="stack"><div class="keyname">${n}</div><div class="keydesc">${d}</div></div></div>`).join('')}</div>
+    </div>
+    <div class="noprint" style="position:sticky;top:0;z-index:20;margin-top:16px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg);border-bottom:1px solid var(--line)">
+      <button style="height:40px;padding:0 18px;border-radius:3px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font:700 12px/1 IBM Plex Mono,monospace" onclick="createPrompt()">CREATE PROMPT</button>
+      <button style="height:40px;padding:0 14px;border-radius:3px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 12px/1 IBM Plex Mono,monospace" onclick="resetAll()">RESET</button>
+      <select style="height:40px;padding:0 10px;border-radius:3px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink)" onchange="state.filterProgram=this.value; render()">
+        <option value="ALL">ALL PROGRAMS</option>
+        ${DATA.programs.map(p=>`<option value="${p.k}" ${state.filterProgram===p.k?'selected':''}>${esc(p.name)}</option>`).join('')}
+      </select>
+      <select style="height:40px;padding:0 10px;border-radius:3px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink)" onchange="state.filterPerson=this.value; render()">
+        <option value="ALL">ALL PEOPLE</option>
+        ${people.map(p=>`<option value="${p}" ${state.filterPerson===p?'selected':''}>${esc(p)}</option>`).join('')}
+      </select>
+      <input style="height:40px;width:190px;padding:0 10px;border-radius:3px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink)" placeholder="search…" value="${esc(state.query)}" oninput="state.query=this.value; render()">
+      <button style="height:40px;padding:0 14px;border-radius:3px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:600 11px/1 IBM Plex Mono,monospace" onclick="state.allOpen=!state.allOpen; render()">${state.allOpen?'COLLAPSE ALL':'EXPAND ALL'}</button>
+      <div class="schemewrap">
+        <div class="schemelbl">SCHEME</div>
+        <div style="display:flex;gap:6px">${SCHEMES.map(([k,l,a,b,c])=>`<button class="sbtn${state.scheme===k?' on':''}" title="${l}" onclick="setScheme('${k}')"><span class="dots"><i style="background:${a}"></i><i style="background:${b}"></i><i style="background:${c}"></i></span>${l}</button>`).join('')}</div>
+      </div>
+    </div>
+    ${state.prompt? `<textarea id="promptbox" class="noprint" readonly style="width:100%;margin-top:10px;border:none;border-radius:4px;padding:14px;font:400 12px/1.6 IBM Plex Mono,monospace;min-height:150px;background:var(--ink);color:var(--bg)">${esc(state.prompt)}</textarea>` : ''}
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Programme Index</div><div style="flex:1;height:1px;background:var(--line)"></div><div style="font:400 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--accentText)">CLICK A ROW TO SCOPE THE SECTIONS BELOW</div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:520px">
+      <div class="hdr gidxR"><div>REF</div><div>PROGRAM</div><div>STATUS</div><div style="text-align:center">PEOPLE</div><div style="text-align:center">TASKS</div></div>
+      <div id="idxBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">People &amp; Allocation</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:560px">
+      <div class="hdr gallocR"><div>PROGRAM</div><div>PERSON</div><div style="text-align:center">TASKS</div><div>NOTE</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="allocBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">People Summary</div><div style="flex:1;height:1px;background:var(--line)"></div><div style="font:400 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--accentText)">SUMMED AT RENDER · NEVER STORED</div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:440px">
+      <div class="hdr gsumR"><div>PERSON</div><div>TOTAL TASKS</div><div>PROGRAMS (TASKS)</div></div>
+      <div id="sumBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Resourcing Notes</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:480px">
+      <div class="hdr gnotesR"><div>PROGRAM</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="notesBody"></div>
+    </div></div>
+
+    <div class="foot">A view over the resource suite — people and programs are the two axes; filter either, or both</div>
+   </div>`;
+  renderIndex();
+  renderAlloc();
+  renderSummary();
+  renderNotes();
+}
+loadData();
+</script></body></html>

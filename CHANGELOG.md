@@ -2,6 +2,65 @@
 
 All notable changes to this skill are documented here.
 
+## [1.11.0] - 2026-07-28
+
+Two changes, both driven by a real build on the reference programme (CRA): the
+Facilitator/Resources exemption from 1.10.0 is reversed, and the ISSUE·PROBLEM·NEEDED row
+triple used throughout that build's dashboards is now documented as the standard.
+
+**Reversed — Facilitator and Resources are interactive again (`DASHBOARD_SPEC.md` §13,
+`dashboard-set.md`)**
+- 1.10.0 made both surfaces read-only, exempt from the action trio, CREATE PROMPT, and the
+  scheme switcher, reasoning that a surface with no write-back loop had no need for the
+  machinery that serves one.
+- Building the reference programme's actual Facilitator Hub and Resource Tracker showed
+  the opposite: marking rows pooled from every line and compiling them into one CREATE
+  PROMPT hand-off is exactly what a facilitator or resourcing review is for. A read-only
+  briefing card removed the one action that made opening either surface mid-meeting worth
+  it.
+- Both surfaces now carry the action trio, CREATE PROMPT, and the scheme switcher, same as
+  the shell — plus something the shell doesn't need: a click-to-scope index (one row per
+  tracker or per project line; click to filter every section below to it) and independent
+  dropdown filters (by tracker/program, by owner/person) composable with free-text search.
+- The honesty rules that were never exempt — status vocabulary, evidence discipline,
+  derived-never-stored, freshness stamp, evidence baseline, print rules — are unchanged;
+  they were the actual point of the 1.10.0 rule, the controls were just the wrong lever.
+- New reference build: `references/facilitator-hub-reference.html`, the canonical shell
+  for both surfaces, alongside the existing `dashboard-reference.html` for single-line
+  trackers.
+- New sample: `docs/samples/resource-tracker/resource-tracker_v2.html` (and matching
+  `.json`) built on the new shell. `resource-tracker_v1.html` is kept for history and
+  marked superseded — it predates the index/filter pattern.
+
+**Added — the ISSUE·PROBLEM·NEEDED row triple (`DASHBOARD_SPEC.md` §3.7)**
+- Any row a reader has to act on — Decisions, Open Issues, Next Actions, and anything
+  pooled onto Facilitator/Resources from them — may now be authored as three fields
+  (`issue`, `problem`, `needed`) instead of one flat `note`. A flat note conflates three
+  different questions a facilitator needs answered separately: what is this, why does it
+  matter, what has to happen next.
+- Each line clamps to one row by default with a per-row `… expand` / `– collapse` toggle;
+  `EXPAND ALL` in the control bar toggles every row at once. This is an authoring step,
+  not a splitting heuristic — a row missing any of the three fields stays a flat `note`
+  rather than shipping a padded or guessed triple.
+- Empty sections keep a lone `(+)` IMPROVE button, reusing the standard action-trio wiring
+  with EXPLAIN/PROCEED present but hidden, so a facilitator can still direct what belongs
+  in an empty section instead of hitting a dead end.
+- `references/dashboard-reference.html` updated to match: the triple format is now the
+  default row renderer for the sections above, replacing the flat-note-only version.
+
+**Added — the header Function/Purpose/Objective block (`DASHBOARD_SPEC.md` §3.7)**
+- Three optional `meta` fields — `trackerFunction`, `trackerPurpose`, `trackerOutcome` —
+  render as a three-column block below the title/eyebrow and above the how-this-works
+  panel, stating what a specific dashboard tracks, why, and what "done" looks like for
+  that line.
+- Each column hides independently when empty; the whole block hides when all three are
+  empty, so older `EMBEDDED` seeds and pre-1.11.0 tracker JSON render unchanged.
+
+**Changed**
+- `SKILL.md` Phase 4 and the references list updated to the reversed pooled-view rule and
+  the new `facilitator-hub-reference.html` file.
+- `README.md` sample-dashboards section and file tree updated to match.
+
 ## [1.10.0] - 2026-07-27
 
 A standard run now emits **three dashboards, not one**, and asks before hosting any of

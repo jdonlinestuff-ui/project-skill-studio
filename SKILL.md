@@ -92,8 +92,8 @@ Keep each generated SKILL.md under ~500 lines; push bulk detail into that skill'
 ### Phase 4 — The dashboard set (three surfaces, standard)
 
 A studio run emits **three dashboards, not one** — three audiences reading the same
-trackers. `references/dashboard-set.md` is the authority on what each contains and
-what the two derived surfaces are exempt from; build in this order:
+trackers. `references/dashboard-set.md` is the authority on what each contains and how
+the two pooled surfaces filter and scope; build in this order:
 
 1. **Skill builder** (skills-creation) — the full tracker shell, rows are the studio's
    own skills: roster, class, install state, staleness verdict. Existing behaviour.
@@ -104,11 +104,16 @@ what the two derived surfaces are exempt from; build in this order:
    skew called out, the tracker/dashboard inventory including retired ones, open
    decisions, and where canon and the memory tiers live.
 
-Surfaces 2 and 3 are **read-only derived views** (spec §13): no trio, no CREATE PROMPT,
-no scheme switcher, no module grid — but the status vocabulary, evidence discipline,
-derived-never-stored, freshness stamp, evidence baseline and print rules all still bind.
-Dropping the controls makes it a briefing card; dropping the honesty rules makes it a
-poster. All three regenerate from the trackers; none is ever hand-edited to fix a fact.
+Surfaces 2 and 3 are **pooled derived views** (spec §13) — every row is gathered from
+another tracker rather than authored here — but as of spec v3.4 both are fully
+interactive: the action trio, CREATE PROMPT, and the scheme switcher all carry over from
+the shell, plus a click-to-scope index and dropdown/search filtering unique to a pooled
+surface (filter by tracker/program, by owner/person, or by text, all composable). Copy
+`references/facilitator-hub-reference.html` for both — don't build either from prose. The
+status vocabulary, evidence discipline, derived-never-stored, freshness stamp, evidence
+baseline and print rules still bind without exception; those were never the part the
+controls existed to protect. All three regenerate from the trackers; none is ever
+hand-edited to fix a fact.
 
 **Then ask about hosting — do not assume it.** Delivered as files the set is inert.
 Hosted as live artifacts, the pages become reachable by whoever holds the link and the
@@ -117,7 +122,7 @@ before any write, but newly available. Ask per surface (a project may want Resou
 shared and Facilitator local), record the answer as a logged decision, and treat "no"
 as a complete answer. Full wording and rationale in `dashboard-set.md`.
 
-Build the shell to **`references/DASHBOARD_SPEC.md` (v3.3)** — that file is the authority.
+Build the shell to **`references/DASHBOARD_SPEC.md` (v3.4)** — that file is the authority.
 Copy `references/dashboard-reference.html`, point `TRACKER_SOURCE` at the line's
 JSON, replace the `EMBEDDED` seed. Copying the reference is faster and far more
 accurate than building from the spec text.
@@ -210,8 +215,9 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/skill-baseline.md` — work loop, MCP-first rule, five-point new-skill checklist, install boundary
 - `references/canon-first-workflow.md` — the mandatory search-canon-first sequence for generation requests; task-orchestrator and the project's own skills as the two checks before acting
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
-- `references/dashboard-set.md` — the three surfaces a run emits (Skill builder, Facilitator, Resources), what each derives, the read-only carve-out, and the live-artifact consent step
-- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.3): data contract and load modes, evidence baseline, status marks, defect register and ref-prefix registry, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist, derived-view rules
-- `references/dashboard-reference.html` — the working live-fetch build: copy this, don't build from prose
+- `references/dashboard-set.md` — the three surfaces a run emits (Skill builder, Facilitator, Resources), what each derives, the pooled-view conformance rules, and the live-artifact consent step
+- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.4): data contract and load modes, evidence baseline, the ISSUE·PROBLEM·NEEDED row triple and header purpose block, status marks, defect register and ref-prefix registry, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist, pooled-view rules
+- `references/dashboard-reference.html` — the working live-fetch build for a single-line tracker: copy this, don't build from prose
+- `references/facilitator-hub-reference.html` — the working build for the Facilitator and Resources surfaces: click-to-scope index, dropdown/search filtering, same action trio and CREATE PROMPT as the shell
 - `references/dashboard-standard.md` — pointer + record of what v3.0 changed from the superseded static-bake rules
 - `references/dashboard-sample-generator.py` — regenerates the four scheme mockups and prints the WCAG contrast table

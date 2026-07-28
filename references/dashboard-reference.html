@@ -52,6 +52,10 @@ button,textarea,select,input{font-family:inherit}
 .eyebrow{font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.18em;color:var(--accentText)}
 .title{font:700 27px/1.15 Libre Baskerville,Georgia,serif;letter-spacing:-.01em}
 .headmeta{font:400 10px/1.5 IBM Plex Mono,monospace;text-align:right;color:var(--muted)}
+.purpose{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px}
+.purpose .pcol{display:flex;flex-direction:column;gap:4px}
+.purpose .plbl{font:600 10px/1.3 IBM Plex Mono,monospace;letter-spacing:.12em;color:var(--accentText)}
+.purpose .ptext{font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
 
 /* ---- metric strip ---- */
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px}
@@ -97,19 +101,21 @@ button,textarea,select,input{font-family:inherit}
 /* ---- panels & rows ---- */
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden}
 .scroller{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto}
-.inner{min-width:848px}
+.inner{min-width:650px}
 .row{border-top:1px solid var(--line)}
-.cells{display:grid;gap:12px;align-items:start;padding:12px 14px}
-.hdr{display:grid;gap:8px;align-items:center;padding:9px 14px;background:var(--headerBg);color:var(--headerFg);font:600 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
-.gmod{grid-template-columns:104px 92px 351px minmax(140px,1fr) 104px;gap:8px}
-.gqueue{grid-template-columns:62px minmax(140px,220px) 1fr 116px}
-.gissue{grid-template-columns:52px 84px 1fr 116px}
-.gbudget{grid-template-columns:52px 1fr 96px 96px 92px 116px}
-.gmile{grid-template-columns:92px 22px 1fr 84px 116px}
-.gnext{grid-template-columns:34px 1fr 104px 116px}
-.gfeedback{grid-template-columns:52px 1fr 108px 92px 96px 116px}
-.gproj{grid-template-columns:52px 1fr 128px 76px 76px 1fr}
-.gpeople{grid-template-columns:1fr 96px 76px 1fr}
+.cells{display:grid;gap:12px;align-items:start;padding:12px 14px;overflow-wrap:anywhere}
+.cells>*{min-width:0}
+.hdr{display:grid;gap:8px;align-items:center;padding:9px 14px;background:var(--headerBg);color:var(--headerFg);font:600 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em;overflow-wrap:anywhere}
+.hdr>*{min-width:0}
+.gmod{grid-template-columns:88px 100px 300px 1fr 88px;gap:8px}
+.gqueue{grid-template-columns:44px 130px 1fr 96px}
+.gissue{grid-template-columns:40px 70px 1fr 96px}
+.gbudget{grid-template-columns:40px 1fr 72px 72px 72px 96px}
+.gmile{grid-template-columns:76px 18px 1fr 68px 96px}
+.gnext{grid-template-columns:28px 1fr 80px 96px}
+.gfeedback{grid-template-columns:40px 1fr 84px 72px 76px 96px}
+.gproj{grid-template-columns:40px 1fr 96px 52px 52px 1fr}
+.gpeople{grid-template-columns:1fr 76px 56px 1fr}
 .zebra{background:var(--zebra)}
 .name{font:600 12px/1.4 IBM Plex Mono,monospace}
 .ver{font:400 12px/1.35 IBM Plex Mono,monospace;color:var(--muted)}
@@ -139,14 +145,21 @@ button,textarea,select,input{font-family:inherit}
 
 /* ---- action trio ---- */
 .acts{display:flex;gap:6px;justify-content:flex-end}
-.abtn{width:30px;height:30px;border-radius:50%;cursor:pointer;font:600 13px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
-.abtn.plus{font-size:15px}
+.abtn{flex:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font:600 12px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.abtn.plus{font-size:14px}
 .abtn.sel{background:var(--ink);color:var(--bg)}
 .detail{display:none;grid-column:1/-1;padding:2px 0 2px}
 .detail textarea{width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:52px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)}
 
 .nonerow{padding:10px 2px;font-weight:400;font-size:12px;line-height:1.45;
   font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--muted)}
+.gnone{grid-template-columns:1fr 96px}
+.triple{display:flex;flex-direction:column;gap:4px}
+.triple b{font:600 10px/1.5 IBM Plex Mono,monospace;letter-spacing:.06em;color:var(--accentText)}
+.tline{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
+.line-clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.line-open{display:block}
+.expandtoggle{font:600 10px/1.4 IBM Plex Mono,monospace;letter-spacing:.05em;color:var(--accentText);cursor:pointer;margin-top:2px}
 .srcbanner{grid-column:1/-1;margin:0 0 14px;padding:10px 14px;border-radius:4px;
   border:2px solid var(--fail);background:var(--failTint);color:var(--fail);
   font-weight:600;font-size:12px;line-height:1.45;font-family:'IBM Plex Mono',monospace}
@@ -175,6 +188,12 @@ button,textarea,select,input{font-family:inherit}
       <div class="title">Digital Dev Tracker</div>
     </div>
     <div class="headmeta">Teams app source v0.6<br>baselined 2026-07-25 · maintained by Claude</div>
+  </div>
+
+  <div class="purpose" id="purpose" hidden>
+    <div class="pcol" id="pcolFunction"><div class="plbl">FUNCTION</div><div class="ptext" id="purposeFunction"></div></div>
+    <div class="pcol" id="pcolPurpose"><div class="plbl">PURPOSE</div><div class="ptext" id="purposePurpose"></div></div>
+    <div class="pcol" id="pcolOutcome"><div class="plbl">OBJECTIVE / OUTCOME</div><div class="ptext" id="purposeOutcome"></div></div>
   </div>
 
   <div id="srcbanner" class="srcbanner" hidden></div>
@@ -214,7 +233,7 @@ button,textarea,select,input{font-family:inherit}
   </section>
 
   <section id="sec-modules">
-  <div class="sechead"><h2>Module Grid</h2><div class="rule"></div><div class="secmeta" id="sourceLabel">ONLINE_DEV_TRACKER.json</div></div>
+  <div class="sechead"><h2>Module Grid</h2><div class="rule"></div><div class="secmeta" id="sourceLabel">05_TEAMS_APP_v0.6_SOURCE</div></div>
   <div class="legend" id="legend"></div>
   <div class="scroller"><div class="inner">
     <div class="hdr gmod">
@@ -280,7 +299,7 @@ const DASHBOARD_SOURCE=TRACKER_SOURCE;   /* alias: SKILL.md uses this name */
    This is NOT the source of truth. Live data replaces it wholesale at run time.
    A skill replaces this block only to seed a first build.                       */
 const EMBEDDED={
-meta:{line:'example-line',title:'Digital Dev Tracker',sourceLabel:'ONLINE_DEV_TRACKER.json',
+meta:{line:'example-line',title:'Digital Dev Tracker',sourceLabel:'05_TEAMS_APP_v0.6_SOURCE',
  eyebrow:'CYBER RISK ASSESSMENT · ONLINE DEV',
  checkNames:['Typecheck','Unit','Golden files','Multi-client','Code security','Privacy'],
  currency:'AUD',revision:0,generatedAt:'2026-07-25T00:00:00+10:00'},
@@ -371,7 +390,7 @@ const FEEDBACK_WORD={pass:'INTERESTED',pending:'UNDECIDED',fail:'NOT INTERESTED'
 const PROJ_WORD={pass:'ON TRACK',pending:'AT RISK',blocked:'BLOCKED',fail:'CANCELLED',na:'NOT STARTED'};
 const SCHEMES=[['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
                ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
-const state={choices:{},details:{},marks:{},refresh:false,canon:false,dataRefresh:false,scheme:'canon',
+const state={choices:{},details:{},marks:{},expanded:{},refresh:false,canon:false,dataRefresh:false,scheme:'canon',
   stamp:new Date(),live:false,fetchedAt:null,loadError:null};
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -382,6 +401,39 @@ const acts=(sec,id)=>`<div class="acts noprint" data-k="${sec}:${id}">
   <button class="abtn plus" title="Improve" onclick="pick('${sec}','${id}','improve')">+</button>
  </div>
  <div class="detail" data-d="${sec}:${id}"><textarea placeholder="Extra direction for this item…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
+
+/* ISSUE · PROBLEM · NEEDED triple, with a click-to-expand toggle (matches the Facilitator Hub pattern) */
+function triple(sec,id,issue,problem,needed){
+  const k=sec+':'+id, open=!!state.expanded[k];
+  const cls=open?'tline line-open':'tline line-clamp';
+  return `<div class="triple" data-t="${sec}:${id}">
+    <div class="${cls}"><b>ISSUE </b>${esc(issue)}</div>
+    <div class="${cls}"><b>PROBLEM </b>${esc(problem)}</div>
+    <div class="${cls}"><b>NEEDED </b>${esc(needed)}</div>
+    <div class="expandtoggle noprint" onclick="toggleExpand('${sec}','${id}')">${open?'– collapse':'… expand'}</div>
+  </div>`;
+}
+function toggleExpand(sec,id){
+  const k=sec+':'+id;
+  state.expanded[k]=!state.expanded[k];
+  const open=state.expanded[k];
+  const el=document.querySelector(`.triple[data-t="${CSS.escape(k)}"]`);
+  if(!el) return;
+  el.querySelectorAll('.tline').forEach(d=>{d.classList.toggle('line-open',open); d.classList.toggle('line-clamp',!open);});
+  const tgl=el.querySelector('.expandtoggle'); if(tgl) tgl.textContent = open?'– collapse':'… expand';
+}
+/* far-right (+) IMPROVE trigger for an empty section — reuses acts()'s data-k/data-d wiring so
+   syncMarks() keeps working; EXPLAIN/PROCEED are present but hidden since neither makes sense
+   on an empty section. */
+function actsEmpty(sec){
+  const id='empty';
+  return `<div class="acts noprint" data-k="${sec}:${id}">
+  <button class="abtn" style="display:none" title="Explain" onclick="pick('${sec}','${id}','explain')">!</button>
+  <button class="abtn" style="display:none" title="Proceed" onclick="pick('${sec}','${id}','proceed')">✓</button>
+  <button class="abtn plus" title="Improve" onclick="pick('${sec}','${id}','improve')">+</button>
+ </div>
+ <div class="detail" data-d="${sec}:${id}"><textarea placeholder="What should go here…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
+}
 
 function render(){
   const m=DATA.modules, cnt=s=>m.filter(r=>r[2]===s).length;
@@ -403,13 +455,13 @@ function render(){
 
   document.getElementById('legend').innerHTML=['pass','fail','pending','blocked','na'].map(k=>mark(k,'pad')).join('');
 
-  document.getElementById('modules').innerHTML=m.map(([n,v,b,checks,note],i)=>`
+  document.getElementById('modules').innerHTML=m.map(([n,v,b,checks,t],i)=>`
    <div class="row${i%2?' zebra':''}">
     <div class="cells gmod">
       <div class="stack"><div class="name">${esc(n)}</div><div class="ver">${esc(v)}</div></div>
       <div><span class="badge b-${b.toLowerCase()}">${b}</span></div>
       <div class="chk">${checks.map((c,j)=>`<span title="${CHECK_NAMES[j]}: ${WORD[c]}">${mark(c)}</span>`).join('')}</div>
-      <div class="note">${esc(note)}</div>
+      ${triple('modules',n,t.issue,t.problem,t.needed)}
       ${acts('modules',n)}
     </div></div>`).join('');
 
@@ -419,47 +471,46 @@ function render(){
     ['Decisions Pending (Dan)',DATA.decisions.length+' TO CALL','decisions',DATA.decisions,true]
   ].filter(([,,sec])=>!state.absent[sec]).map(([t,c,sec,rows,hide])=>`
    <div class="sechead"><h2>${t}</h2><div class="rule"></div><div class="secmeta">${c}</div></div>
-   <div class="panel">${rows.length?rows.map(([ref,name,badge,note])=>`
+   <div class="panel">${rows.length?rows.map(([ref,name,badge,tr])=>`
      <div class="row"><div class="cells gqueue">
        <div class="ref">${ref}</div>
        <div class="stack"><div class="rowtitle">${esc(name)}</div>${hide?'':`<div><span class="badge b-${badge.toLowerCase()}">${badge}</span></div>`}</div>
-       <div class="note">${esc(note)}</div>
+       ${triple(sec,ref,tr.issue,tr.problem,tr.needed)}
        ${acts(sec,ref)}
-     </div></div>`).join(''):NONE}</div>`).join('');
+     </div></div>`).join(''):noneRow(sec)}</div>`).join('');
 
-  document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,note])=>`
-   <div class="row"><div class="cells gissue" style="align-items:center">
+  document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,t])=>`
+   <div class="row"><div class="cells gissue" style="align-items:start">
      <div class="ref">${ref}</div>${mark(SEV[sev]).replace(WORD[SEV[sev]],sev.toUpperCase())}
-     <div class="note">${esc(note)}</div>${acts('issues',ref)}
+     ${triple('issues',ref,t.issue,t.problem,t.needed)}${acts('issues',ref)}
    </div></div>`).join('');
 
   document.getElementById('risks').innerHTML=DATA.risks.map(([ref,exp,title,cause,control])=>`
    <div class="row"><div class="cells gissue">
      <div class="ref">${ref}</div>${mark(SEV[exp]).replace(WORD[SEV[exp]],exp.toUpperCase())}
-     <div class="stack"><div class="rowtitle">${esc(title)}</div><div class="note">${esc(cause)}</div>
-       <div style="display:flex;gap:6px;align-items:baseline"><div class="ctrl">CONTROL</div><div class="ctrltext">${esc(control)}</div></div></div>
+     ${triple('risks',ref,title,cause,control)}
      ${acts('risks',ref)}
    </div></div>`).join('');
 
   const bT=DATA.budget.reduce((a,r)=>a+r[2],0), sT=DATA.budget.reduce((a,r)=>a+r[3],0);
-  document.getElementById('budgetPct').textContent=Math.round(sT/bT*100)+'% COMMITTED';
+  document.getElementById('budgetPct').textContent=(bT?Math.round(sT/bT*100):0)+'% COMMITTED';
   document.getElementById('budget').innerHTML=
    `<div class="hdr gbudget"><div>REF</div><div>LINE ITEM</div><div style="text-align:right">BUDGET</div><div style="text-align:right">SPENT</div><div style="text-align:center">STATE</div><div style="text-align:right">ACTION</div></div>`
-   +DATA.budget.map(([ref,item,b,s,note])=>{
+   +DATA.budget.map(([ref,item,b,s,t])=>{
      const pct=b?Math.round(s/b*100):0, k=pct>100?'fail':pct>=85?'pending':s===0?'na':'pass';
      const word=pct>100?'OVER':pct>=85?'WATCH':s===0?'UNSPENT':'ON TRACK';
      return `<div class="row"><div class="cells gbudget">
        <div class="ref">${ref}</div>
        <div class="stack"><div class="rowtitle">${esc(item)}</div>
          <div class="barTrack mk-${k}"><div class="barFill" style="width:${Math.min(pct,100)}%;background:currentColor"></div></div>
-         <div class="note">${esc(note)}</div></div>
+         ${triple('budget',ref,t.issue,t.problem,t.needed)}</div>
        <div class="money">${money(b)}</div><div class="money" style="color:var(--body)">${money(s)}</div>
        ${mark(k).replace(WORD[k],word)}${acts('budget',ref)}
      </div></div>`;}).join('')
    +`<div class="total gbudget"><div></div><div class="ref" style="color:var(--ink)">TOTAL · ${money(bT-sT)} REMAINING</div>
      <div class="money">${money(bT)}</div><div class="money">${money(sT)}</div><div></div><div></div></div>`;
 
-  document.getElementById('milestones').innerHTML=DATA.milestones.map(([ref,date,title,st,note],i)=>{
+  document.getElementById('milestones').innerHTML=DATA.milestones.map(([ref,date,title,st,t],i)=>{
     const k=st==='done'?'pass':st==='blocked'?'blocked':st==='next'?'pending':'na';
     const word=st==='done'?'DONE':st==='next'?'NEXT':st==='blocked'?'BLOCK':'PEND';
     const last=i===DATA.milestones.length-1;
@@ -468,13 +519,13 @@ function render(){
       <div class="rail"><div class="dot mk-${k}" style="border:2px solid currentColor;background:${st==='done'||st==='blocked'?'currentColor':'transparent'}"></div>${last?'':'<div class="conn"></div>'}</div>
       <div class="stack"><div style="display:flex;align-items:baseline;gap:8px"><div class="ref">${ref}</div>
         <div class="rowtitle" style="${st==='done'?'color:var(--muted)':''}">${esc(title)}</div></div>
-        <div class="note">${esc(note)}</div></div>
+        ${triple('milestones',ref,t.issue,t.problem,t.needed)}</div>
       ${mark(k).replace(WORD[k],word)}${acts('milestones',ref)}
     </div></div>`;}).join('');
 
-  document.getElementById('nextActions').innerHTML=DATA.nextActions.map(([n,what,owner])=>`
-   <div class="row"><div class="cells gnext" style="align-items:center">
-     <div class="ref">${n}</div><div class="note">${esc(what)}</div>
+  document.getElementById('nextActions').innerHTML=DATA.nextActions.map(([n,t,owner])=>`
+   <div class="row"><div class="cells gnext" style="align-items:start">
+     <div class="ref">${n}</div>${triple('next','NA'+n,t.issue,t.problem,t.needed)}
      <div class="meta" style="text-align:right">${owner}</div>${acts('next','NA'+n)}
    </div></div>`).join('');
 
@@ -569,11 +620,16 @@ function normalise(){
   SECTIONS.forEach(k=>{ if(!Array.isArray(DATA[k])){ state.absent[k]=true; DATA[k]=[]; } });
 }
 const NONE='<div class="nonerow">— none —</div>';
+function noneRow(sec){
+  return `<div class="row"><div class="cells gnone" style="align-items:center">
+    <div class="nonerow">— none —</div>${actsEmpty(sec)}
+  </div></div>`;
+}
 function markEmpty(k){
   const wrap=document.getElementById('sec-'+k), panel=document.getElementById(k);
   if(wrap) wrap.hidden = !!state.absent[k];
   if(state.absent[k]) return;
-  if(panel && !DATA[k].length) panel.innerHTML=NONE;
+  if(panel && !DATA[k].length) panel.innerHTML=noneRow(k);
 }
 function applyEmptyStates(){
   // 'queues' has no single panel of its own - its three sub-lists are handled inline in render()
@@ -590,6 +646,20 @@ function applyMeta(){
   if(m.title)      document.querySelector('.title').textContent=m.title;
   if(m.eyebrow)    document.querySelector('.eyebrow').textContent=m.eyebrow;
   if(m.sourceLabel)document.getElementById('sourceLabel').textContent=m.sourceLabel;
+  applyPurpose(m);
+}
+
+function applyPurpose(m){
+  const box=document.getElementById('purpose');
+  const parts=[['pcolFunction','purposeFunction',m.trackerFunction],
+               ['pcolPurpose','purposePurpose',m.trackerPurpose],
+               ['pcolOutcome','purposeOutcome',m.trackerOutcome]];
+  let any=false;
+  parts.forEach(([colId,txtId,val])=>{
+    const col=document.getElementById(colId), el=document.getElementById(txtId);
+    if(val){ el.textContent=val; col.hidden=false; any=true; } else { col.hidden=true; }
+  });
+  box.hidden=!any;
 }
 
 function banner(){

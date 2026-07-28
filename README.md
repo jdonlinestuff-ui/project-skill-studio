@@ -43,11 +43,13 @@ If you already have a studio pattern from another project, say so — it will se
 
 A run emits three surfaces — **Skill builder**, **Facilitator** and **Resources**
 ([`references/dashboard-set.md`](references/dashboard-set.md)). The samples below are the
-full tracker shell, which the Skill builder uses; the other two are read-only derived views
-over the same trackers, exempt from the shell's controls but bound by its honesty rules.
+full tracker shell, which the Skill builder uses; the other two are pooled derived views
+over the same trackers — as of v3.4 fully interactive (action trio, CREATE PROMPT, scheme
+switcher) plus a click-to-scope index and dropdown/search filtering unique to a pooled
+surface — and bound by the same honesty rules as the shell throughout.
 
 Every dashboard the studio emits conforms to [`references/DASHBOARD_SPEC.md`](references/DASHBOARD_SPEC.md)
-(v3.3) — that file is the authority, not this README. Full worked samples, screenshots,
+(v3.4) — that file is the authority, not this README. Full worked samples, screenshots,
 and a regeneration script live in [`docs/samples/`](docs/samples); a ready-to-paste wiki
 page with the same material is in [`docs/wiki/`](docs/wiki).
 
@@ -112,8 +114,9 @@ project-skill-studio/
 │   ├── working-rules.md                  # working-rule set embedded in generated skills
 │   ├── skill-baseline.md                 # work loop, MCP-first rule, new-skill checklist
 │   ├── canon-first-workflow.md           # search-canon-first sequence for generation requests
-│   ├── DASHBOARD_SPEC.md                 # the dashboard authority (v3.3)
+│   ├── DASHBOARD_SPEC.md                 # the dashboard authority (v3.4)
 │   ├── dashboard-reference.html          # working live-fetch reference build — copy this
+│   ├── facilitator-hub-reference.html    # working build for Facilitator/Resources — copy this
 │   ├── dashboard-standard.md             # pointer: what v3.0 changed from the retired v1.0 rules
 │   └── dashboard-sample-generator.py     # regenerates the four scheme mockups + contrast table
 └── docs/

@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "title": "Resource Tracker",
+    "eyebrow": "CYBER RISK ASSESSMENT · PEOPLE & ALLOCATION",
+    "generatedAt": "2026-07-27",
+    "maintainer": "Claude",
+    "trackerFunction": "Tracks who — Dan or Claude, the project's only two real resources — is allocated to which project line, and how many open tasks each carries right now.",
+    "trackerPurpose": "Surfaces allocation imbalance (e.g. one line quietly carrying most of the open task load) before it becomes a bottleneck, using counts derived live from the trackers rather than typed-in guesses.",
+    "trackerOutcome": "A realistic, canon-derived picture of workload across the studio, kept honest by the 'derived, never stored' rule — recount from source every refresh, never hand-edit a total."
+  },
+  "programs": [
+    {
+      "k": "P0",
+      "id": "P0",
+      "name": "Programme / Tracker Ops",
+      "status": "pass",
+      "note": "Delete superseded DESIGN_TRACKER copies (I10) and the duplicate DESIGN_TRACKER (2).json; supply real B1-B6 budget figures; refresh SESSION_STATE.md (I7)."
+    },
+    {
+      "k": "P1",
+      "id": "P1",
+      "name": "Design & Publishing (physical line)",
+      "status": "pass",
+      "note": "Confirm/close I1 (card background templates) and Q1/Q2 against Game Manual v3.2 — both already resolved, pending formal retirement from the next-actions list."
+    },
+    {
+      "k": "P2",
+      "id": "P2",
+      "name": "Digital Dev / Teams App",
+      "status": "pending",
+      "note": "Re-baseline against the cra-offline-app repo (I8/I12); decide D14; resolve the scoring golden-file/prose contradiction; run the live multi-client rehearsal (I6); sequence the design-review P1-P3 sets."
+    },
+    {
+      "k": "P3",
+      "id": "P3",
+      "name": "Compliance Gate",
+      "status": "pending",
+      "note": "Prioritise the design-review P1 platform-fit items (T1/T3) and run the live multi-client rehearsal that also gates PG1."
+    },
+    {
+      "k": "P4",
+      "id": "P4",
+      "name": "Expansion — SOC 2 TSC Light Pack",
+      "status": "na",
+      "note": "No roster assigned yet — triage-only; expansion issues (I17) are tracked but no next_actions reference this line specifically."
+    },
+    {
+      "k": "P5",
+      "id": "P5",
+      "name": "Skill Suite",
+      "status": "pass",
+      "note": "Confirm cra-* skill install status (I9) — resolved this refresh; work through the 2026-07-26 staleness-audit follow-ups."
+    },
+    {
+      "k": "P6",
+      "id": "P6",
+      "name": "Cloudflare Hosting",
+      "status": "na",
+      "note": "Own the hosting planning-only gate decision (GATE1) and its live Cloudflare account check."
+    }
+  ],
+  "people": [
+    [
+      "Dan",
+      "P0",
+      3,
+      "Delete superseded tracker copies; supply real budget figures."
+    ],
+    [
+      "Dan",
+      "P1",
+      2,
+      "Confirm/close I1; confirm Q1/Q2 — both stale/already-resolved rows."
+    ],
+    [
+      "Dan",
+      "P2",
+      11,
+      "Decide D14; authorise the v0.19+ source sync and re-baseline; call the live multi-client rehearsal; sequence the design-review set."
+    ],
+    [
+      "Dan",
+      "P3",
+      2,
+      "Prioritise T1/T3; call the live multi-client rehearsal (shared with Claude)."
+    ],
+    [
+      "Dan",
+      "P5",
+      2,
+      "Confirm cra-* skill install status (I9)."
+    ],
+    [
+      "Dan",
+      "P6",
+      1,
+      "Own the hosting planning-only gate decision."
+    ],
+    [
+      "Claude",
+      "P0",
+      1,
+      "Refresh SESSION_STATE.md (I7)."
+    ],
+    [
+      "Claude",
+      "P2",
+      8,
+      "Resolve the scoring golden-file contradiction; re-derive module marks once source lands; build scoring golden files (S8); execute the design-review sequencing."
+    ],
+    [
+      "Claude",
+      "P3",
+      2,
+      "Same P1 platform-fit / rehearsal items, Claude's side of the pairing."
+    ],
+    [
+      "Claude",
+      "P6",
+      1,
+      "Ran the live Cloudflare account check this refresh — nothing provisioned."
+    ]
+  ],
+  "log": [
+    [
+      "2026-07-27",
+      "First build (static shell): 26 owner-bearing rows counted across DESIGN_TRACKER.next_actions (11), ONLINE_DEV_TRACKER.nextActions (11), the Compliance Gate Tracker's 2 hand-authored next actions, and Hosting's GATE1 decision + its live-check log line; each tagged to the project line (P0-P6) it is actually about. P4 (Expansion) has zero next_actions referencing it this session, so it carries no roster row — shown as an explicit 0/0, not silently omitted."
+    ],
+    [
+      "2026-07-28",
+      "Rebuilt on the Facilitator Hub's interactive shell (index + filter + mark/expand/CREATE PROMPT), per Dan's request, replacing the static per-line dashboard shell. Same underlying data and counting method as the 2026-07-27 build — only the layout and interaction model changed. Programme Index, People & Allocation, People Summary and Resourcing Notes sections; filter by program, by person, and by search text; click an index row to scope the two detail sections to that program."
+    ]
+  ]
+}

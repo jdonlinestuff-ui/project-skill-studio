@@ -1,0 +1,414 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facilitator Hub</title>
+<style>
+/* ---- tokens: Canon v6 is the default scheme (spec v2.0 §6) ---- */
+:root{
+  --bg:#F6ECD6; --panel:#FFFAEE; --ink:#101D3D; --headerBg:#101D3D; --headerFg:#F6ECD6;
+  --muted:#7A6E55; --line:#E3D2A8; --zebra:#FBF4E3; --accent:#C9A961; --onAccent:#101D3D;
+  --accentText:#A8843C; --body:#4A4535; --field:#FFFDF7; --tested:#E7D9B4; --testedFg:#101D3D;
+  --pass:#1E7A45; --passT:#E4F2E9; --fail:#B3261E; --failT:#FBE6E4;
+  --pend:#A97605; --pendT:#F8EED6; --block:#141414; --blockT:#E8E4DA;
+  --na:#9A8F75; --naT:#F1EADA;
+}
+[data-scheme="slate"]{
+  --bg:#EEF0F1; --panel:#FBFCFC; --ink:#1B2227; --headerBg:#1B2227; --headerFg:#EEF0F1;
+  --muted:#6F787D; --line:#DBE0E2; --zebra:#F4F6F6; --accent:#2F7D74; --onAccent:#FFFFFF;
+  --accentText:#2F7D74; --body:#3C464C; --field:#FFFFFF; --tested:#D6E7E4; --testedFg:#1B2227;
+  --pass:#1F6B45; --passT:#E1EFE7; --fail:#B4482F; --failT:#F9E7E2;
+  --pend:#9A6B12; --pendT:#F6EEDD; --block:#1B2227; --blockT:#E4E7E9;
+  --na:#8D969B; --naT:#EEF1F2;
+}
+[data-scheme="dark"]{
+  --bg:#14171B; --panel:#1C2127; --ink:#E7E4DC; --headerBg:#242B33; --headerFg:#E7E4DC;
+  --muted:#8B939B; --line:#2C333B; --zebra:#20262D; --accent:#E0A93A; --onAccent:#14171B;
+  --accentText:#E0A93A; --body:#C3C8CD; --field:#161A1F; --tested:#3A424B; --testedFg:#E7E4DC;
+  --pass:#4CC38A; --passT:#17301F; --fail:#F2665B; --failT:#331A19;
+  --pend:#E0A93A; --pendT:#332714; --block:#C3C8CD; --blockT:#2A2F35;
+  --na:#6B7178; --naT:#22272D;
+}
+[data-scheme="mono"]{
+  --bg:#F2F2F0; --panel:#FFFFFF; --ink:#111111; --headerBg:#111111; --headerFg:#FFFFFF;
+  --muted:#6E6E6E; --line:#DADADA; --zebra:#F7F7F5; --accent:#111111; --onAccent:#FFFFFF;
+  --accentText:#4A4A4A; --body:#333333; --field:#FFFFFF; --tested:#DDDDDD; --testedFg:#111111;
+  --pass:#111111; --passT:#E6E6E4; --fail:#111111; --failT:#CFCFCD;
+  --pend:#6E6E6E; --pendT:#EDEDEB; --block:#111111; --blockT:#C2C2C0;
+  --na:#9A9A98; --naT:#F4F4F2;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+a{color:var(--ink)} a:hover{color:var(--accentText)}
+button,textarea,select,input{font-family:inherit}
+@media print{.noprint{display:none!important}}
+
+/* ---- header ---- */
+.head{padding-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:3px solid var(--ink)}
+.eyebrow{font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.18em;color:var(--accentText)}
+.title{font:700 27px/1.15 Libre Baskerville,Georgia,serif;letter-spacing:-.01em}
+.headmeta{font:400 10px/1.5 IBM Plex Mono,monospace;text-align:right;color:var(--muted)}
+
+/* ---- metric strip ---- */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 12px 11px;display:flex;flex-direction:column;gap:4px}
+.metric .num{font:700 26px/1 Libre Baskerville,Georgia,serif}
+.metric .lbl{font:500 10px/1.3 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--muted)}
+
+/* ---- how-this-works ---- */
+.keypanel{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:16px 18px}
+.keyintro{font:400 13px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);margin-bottom:14px}
+.keygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px}
+.keyitem{display:flex;align-items:flex-start;gap:10px}
+.circ{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 14px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:var(--panel);color:var(--ink)}
+.circ.explain{border-color:var(--accent)}
+.circ.proceed{background:var(--ink);color:var(--bg)}
+.circ.improve,.circ.data{background:var(--accent);color:var(--onAccent)}
+.keyname{font:700 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+.keydesc{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);text-wrap:pretty}
+
+/* ---- sticky bar ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);margin-top:18px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.btn{border-radius:3px;height:44px;padding:0 20px;font:700 12px/1 IBM Plex Mono,monospace;letter-spacing:.08em;cursor:pointer;background:var(--ink);color:var(--bg);border:2px solid var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);font-weight:600;padding:0 16px}
+.btn.ghost.on{background:var(--ink);color:var(--bg)}
+.btn.ghost.accent-on{background:var(--accent);color:var(--onAccent)}
+.schemewrap{display:flex;align-items:center;gap:6px;margin-left:auto}
+.schemelbl{font:500 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--muted)}
+.sbtn{display:flex;align-items:center;gap:5px;height:32px;padding:0 9px;border-radius:3px;cursor:pointer;font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.06em;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.sbtn.on{background:var(--ink);color:var(--bg)}
+.dots{display:flex}
+.dots i{width:9px;height:9px;border-radius:50%;display:block}
+.dots i+i{margin-left:-3px}
+.statuswrap{display:flex;flex-direction:column;gap:3px;align-items:flex-end;font-family:IBM Plex Mono,monospace}
+.statuswrap div{font:400 10px/1.3 IBM Plex Mono,monospace;color:var(--muted)}
+#promptbox{width:100%;margin-top:10px;border:none;border-radius:4px;padding:14px;font:400 12px/1.6 IBM Plex Mono,monospace;min-height:120px;resize:vertical;background:var(--ink);color:var(--bg)}
+
+/* ---- section heading ---- */
+.sechead{display:flex;align-items:baseline;gap:12px;margin:30px 0 10px}
+.sechead h2{font:700 15px/1.2 Libre Baskerville,Georgia,serif}
+.rule{flex:1;height:1px;background:var(--line)}
+.secmeta{font:400 10px/1 IBM Plex Mono,monospace;letter-spacing:.1em;color:var(--accentText)}
+
+/* ---- panels & rows ---- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.scroller{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto}
+.inner{min-width:848px}
+.row{border-top:1px solid var(--line)}
+.cells{display:grid;gap:12px;align-items:start;padding:12px 14px;overflow-wrap:anywhere}
+.cells>*{min-width:0}
+.hdr{overflow-wrap:anywhere}
+.hdr>*{min-width:0}
+.hdr{display:grid;gap:8px;align-items:center;padding:9px 14px;background:var(--headerBg);color:var(--headerFg);font:600 12px/1.2 IBM Plex Mono,monospace;letter-spacing:.02em}
+.gmod{grid-template-columns:104px 92px 351px minmax(140px,1fr) 104px;gap:8px}
+.gqueue{grid-template-columns:62px minmax(140px,220px) 1fr 116px}
+.gissue{grid-template-columns:52px 84px 1fr 116px}
+.gbudget{grid-template-columns:52px 1fr 96px 96px 92px 116px}
+.gmile{grid-template-columns:92px 22px 1fr 84px 116px}
+.gnext{grid-template-columns:34px 1fr 104px 116px}
+.gfeedback{grid-template-columns:52px 1fr 108px 92px 96px 116px}
+.gproj{grid-template-columns:52px 1fr 128px 76px 76px 1fr}
+.gpeople{grid-template-columns:1fr 96px 76px 1fr}
+.zebra{background:var(--zebra)}
+.name{font:600 12px/1.4 IBM Plex Mono,monospace}
+.ver{font:400 12px/1.35 IBM Plex Mono,monospace;color:var(--muted)}
+.rowtitle{font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif}
+.note{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
+.ref{font:600 12px/1.4 IBM Plex Mono,monospace;color:var(--accentText)}
+.money{font:500 12px/1.4 IBM Plex Mono,monospace;text-align:right}
+.meta{font:500 12px/1.4 IBM Plex Mono,monospace;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:4px}
+
+/* ---- status marks: glyph + word + tint ---- */
+.chk{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;align-items:center}
+.mk{display:flex;align-items:center;justify-content:center;gap:3px;height:24px;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
+.mk i{font-style:normal;font-size:13px}
+.mk.pad{padding:0 9px;gap:4px}
+.mk-pass{background:var(--passT);color:var(--pass)}
+.mk-fail{background:var(--failT);color:var(--fail)}
+.mk-pending{background:var(--pendT);color:var(--pend)}
+.mk-blocked{background:var(--blockT);color:var(--block)}
+.mk-na{background:var(--naT);color:var(--na)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:2px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em;border:1px solid var(--ink)}
+.b-integrated{background:var(--headerBg);color:var(--headerFg)}
+.b-tested{background:var(--tested);color:var(--testedFg);border-color:var(--tested)}
+.b-building,.b-proposed{background:transparent;color:var(--ink)}
+.b-prototype,.b-pending{background:transparent;color:var(--muted);border-color:var(--line)}
+
+/* ---- action trio ---- */
+.acts{display:flex;gap:6px;justify-content:flex-end}
+.abtn{width:30px;height:30px;border-radius:50%;cursor:pointer;font:600 13px/1 IBM Plex Mono,monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.abtn.plus{font-size:15px}
+.abtn.sel{background:var(--ink);color:var(--bg)}
+.detail{display:none;grid-column:1/-1;padding:2px 0 2px}
+.detail textarea{width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:52px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)}
+
+.nonerow{padding:10px 2px;font-weight:400;font-size:12px;line-height:1.45;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--muted)}
+.srcbanner{grid-column:1/-1;margin:0 0 14px;padding:10px 14px;border-radius:4px;
+  border:2px solid var(--fail);background:var(--failTint);color:var(--fail);
+  font-weight:600;font-size:12px;line-height:1.45;font-family:'IBM Plex Mono',monospace}
+.stale{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:2px;
+  border:1px solid var(--pending);color:var(--pending);background:var(--pendingTint);
+  font-weight:600;font-size:10px;font-family:'IBM Plex Mono',monospace}
+/* ---- budget & milestones ---- */
+.barTrack{height:5px;border-radius:3px}
+.barFill{height:100%;border-radius:3px}
+.total{display:grid;gap:12px;align-items:center;padding:11px 14px;border-top:2px solid var(--ink)}
+.rail{display:flex;flex-direction:column;align-items:center;align-self:stretch}
+.dot{width:11px;height:11px;border-radius:50%;margin-top:4px}
+.conn{flex:1;width:2px;margin-top:4px;background:var(--line)}
+.ctrl{font:600 12px/1.45 IBM Plex Mono,monospace;letter-spacing:.02em;color:var(--accentText)}
+.ctrltext{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);text-wrap:pretty}
+.logrow{display:grid;grid-template-columns:186px 1fr;gap:14px;padding:10px 14px;border-left:2px solid var(--accent);background:var(--zebra)}
+.logwhen{font:500 12px/1.45 IBM Plex Mono,monospace;color:var(--muted)}
+.foot{margin-top:28px;font:400 10px/1.5 IBM Plex Mono,monospace;text-align:center;color:var(--muted)}
+
+.gidx{grid-template-columns:160px 1fr 36px 36px 36px 82px 52px}
+.ghub{grid-template-columns:82px 42px 1fr 60px 136px}
+.ghubR{grid-template-columns:82px 42px 54px 1fr 60px 136px}
+.ggen{grid-template-columns:1fr 136px}
+.triple{font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body)}
+.trio2{display:flex;gap:5px;justify-content:flex-end}
+.trio2 button{flex:none;width:26px;height:26px;border-radius:50%;font:600 12px/1 "IBM Plex Mono",monospace;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.trio2 button.on{background:var(--ink);color:var(--bg)}
+.trio2 button.imp{background:var(--accent);color:var(--ink)}
+.trio2 button.ghost{flex:none;width:26px;height:26px;border-radius:50%;font:600 11px/1 "IBM Plex Mono",monospace;border:1.5px solid var(--line);background:transparent;color:var(--muted)}
+.idxrow{cursor:pointer}
+.pill{display:flex;align-items:center;justify-content:center;height:24px;border-radius:3px;font:600 12px/1 "IBM Plex Mono",monospace}
+.pill0{background:var(--naT);color:var(--na)}
+.pillhot{background:var(--failT);color:var(--fail)}
+.pillwarm{background:var(--pendT);color:var(--pend)}
+.line-clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.line-open{display:block}
+.triple b{font:600 10px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--accentText)}
+</style></head><body><div class="wrap" id="app"></div>
+<script>
+const TRACKER_SOURCE='';
+const EMBEDDED = {"meta": {"title": "Facilitator Hub", "eyebrow": "CYBER RISK ASSESSMENT · PROGRAMME REVIEW SURFACE", "generatedAt": "2026-07-27", "maintainer": "Claude"}, "trackers": [{"k": "programme", "id": "DESIGN_TRACKER.json", "name": "Programme Tracker", "updated": "2026-07-27", "owner": "Dan"}, {"k": "digital", "id": "ONLINE_DEV_TRACKER.json", "name": "Digital Dev Tracker", "updated": "2026-07-27", "owner": "Claude"}, {"k": "portfolio", "id": "DESIGN_TRACKER.json + ONLINE_DEV_TRACKER.json", "name": "Portfolio Tracker", "updated": "2026-07-27", "owner": "Dan"}, {"k": "skillsuite", "id": "DESIGN_TRACKER.json", "name": "Skill-Suite Tracker", "updated": "2026-07-27", "owner": "Claude"}, {"k": "compliance", "id": "DESIGN_TRACKER.json + ONLINE_DEV_TRACKER.json", "name": "Compliance Tracker", "updated": "2026-07-27", "owner": "Unassigned"}, {"k": "hosting", "id": "DESIGN_TRACKER.json", "name": "Hosting Tracker", "updated": "2026-07-27", "owner": "Unassigned"}, {"k": "expansion", "id": "DESIGN_TRACKER.json", "name": "Expansion Tracker", "updated": "2026-07-27", "owner": "Dan"}], "hubDecisions": [{"tracker": "programme", "ref": "D14", "short": "Reintroduce Role cards + secret Insider Threat + sabotage-during-Crisis to the Teams app?", "issue": "Dan sketched a full mechanic spec during a live walkthrough on 2026-07-26 — a private Role card for up to 10% of players, exactly one hidden Insider per table, and a 3-minute sabotage window during Crisis rounds — but this reverses two decisions already locked and shipped (Insider removed v0.7; Role cards removed v0.19 #167).", "problem": "Nothing has been decided or built against it, so digital-line modules below it (scoring, timers, reveal) stay parked, and citing ‘D14’ elsewhere now risks the three-way ref collision logged as I18.", "needed": "Dan's per-point answers to the 8 open sub-questions in the 2026-07-27 feasibility brief (mode scope, privacy layer, role definitions, 10% rounding, timer nesting, scoring/outcome, reveal/export naming, priority). Claude's feasibility pass gave a recommendation for each, but choice is deliberately still null.", "owner": "Dan"}], "hubIssues": [{"tracker": "digital", "ref": "I8", "rating": "High", "issue": "The real Teams-app build is v0.19.0/v0.20.0, handed to Dan directly and never synced to Drive — Drive canon still only holds the stale v0.2/v0.6 source.", "problem": "Every module status mark evidenced against that stale snapshot may be confidently wrong in either direction. Kept explicitly distinct from I13/D15's repo-pivot per canon's own note — the Drive-sync gap and the repo-pivot are two different things, not to be merged.", "needed": "Sync the real v0.19+ source to Drive (Dan already authorised this on 2026-07-27) so the parked App-POC modules can finally be re-evidenced.", "owner": "Dan"}, {"tracker": "compliance", "ref": "I3", "rating": "Med", "issue": "The Canon v6 colour palette fails WCAG contrast at several small-text pairings in the app's own card templates — a full six-pair audit (2026-07-26) found accentText on bg at 2.97:1, na-mark at 2.67:1, and others below AA.", "problem": "Labels already rendered small read below the accessibility floor. This is about the app's card templates only — the locked physical print deck is unaffected and needs no action.", "needed": "Darken accentText to roughly #7A5E23 (clears AA on both bg and panel) and re-audit before the app's next release.", "owner": "Claude"}, {"tracker": "digital", "ref": "I6", "rating": "Med", "issue": "The Teams app has never been tested live with several real people connected at once — only single-client and simulated multi-tab testing has been run.", "problem": "A paid workshop would be the first real multi-client Fluid test, so a sync or privacy failure would be client-visible.", "needed": "Run a live multi-client rehearsal of the real v0.20.0 app before any real workshop is booked.", "owner": "Dan + Claude"}, {"tracker": "digital", "ref": "I12", "rating": "High", "issue": "Digital-line source of truth pivoted 2026-07-27 to the cra-offline-app repo fork, but every module status mark was evidenced against the now-parked Drive-synced snapshots (v0.2/v0.6/v0.19/v0.20).", "problem": "None of those marks have been re-verified against the new repo, so every module status shown anywhere is provisional and could be silently read as current when it isn't.", "needed": "Re-baseline every module mark against the real cra-offline-app repo state before trusting any status shown there.", "owner": "Dan + Claude"}, {"tracker": "digital", "ref": "M4", "rating": "High", "issue": "The scoring module's own canon record contradicts itself: the golden-file test field reads FAIL, but the same module's prose says the Scoring_Matrix_v3.0 tier benchmarks haven't been run yet.", "problem": "Milestone M4 (scoring golden files vs matrix v3.0) is blocked on this being resolved at the source, not on effort — nobody can act on a status that disagrees with itself.", "needed": "Dan or a canon sync to determine which record is correct and fix the other, rather than the hub silently picking one.", "owner": "Dan"}, {"tracker": "expansion", "ref": "I17", "rating": "Med", "issue": "The SOC 2 TSC Light Pack is recorded as ‘accepted’ (registered via D10), but none of its actual pack files (cards/crosswalk/manifest/insert/overlay) can be located anywhere in the Drive-mirrored canon folder.", "problem": "The ‘accepted’ status currently rests only on the tracker's own record, not on an inspectable asset — a full-folder search for the pack's likely filenames returned nothing matching.", "needed": "Confirm where the real v0.1-draft pack files are — possibly delivered directly to Dan and never synced to Drive, similar to the v0.19 app-source gap in I8.", "owner": "Dan"}, {"tracker": "programme", "ref": "I18", "rating": "High", "issue": "The identifier ‘D14’ has been used for three different things across project history: this tracker's actual open Insider/Roles/Sabotage decision, a same-day sync instruction that used ‘D14’ to mean a GitHub-repo/physical-deck item, and a separate historical session file that used ‘D14’ for an already-resolved Deck Library Epic (E10).", "problem": "Three distinct referents share one ID, so citing ‘D14’ anywhere without context risks pointing at the wrong thing.", "needed": "Dan to confirm which D14 is meant whenever it's referenced going forward, or renumber one of the three to remove the collision.", "owner": "Dan"}, {"tracker": "programme", "ref": "D13/E2", "rating": "Med", "issue": "decisions_required[D13]'s own details say Dan still needs to pick between accepting E2 (the owner budget-economy mechanic) as superseded or reinstating it before D13 can close fully — but digital_enhancements[E2] already records its status as ‘superseded’, reasoning ‘nothing left to register’.", "problem": "Those are two different answers inside the same tracker: one says this is still an open decision, the other says it's already resolved. Not resolved here — flagged back to canon rather than picking one.", "needed": "Dan, or the next design-tracker sync, to reconcile decisions_required[D13] and digital_enhancements[E2] so only one status stands.", "owner": "Dan"}], "hubActions": [{"tracker": "portfolio", "ref": "B1-B6", "issue": "All six budget lines (B1–B6: print proofs, publisher setup, Teams app tooling, Claude usage, playtest sessions, fonts/licensing) are still placeholder figures, not real spend.", "problem": "Every budget total and variance shown anywhere is provisional until real numbers replace the placeholders.", "needed": "Dan to supply real budget figures for B1–B6.", "owner": "Dan"}, {"tracker": "skillsuite", "ref": "Q10", "issue": "Whether native Teams Breakout Rooms are a hard requirement or a nice-to-have is unanswered, and this gates the cra-mobile-dev improvement work.", "problem": "Without an answer, that mobile-dev improvement can't be scoped.", "needed": "Dan to answer Q10: hard requirement or nice-to-have?", "owner": "Dan"}, {"tracker": "digital", "ref": "P2/P3", "issue": "14 remaining Design-Review.md items (V4–V6, U3–U7, A2–A4, T2) are queued behind the P1 ‘unblock a credible test’ set (T1, T3, U1, U2, A1), which is already active.", "problem": "Nothing formally triggers moving them into active work once P1 clears — they could sit queued indefinitely without a check-in.", "needed": "Once the P1 set is verified working, move V4–V6/U3–U7/A2–A4/T2 into active work.", "owner": "Dan + Claude"}], "hubGeneral": [{"tracker": "programme", "note": ""}, {"tracker": "digital", "note": ""}, {"tracker": "portfolio", "note": ""}, {"tracker": "skillsuite", "note": ""}, {"tracker": "compliance", "note": ""}, {"tracker": "hosting", "note": ""}, {"tracker": "expansion", "note": ""}], "incomplete": [], "log": [["2026-07-27", "Rebuilt on the real cra-facilitator-hub skill (superseding an earlier ad-hoc build): pooled DESIGN_TRACKER.json (id 1Wvrb) and ONLINE_DEV_TRACKER.json (id 1BQ4p, rev 6), read fresh via Drive by title. 1 decision, 8 issues, 3 actions surfaced; 0 rows held to incomplete. Deduplicated 3 same-fact/same-ref pairs across the two trackers (I3, I6, I8) down to one row each, citing the fuller source. Found and flagged a NEW self-contradiction (decisions_required[D13] says E2 still needs Dan's pick; digital_enhancements[E2] already reads 'superseded') alongside the previously-known scoring golden-file FAIL vs NOT-YET-RUN contradiction (M4). Excluded as stale, not silently dropped: I14 (duplicate Drive files) — a fresh folder listing during this build shows only one DESIGN_TRACKER.json and one ONLINE_DEV_TRACKER.json remain, so the files I14 describes appear to already be gone; I9 (skill install state) — DESIGN_TRACKER.json already marks this resolved, ONLINE_DEV_TRACKER.json's copy is stale. Excluded as already actioned/redundant: 'Decide D14' and 'Live multi-client rehearsal' next_actions (restate rows already carried under Decisions/Issues); P1 design-review set T1/T3/U1/U2/A1 (already advanced to active, nothing pending to surface)."], ["2026-07-27b", "Bug-fix pass on reported broken functionality: (1) CREATE PROMPT — #promptbox carried a permanent display:none rule that survived the conditional insert, so the prompt rendered but stayed invisible; removed. (2) Dashboard Index — expanded from the 2 canon-source keys (design/digital) to all 7 built CRA dashboards (Programme, Digital Dev, Portfolio, Skill-Suite, Compliance, Hosting, Expansion), and re-tagged each existing decision/issue/action row from its coarse canon source to the specific dashboard it's most relevant to: D14, I18, D13/E2 -> Programme (design/rules-level); I17 -> Expansion (SOC 2 pack); B1-B6 -> Portfolio (cross-line budget); Q10 -> Skill-Suite (gates cra-mobile-dev); I3 -> Compliance (WCAG/accessibility); I8, I6, I12, M4, P2/P3 stay Digital Dev. Hosting shows 0/0/0 - no rows currently apply, consistent with 0 modules provisioned. This re-tagging is a judgement call, not a canon field - flagging for Dan to correct if any placement reads wrong. A 'Resource Tracker' third archetype exists in project-skill-studio's own sample docs (portfolio-level projects+people rollup) but is not yet a built CRA dashboard, so it is NOT added to this index - open question back to Dan on whether to build it as a new skill. (3) IMPROVE action on Decisions/Issues/Next Actions and General Update now opens a real textarea wired to setDetail/DATA.hubGeneral, previously the button toggled state with no input surface. (4) General Update simplified from 3 always-on Budget/Resource/Timeline fields per tracker to 1 field, labelled with the tracker name, revealed only on IMPROVE. (5) Scheme swatches (CANON/SLATE/DARK/MONO) were styled in CSS but never rendered as buttons - added, matching the working picker in dashboard-reference.html."]]};
+let DATA = EMBEDDED;
+let state = {
+  scheme:'canon', filterTracker:'ALL', filterOwner:'ALL', query:'',
+  choices:{}, details:{}, expanded:{}, allOpen:false, general:{}, prompt:'',
+  sort:{index:{key:'id',dir:1}, decisions:{key:'tracker',dir:1}, issues:{key:'rating',dir:1}, actions:{key:'tracker',dir:1}},
+  live:false, loadError:null
+};
+const GLYPH={pass:'\u2713',fail:'\u2715',pending:'~',blocked:'\u25a0',na:'\u2013'};
+const RATING_RANK={High:0,Med:1,Low:2};
+const SCHEMES=[['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
+               ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
+function setScheme(k){ state.scheme=k;
+  if(k==='canon'){ delete document.documentElement.dataset.scheme; } else { document.documentElement.dataset.scheme=k; }
+  render(); }
+function esc(s){ s=String(s==null?'':s); const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function tname(k){ const t=DATA.trackers.find(t=>t.k===k); return t?t.name:k; }
+function tid(k){ const t=DATA.trackers.find(t=>t.k===k); return t?t.id:k; }
+
+async function loadData(){
+  if(TRACKER_SOURCE){
+    try{ const r=await fetch(TRACKER_SOURCE,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status);
+      DATA=await r.json(); state.live=true; state.loadError=null; }
+    catch(e){ DATA=EMBEDDED; state.live=false; state.loadError=String(e.message||e); }
+  } else { DATA=EMBEDDED; state.live=false; state.loadError='no TRACKER_SOURCE configured'; }
+  render();
+}
+
+function matches(r){
+  if(state.filterTracker!=='ALL' && r.tracker!==state.filterTracker) return false;
+  if(state.filterOwner!=='ALL' && (r.owner||'Unassigned')!==state.filterOwner) return false;
+  const q=state.query.trim().toLowerCase(); if(!q) return true;
+  return [r.ref,r.short,r.issue,r.problem,r.needed,r.owner,tname(r.tracker)].filter(Boolean).join(' ').toLowerCase().includes(q);
+}
+function sortRows(rows,sec){
+  const {key,dir}=state.sort[sec];
+  const val=r=>{ if(key==='tracker') return tname(r.tracker); if(key==='rating') return RATING_RANK[r.rating]??9; return r[key]??''; };
+  return rows.slice().sort((a,b)=>{ const x=val(a),y=val(b); return x<y?-dir:x>y?dir:0; });
+}
+function toggleSort(sec,key){ const s=state.sort[sec]; state.sort={...state.sort,[sec]:{key,dir:s.key===key?-s.dir:1}}; render(); }
+function markRow(sec,ref,choice){ const k=sec+':'+ref; if(state.choices[k]===choice) delete state.choices[k]; else state.choices[k]=choice; state.prompt=''; render(); }
+function setDetail(sec,ref,v){ state.details[sec+':'+ref]=v; }
+function toggleExpand(sec,ref){ const k=sec+':'+ref; state.expanded[k]=!state.expanded[k]; render(); }
+
+function triple(sec,r){
+  const k=sec+':'+r.ref; const open=state.allOpen||!!state.expanded[k];
+  const cls=open?'line-open':'line-clamp';
+  return `<div class="triple" style="display:flex;flex-direction:column;gap:5px">
+    <div class="${cls}"><b>ISSUE </b>${esc(r.issue)}</div>
+    <div class="${cls}"><b>PROBLEM </b>${esc(r.problem)}</div>
+    <div class="${cls}"><b>NEEDED </b>${esc(r.needed)}</div>
+  </div>`;
+}
+function trio(sec,r){
+  const k=sec+':'+r.ref; const c=state.choices[k]; const open=state.allOpen||!!state.expanded[k];
+  return `<div class="trio2">
+    <button class="${c==='explain'?'on':''}" title="EXPLAIN" onclick="markRow('${sec}','${r.ref}','explain')">!</button>
+    <button class="${c==='proceed'?'on':''}" title="PROCEED" onclick="markRow('${sec}','${r.ref}','proceed')">\u2713</button>
+    <button class="${c==='improve'?'imp':''}" title="IMPROVE" onclick="markRow('${sec}','${r.ref}','improve')">+</button>
+    <button class="ghost" title="Expand" onclick="toggleExpand('${sec}','${r.ref}')">${open?'\u2013':'\u2026'}</button>
+  </div>`;
+}
+function rowBar(sec,ref){ const c=state.choices[sec+':'+ref]; return c?'box-shadow:inset 4px 0 0 var(--accent);':''; }
+
+function renderIndex(){
+  const rows = DATA.trackers
+    .filter(t=>state.filterOwner==='ALL'||t.owner===state.filterOwner)
+    .map(t=>{
+      const dec=DATA.hubDecisions.filter(r=>r.tracker===t.k).length;
+      const iss=DATA.hubIssues.filter(r=>r.tracker===t.k).length;
+      const act=DATA.hubActions.filter(r=>r.tracker===t.k).length;
+      return {...t, dec, iss, act};
+    });
+  const {key,dir}=state.sort.index;
+  rows.sort((a,b)=>{ const x=a[key]??a.id, y=b[key]??b.id; return x<y?-dir:x>y?dir:0; });
+  const pill=(n,hot)=>`<div class="pill ${n===0?'pill0':hot?'pillhot':'pillwarm'}">${n}</div>`;
+  document.getElementById('idxBody').innerHTML = rows.length ? rows.map((r,i)=>`
+    <div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${state.filterTracker===r.k?'box-shadow:inset 4px 0 0 var(--ink);':''}">
+     <div class="cells gidx idxrow" style="align-items:center" onclick="state.filterTracker=state.filterTracker==='${r.k}'?'ALL':'${r.k}'; render();">
+      <div style="font:600 11px/1.4 IBM Plex Mono,monospace;color:var(--accentText)">${esc(r.id)}</div>
+      <div style="font:600 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif">${esc(r.name)}</div>
+      ${pill(r.dec,false)}${pill(r.iss,r.iss>2)}${pill(r.act,false)}
+      <div style="font:400 11px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(r.updated)}</div>
+      <div style="font:500 11px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(r.owner)}</div>
+     </div></div>`).join('') : '<div class="nonerow">\u2014 none \u2014</div>';
+}
+
+function renderSection(id,sec,rows,cols,extraCol){
+  const filtered = sortRows(rows.filter(matches), sec);
+  document.getElementById(id).innerHTML = filtered.length ? filtered.map((r,i)=>{
+    const c=state.choices[sec+':'+r.ref];
+    return `
+    <div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${rowBar(sec,r.ref)}">
+     <div class="cells ${cols}" style="align-items:start">
+      <div style="font:500 11px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(tname(r.tracker))}</div>
+      <div style="font:600 12px/1.4 IBM Plex Mono,monospace;color:var(--accentText)">${esc(r.ref)}</div>
+      ${extraCol?extraCol(r):''}
+      ${triple(sec,r)}
+      <div style="font:500 11px/1.4 IBM Plex Mono,monospace;color:var(--muted)">${esc(r.owner||'Unassigned')}</div>
+      ${trio(sec,r)}
+     </div>
+     ${c==='improve' ? `<div style="padding:0 14px 12px"><textarea style="width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:60px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)" placeholder="what to change\u2026" oninput="setDetail('${sec}','${r.ref}',this.value)">${esc(state.details[sec+':'+r.ref]||'')}</textarea></div>` : ''}
+     </div>`;
+  }).join('') : '<div class="nonerow">\u2014 none \u2014</div>';
+}
+
+function renderGeneral(){
+  const rows = DATA.hubGeneral.filter(g=>state.filterTracker==='ALL'||g.tracker===state.filterTracker);
+  document.getElementById('genBody').innerHTML = rows.length ? rows.map((g,i)=>{
+    const c=state.choices['general:'+g.tracker];
+    return `<div style="border-top:1px solid var(--line);${i%2?'background:var(--zebra);':''}${c?'box-shadow:inset 4px 0 0 var(--accent);':''}">
+     <div class="cells ggen" style="align-items:center">
+      <div style="font:600 11px/1.4 IBM Plex Mono,monospace">${esc(tname(g.tracker))}</div>
+      <div class="trio2">
+        <button class="${c==='explain'?'on':''}" title="EXPLAIN" onclick="markRow('general','${g.tracker}','explain')">!</button>
+        <button class="${c==='proceed'?'on':''}" title="PROCEED" onclick="markRow('general','${g.tracker}','proceed')">\u2713</button>
+        <button class="${c==='improve'?'imp':''}" title="IMPROVE" onclick="markRow('general','${g.tracker}','improve')">+</button>
+      </div>
+     </div>
+     ${c==='improve' ? `<div style="padding:0 14px 12px"><textarea style="width:100%;border-radius:3px;padding:9px;font:400 12px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif;min-height:60px;resize:vertical;background:var(--field);border:1.5px solid var(--accent);color:var(--ink)" placeholder="general update for ${esc(tname(g.tracker))}\u2026" oninput="DATA.hubGeneral.find(x=>x.tracker==='${g.tracker}').note=this.value">${esc(g.note||'')}</textarea></div>` : ''}
+     </div>`;}).join('') : '<div class="nonerow">\u2014 none \u2014</div>';
+}
+
+function buildPrompt(){
+  const L=[];
+  const block=(label,rows,sec)=>{ rows.forEach(r=>{ const c=state.choices[sec+':'+r.ref]; if(!c) return;
+    const extra=(state.details[sec+':'+r.ref]||'').trim();
+    L.push('- ['+c.toUpperCase()+'] '+label+' '+r.ref+' ('+tname(r.tracker)+', owner '+(r.owner||'Unassigned')+')'
+      +'\n    Issue: '+r.issue+'\n    Problem: '+r.problem+'\n    What is needed: '+r.needed
+      +(extra?'\n    Extra direction: '+extra:'')); }); };
+  block('DECISION',DATA.hubDecisions,'decisions'); block('ISSUE',DATA.hubIssues,'issues'); block('NEXT ACTION',DATA.hubActions,'actions');
+  const gen=[];
+  DATA.hubGeneral.forEach(g=>{ const c=state.choices['general:'+g.tracker]; const note=(g.note||'').trim();
+    if(!note && !c) return;
+    gen.push('- '+(c?'['+c.toUpperCase()+'] ':'')+tname(g.tracker)+(note?'\n    '+note:'')); });
+  const head='Facilitator Hub review \u2014 '+(DATA.meta.generatedAt||'')+(state.filterTracker!=='ALL'?' \u2014 scoped to '+tname(state.filterTracker):'')
+    +'\nEXPLAIN = tell me more before I decide. PROCEED = implement as written. IMPROVE = follow the extra direction.\n';
+  if(!L.length && !gen.length) return head+'\nNothing marked.';
+  return head+(L.length?'\nMARKED ITEMS\n'+L.join('\n'):'')+(gen.length?'\n\nGENERAL UPDATE\n'+gen.join('\n'):'');
+}
+function createPrompt(){ state.prompt=buildPrompt(); render();
+  const b=document.getElementById('promptbox'); if(navigator.clipboard) navigator.clipboard.writeText(state.prompt).catch(()=>{}); }
+function resetAll(){ state={...state, choices:{}, details:{}, expanded:{}, allOpen:false, prompt:'', filterTracker:'ALL', filterOwner:'ALL', query:'', scheme:'canon'}; delete document.documentElement.dataset.scheme; render(); }
+
+function render(){
+  const owners = Array.from(new Set([].concat(DATA.hubDecisions,DATA.hubIssues,DATA.hubActions).map(r=>r.owner||'Unassigned'))).sort();
+  document.getElementById('app').innerHTML = `
+   <div style="max-width:1440px;margin:0 auto;padding:30px 24px 80px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:3px solid var(--ink)">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.18em;color:var(--accentText)">${esc(DATA.meta.eyebrow||'PROGRAMME REVIEW SURFACE')}</div>
+        <div style="font:700 27px/1.15 Libre Baskerville,Georgia,serif">${esc(DATA.meta.title||'Facilitator Hub')}</div>
+      </div>
+      <div style="font:400 10px/1.6 IBM Plex Mono,monospace;text-align:right;color:var(--muted)">
+        rollup across ${DATA.trackers.length} trackers<br>${state.live?'live':'SNAPSHOT'} \u00b7 generated ${esc(DATA.meta.generatedAt)} \u00b7 maintained by ${esc(DATA.meta.maintainer)}
+      </div>
+    </div>
+    <div class="keypanel">
+      <div class="keyintro">Run the meeting top to bottom. Claude cannot see edits made here \u2014 mark rows with the action buttons below, then press <b>CREATE PROMPT</b> and paste the result into chat. Nothing here writes back to canon; the prompt is the hand-off.</div>
+      <div class="keygrid">${[
+        ['!','explain','EXPLAIN','Ask Claude to walk through this item in more detail before deciding.'],
+        ['\u2713','proceed','PROCEED','Implement this item as written.'],
+        ['+','improve','IMPROVE','Add your own extra direction \u2014 a text field opens below the row.'],
+        ['\u2026','','EXPAND','Show the full ISSUE \u00b7 PROBLEM \u00b7 NEEDED text instead of the one-line clamp.']
+      ].map(([g,c,n,d])=>`<div class="keyitem"><div class="circ ${c}">${g}</div><div class="stack"><div class="keyname">${n}</div><div class="keydesc">${d}</div></div></div>`).join('')}</div>
+    </div>
+    <div class="noprint" style="position:sticky;top:0;z-index:20;margin-top:16px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg);border-bottom:1px solid var(--line)">
+      <button style="height:40px;padding:0 18px;border-radius:3px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font:700 12px/1 IBM Plex Mono,monospace" onclick="createPrompt()">CREATE PROMPT</button>
+      <button style="height:40px;padding:0 14px;border-radius:3px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 12px/1 IBM Plex Mono,monospace" onclick="resetAll()">RESET</button>
+      <select style="height:40px;padding:0 10px;border-radius:3px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink)" onchange="state.filterTracker=this.value; render()">
+        <option value="ALL">ALL TRACKERS</option>
+        ${DATA.trackers.map(t=>`<option value="${t.k}" ${state.filterTracker===t.k?'selected':''}>${esc(t.name)}</option>`).join('')}
+      </select>
+      <select style="height:40px;padding:0 10px;border-radius:3px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink)" onchange="state.filterOwner=this.value; render()">
+        <option value="ALL">ALL OWNERS</option>
+        ${owners.map(o=>`<option value="${o}" ${state.filterOwner===o?'selected':''}>${esc(o)}</option>`).join('')}
+      </select>
+      <input style="height:40px;width:190px;padding:0 10px;border-radius:3px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink)" placeholder="search\u2026" value="${esc(state.query)}" oninput="state.query=this.value; render()">
+      <button style="height:40px;padding:0 14px;border-radius:3px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:600 11px/1 IBM Plex Mono,monospace" onclick="state.allOpen=!state.allOpen; render()">${state.allOpen?'COLLAPSE ALL':'EXPAND ALL'}</button>
+      <div class="schemewrap">
+        <div class="schemelbl">SCHEME</div>
+        <div style="display:flex;gap:6px">${SCHEMES.map(([k,l,a,b,c])=>`<button class="sbtn${state.scheme===k?' on':''}" title="${l}" onclick="setScheme('${k}')"><span class="dots"><i style="background:${a}"></i><i style="background:${b}"></i><i style="background:${c}"></i></span>${l}</button>`).join('')}</div>
+      </div>
+    </div>
+    ${state.prompt? `<textarea id="promptbox" class="noprint" readonly style="width:100%;margin-top:10px;border:none;border-radius:4px;padding:14px;font:400 12px/1.6 IBM Plex Mono,monospace;min-height:150px;background:var(--ink);color:var(--bg)">${esc(state.prompt)}</textarea>` : ''}
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Dashboard Index</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:565px">
+      <div class="hdr gidx"><div>TRACKER NAME</div><div>SIMPLE NAME</div><div style="text-align:center">DEC</div><div style="text-align:center">ISS</div><div style="text-align:center">NEXT</div><div>UPDATED</div><div>OWNER</div></div>
+      <div id="idxBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Decisions Pending</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:460px">
+      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="decBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Open Issues</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:500px">
+      <div class="hdr ghubR"><div>TRACKER</div><div>REF</div><div>RATING</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="issBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Next Actions</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:460px">
+      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="actBody"></div>
+    </div></div>
+
+    <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">General Update</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:480px">
+      <div class="hdr ggen"><div>TRACKER</div><div style="text-align:right">ACTIONS</div></div>
+      <div id="genBody"></div>
+    </div></div>
+
+    <div style="margin-top:28px;font:400 10px/1.5 IBM Plex Mono,monospace;text-align:center;color:var(--muted)">A view over the tracker suite \u2014 swap the data, not the layout</div>
+   </div>`;
+  renderIndex();
+  renderSection('decBody','decisions',DATA.hubDecisions,'ghub');
+  renderSection('issBody','issues',DATA.hubIssues,'ghubR', r=>`<div class="pill ${r.rating==='High'?'pillhot':r.rating==='Med'?'pillwarm':'pill0'}">${esc(r.rating)}</div>`);
+  renderSection('actBody','actions',DATA.hubActions,'ghub');
+  renderGeneral();
+}
+loadData();
+</script></body></html>
