@@ -755,13 +755,16 @@ overlapping by `margin-left:-3px`, then the label CANON / SLATE / DARK / MONO.
 ### 10.6 Status chip — the one visual that must never drift
 ```html
 <div title="Golden files: PEND"
-     style="display:flex;align-items:center;justify-content:center;gap:3px;height:24px;
-            border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:0.02em;
-            background:var(--tint);color:var(--mark)">
+     style="display:flex;align-items:center;justify-content:center;gap:3px;min-height:24px;
+            white-space:nowrap;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;
+            letter-spacing:0.02em;background:var(--tint);color:var(--mark)">
   <span style="font-size:13px">~</span>PEND
 </div>
 ```
-Legend chips are identical with `padding:0 9px` and gap 4px. Build-state badges:
+`min-height:24px` (not `height`) plus `white-space:nowrap` is mandatory: §4e permits long
+domain-word aliases (`UNDECIDED`, `NOT INTERESTED`) with no length bound, and a fixed-height
+chip with no nowrap rule clips them mid-word (`NOT INTERESTE` over a stray `D`). The floor
+stays 24px; the chip grows only if a longer alias needs it. Legend chips are identical with `padding:0 9px` and gap 4px. Build-state badges:
 `height:24px;padding:0 8px;border-radius:2px;font:600 12px/1 IBM Plex Mono,monospace;
 letter-spacing:0.02em` with the badge colours of §6.
 
@@ -914,6 +917,12 @@ Compare against the reference at 1080px wide. All must be true:
       breakage; an empty `defects` array omits the section per §3.4
 - [ ] every ref in the file matches the §4h prefix registry, and no two registers in the
       programme issue the same ref
+- [ ] a row whose triple field is a flat string renders as a single note line, not three
+      `undefined` lines (§3.7 flat-note fallback)
+- [ ] a row whose triple field is an object renders all three labels plus the expand toggle
+- [ ] both row shapes render correctly in the same section without layout divergence
+- [ ] the longest status alias in use renders on one line at the narrowest column it appears
+      in — no mid-word wrap or clip (§10.6 `white-space:nowrap`)
 
 ---
 

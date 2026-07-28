@@ -2,6 +2,29 @@
 
 All notable changes to this skill are documented here.
 
+## [1.11.1] - 2026-07-29
+
+**Fixed — found while regenerating the wiki screenshots, not part of the ask**
+- `triple()` in `dashboard-reference.html` had no flat-note path, so any row whose
+  triple field is a plain string rendered `ISSUE undefined / PROBLEM undefined /
+  NEEDED undefined`. That is every row in the shipped `EMBEDDED` seed, across seven
+  sections, and every row of any real tracker not yet authored as triples — which
+  spec §3.7 explicitly permits and expects. Next Actions additionally lost its title
+  text, since its third field *is* the action text. `triple()` now accepts either a
+  triple object or a flat string and falls back to a single note line; the six call
+  sites pass the field rather than three properties of it. Risk Register's positional
+  three-string form is unchanged. Verified with both shapes rendering in one section.
+- The Feedback interest chip wrapped mid-word (`NOT INTERESTE` / `D`): `.mk` was fixed
+  at `height:24px` with no `white-space` rule, while §4e permits long domain-word
+  aliases. Now `min-height:24px` + `white-space:nowrap`, which keeps the §10.6 floor
+  and makes §10.6 and §4e compatible. `DASHBOARD_SPEC.md` §10.6 updated to carry the
+  rule, so it isn't re-fixed per project.
+- `facilitator-hub-reference.html` carries the same chip fix plus a guard at the top of
+  its own `triple()`, falling back to `note`/`short` so a flat pooled row degrades to a
+  readable line instead of three blanks.
+- Four conformance items added (§11) for the flat-note path, the mixed-shape case, and
+  the longest-alias case.
+
 ## [1.11.0] - 2026-07-28
 
 Two changes, both driven by a real build on the reference programme (CRA): the
