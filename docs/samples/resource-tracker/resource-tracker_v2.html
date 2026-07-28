@@ -114,7 +114,7 @@ const TRACKER_SOURCE='';
 const EMBEDDED = {
 "meta": {
   "title": "Resource Tracker", "eyebrow": "CYBER RISK ASSESSMENT · PEOPLE & ALLOCATION",
-  "generatedAt": "2026-07-27", "maintainer": "Claude",
+  "generatedAt": "2026-07-28", "maintainer": "Claude",
   "trackerFunction": "Tracks who — Dan or Claude, the project's only two real resources — is allocated to which project line, and how many open tasks each carries right now.",
   "trackerPurpose": "Surfaces allocation imbalance (e.g. one line quietly carrying most of the open task load) before it becomes a bottleneck, using counts derived live from the trackers rather than typed-in guesses.",
   "trackerOutcome": "A realistic, canon-derived picture of workload across the studio, kept honest by the 'derived, never stored' rule — recount from source every refresh, never hand-edit a total."
@@ -125,7 +125,7 @@ const EMBEDDED = {
   {"k":"P2","id":"P2","name":"Digital Dev / Teams App","status":"pending","note":"Re-baseline against the cra-offline-app repo (I8/I12); decide D14; resolve the scoring golden-file/prose contradiction; run the live multi-client rehearsal (I6); sequence the design-review P1-P3 sets."},
   {"k":"P3","id":"P3","name":"Compliance Gate","status":"pending","note":"Prioritise the design-review P1 platform-fit items (T1/T3) and run the live multi-client rehearsal that also gates PG1."},
   {"k":"P4","id":"P4","name":"Expansion — SOC 2 TSC Light Pack","status":"na","note":"No roster assigned yet — triage-only; expansion issues (I17) are tracked but no next_actions reference this line specifically."},
-  {"k":"P5","id":"P5","name":"Skill Suite","status":"pass","note":"Confirm cra-* skill install status (I9) — resolved this refresh; work through the 2026-07-26 staleness-audit follow-ups."},
+  {"k":"P5","id":"P5","name":"Skill Suite","status":"pass","note":"Skill install status (I9) resolved 2026-07-27; cra-facilitator-hub roster gap closed 2026-07-28 (22 installed + 2 superseded); work through the 2026-07-26 staleness-audit follow-ups."},
   {"k":"P6","id":"P6","name":"Cloudflare Hosting","status":"na","note":"Own the hosting planning-only gate decision (GATE1) and its live Cloudflare account check."}
 ],
 "people": [
@@ -138,15 +138,16 @@ const EMBEDDED = {
   ["Claude","P0",1,"Refresh SESSION_STATE.md (I7)."],
   ["Claude","P2",8,"Resolve the scoring golden-file contradiction; re-derive module marks once source lands; build scoring golden files (S8); execute the design-review sequencing."],
   ["Claude","P3",2,"Same P1 platform-fit / rehearsal items, Claude's side of the pairing."],
-  ["Claude","P6",1,"Ran the live Cloudflare account check this refresh — nothing provisioned."]
+  ["Claude","P6",1,"Ran the live Cloudflare account check 2026-07-27 — nothing provisioned; no Cloudflare MCP connection available to re-check in the 2026-07-28 refresh, carried forward unchanged."]
 ],
 "log": [["2026-07-27","First build (static shell): 26 owner-bearing rows counted across DESIGN_TRACKER.next_actions (11), ONLINE_DEV_TRACKER.nextActions (11), the Compliance Gate Tracker's 2 hand-authored next actions, and Hosting's GATE1 decision + its live-check log line; each tagged to the project line (P0-P6) it is actually about. P4 (Expansion) has zero next_actions referencing it this session, so it carries no roster row — shown as an explicit 0/0, not silently omitted."],
-        ["2026-07-28","Rebuilt on the Facilitator Hub's interactive shell (index + filter + mark/expand/CREATE PROMPT), per Dan's request, replacing the static per-line dashboard shell. Same underlying data and counting method as the 2026-07-27 build — only the layout and interaction model changed. Programme Index, People & Allocation, People Summary and Resourcing Notes sections; filter by program, by person, and by search text; click an index row to scope the two detail sections to that program."]]
+        ["2026-07-28","Rebuilt on the Facilitator Hub's interactive shell (index + filter + mark/expand/CREATE PROMPT), per Dan's request, replacing the static per-line dashboard shell. Same underlying data and counting method as the 2026-07-27 build — only the layout and interaction model changed. Programme Index, People & Allocation, People Summary and Resourcing Notes sections; filter by program, by person, and by search text; click an index row to scope the two detail sections to that program."],
+        ["2026-07-28b","Refresh pass: re-read DESIGN_TRACKER.json fresh (changed only in skills[]/decisions[] -- no new next_actions/issues/decisions affecting people allocation) and ONLINE_DEV_TRACKER.json fresh (unchanged). People/task counts unchanged; P5 note updated to reflect the cra-facilitator-hub roster-gap close. Cloudflare check note explicitly self-dated so it stops reading as freshly re-verified every time this file's generatedAt moves."]]
 };
 let DATA = EMBEDDED;
 let state = {
   scheme:'canon', filterProgram:'ALL', filterPerson:'ALL', query:'',
-  choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'',
+  choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'', dataRefresh:false,
   sort:{index:{key:'k',dir:1}, alloc:{key:'programRef',dir:1}},
   live:false, loadError:null
 };
@@ -273,22 +274,25 @@ function renderNotes(){
 
 function buildPrompt(){
   const L=[];
+  if(state.dataRefresh) L.push('- REFRESH DATA: re-read DESIGN_TRACKER.json and ONLINE_DEV_TRACKER.json fresh from canon, recount every owner-bearing row, and re-derive this tracker\'s program/people totals with a new data stamp.');
   allocRows().forEach(r=>{ const c=state.choices['alloc:'+r.ref]; if(!c) return;
     const extra=(state.details['alloc:'+r.ref]||'').trim();
     L.push('- ['+c.toUpperCase()+'] '+r.name+' × '+pname(r.programRef)+' ('+r.programRef+', '+r.tasks+' tasks)'
-      +'\n    Note: '+r.note+(extra?'\n    Extra direction: '+extra:'')); });
+      +(extra?'\n    Extra direction: '+extra:'')); });
   const gen=[];
   DATA.programs.forEach(p=>{ const c=state.choices['notes:'+p.k]; const note=(state.notes[p.k]||'').trim();
     if(!note && !c) return;
     gen.push('- '+(c?'['+c.toUpperCase()+'] ':'')+p.name+(note?'\n    '+note:'')); });
   const head='Resource Tracker review — '+(DATA.meta.generatedAt||'')+(state.filterProgram!=='ALL'?' — scoped to '+pname(state.filterProgram):'')
-    +'\nEXPLAIN = tell me more before I decide. PROCEED = implement as written. IMPROVE = follow the extra direction.\n';
+    +'\nEXPLAIN = tell me more before I decide. PROCEED = implement as written. IMPROVE = follow the extra direction.\n'
+    +'(Refs only — Claude already has each row\'s full note from canon; re-read it there rather than from this prompt.)\n';
   if(!L.length && !gen.length) return head+'\nNothing marked.';
   return head+(L.length?'\nMARKED ALLOCATIONS\n'+L.join('\n'):'')+(gen.length?'\n\nRESOURCING NOTES\n'+gen.join('\n'):'');
 }
+function forceRefresh(){ state.dataRefresh=true; render(); }
 function createPrompt(){ state.prompt=buildPrompt(); render();
   if(navigator.clipboard) navigator.clipboard.writeText(state.prompt).catch(()=>{}); }
-function resetAll(){ state={...state, choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'', filterProgram:'ALL', filterPerson:'ALL', query:'', scheme:'canon'}; delete document.documentElement.dataset.scheme; render(); }
+function resetAll(){ state={...state, choices:{}, details:{}, expanded:{}, allOpen:false, notes:{}, prompt:'', filterProgram:'ALL', filterPerson:'ALL', query:'', scheme:'canon', dataRefresh:false}; delete document.documentElement.dataset.scheme; render(); }
 
 function render(){
   const people = Array.from(new Set(DATA.people.map(r=>r[0]))).sort();
@@ -320,6 +324,7 @@ function render(){
     <div class="noprint" style="position:sticky;top:0;z-index:20;margin-top:16px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg);border-bottom:1px solid var(--line)">
       <button style="height:40px;padding:0 18px;border-radius:3px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font:700 12px/1 IBM Plex Mono,monospace" onclick="createPrompt()">CREATE PROMPT</button>
       <button style="height:40px;padding:0 14px;border-radius:3px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 12px/1 IBM Plex Mono,monospace" onclick="resetAll()">RESET</button>
+      <button style="height:40px;padding:0 14px;border-radius:3px;border:1.5px solid var(--ink);font:600 12px/1 IBM Plex Mono,monospace;${state.dataRefresh?'background:var(--ink);color:var(--bg)':'background:transparent;color:var(--ink)'}" onclick="forceRefresh()">↻ REFRESH DATA${state.dataRefresh?' ✓':''}</button>
       <select style="height:40px;padding:0 10px;border-radius:3px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink)" onchange="state.filterProgram=this.value; render()">
         <option value="ALL">ALL PROGRAMS</option>
         ${DATA.programs.map(p=>`<option value="${p.k}" ${state.filterProgram===p.k?'selected':''}>${esc(p.name)}</option>`).join('')}
