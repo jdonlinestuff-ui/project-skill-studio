@@ -44,8 +44,8 @@ If you already have a studio pattern from another project, say so — it will se
 A run emits three surfaces — **Skill builder**, **Facilitator** and **Resources**
 ([`references/dashboard-set.md`](references/dashboard-set.md)). The samples below are the
 full tracker shell, which the Skill builder uses; the other two are pooled derived views
-over the same trackers — as of v3.4 fully interactive (action trio, CREATE PROMPT, scheme
-switcher) plus a click-to-scope index and dropdown/search filtering unique to a pooled
+over the same trackers — as of v3.4 fully interactive (action trio, CREATE PROMPT, REFRESH
+DATA, scheme switcher) plus a click-to-scope index and dropdown/search filtering unique to a pooled
 surface — and bound by the same honesty rules as the shell throughout.
 
 Every dashboard the studio emits conforms to [`references/DASHBOARD_SPEC.md`](references/DASHBOARD_SPEC.md)

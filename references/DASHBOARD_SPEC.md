@@ -982,8 +982,13 @@ every project line and hands them back as one compiled prompt is precisely a fac
 or resourcing review, not a single-line tracker session. A read-only briefing card removed
 the one action that made opening it mid-meeting worthwhile.
 
-**Carried, same as the shell, no exceptions**: the action trio (§10.7), CREATE PROMPT and
-the prompt protocol (§5), the scheme switcher (§10.5), the sticky control bar (§10.4).
+**Carried, same as the shell**: the action trio (§10.7), CREATE PROMPT and
+the prompt protocol (§5), REFRESH DATA (§10.4), the scheme switcher (§10.5), the sticky
+control bar (§10.4). **Not carried**: REFRESH BUILD and CANON SYNC — both are
+single-tracker build/canon actions with no meaning against a view pooling several
+trackers at once; a pooled REFRESH DATA line covers re-reading every source tracker
+the surface pools from instead (v1.11.2, found live-testing the CRA reference build --
+REFRESH DATA had simply never been added to the pooled shell at all).
 
 **Added, specific to a pooled surface, not present on a single-line tracker**:
 

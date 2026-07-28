@@ -106,8 +106,10 @@ the two pooled surfaces filter and scope; build in this order:
 
 Surfaces 2 and 3 are **pooled derived views** (spec §13) — every row is gathered from
 another tracker rather than authored here — but as of spec v3.4 both are fully
-interactive: the action trio, CREATE PROMPT, and the scheme switcher all carry over from
-the shell, plus a click-to-scope index and dropdown/search filtering unique to a pooled
+interactive: the action trio, CREATE PROMPT, REFRESH DATA, and the scheme switcher all
+carry over from the shell (REFRESH BUILD and CANON SYNC stay shell-only -- both are
+single-tracker build/canon actions that don't generalise to a pooled, multi-tracker view),
+plus a click-to-scope index and dropdown/search filtering unique to a pooled
 surface (filter by tracker/program, by owner/person, or by text, all composable). Copy
 `references/facilitator-hub-reference.html` for both — don't build either from prose. The
 status vocabulary, evidence discipline, derived-never-stored, freshness stamp, evidence

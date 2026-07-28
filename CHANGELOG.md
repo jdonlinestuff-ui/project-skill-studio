@@ -2,6 +2,61 @@
 
 All notable changes to this skill are documented here.
 
+## [1.11.2] - 2026-07-28
+
+Four more bugs found live-testing the reference programme's (CRA) dashboards, on top of
+1.11.1's triple()/chip fixes (different bugs, same day, different session).
+
+**Fixed — CREATE PROMPT restated the full triple on pooled views
+(`references/facilitator-hub-reference.html`)**
+- `buildPrompt()` on Facilitator/Resources was writing every marked row's full
+  `Issue:`/`Problem:`/`What is needed:` (or `Note:` on Resources) text into the compiled
+  prompt, on top of the ref, tracker, owner, and choice. That's pure restatement — Claude
+  already has the full text from canon when the prompt is pasted back. Trimmed to ref +
+  label + tracker + owner + choice + the reader's own typed extra direction, matching the
+  single-line shell's `id + choice + detail` convention. A one-line note in the prompt
+  header now says explicitly that refs are on purpose, not accidental omission.
+
+**Fixed — REFRESH DATA was missing entirely on Facilitator/Resources**
+- The pooled shell carried CREATE PROMPT, RESET, and the scheme switcher (per 1.11.0) but
+  never got a REFRESH DATA control — not broken, just never added. Added, wired the same
+  way as the single-line shell's EMBEDDED-only case: sets a flag, re-renders, and CREATE
+  PROMPT adds a `REFRESH DATA: re-read both source trackers fresh...` line when it's on.
+  `dashboard-set.md`/`README.md`/`SKILL.md` updated: REFRESH DATA now named explicitly
+  among what a pooled view carries; REFRESH BUILD and CANON SYNC stay shell-only, since
+  both are single-tracker build/canon actions with no meaning against a pooled,
+  multi-tracker view.
+
+**Fixed — REFRESH DATA gave no visible confirmation on the single-line shell
+(`references/dashboard-reference.html`)**
+- `loadData()` always reset the button to its default text and stripped its `accent-on`
+  class once the (EMBEDDED-only, no-op) refresh finished — including when
+  `state.dataRefresh` was still `true`. REFRESH BUILD and CANON SYNC use `toggleFlag()`,
+  which sets the `on` class from state and leaves it there; REFRESH DATA used a bespoke
+  path that always cleared it. Click it, see a one-second "REFRESHING…" flash, and the
+  button lands back exactly as it looked before — nothing on screen shows the click
+  registered, even though `state.dataRefresh` was armed underneath and CREATE PROMPT
+  would correctly include the REFRESH DATA line. Reported against the Digital Dev and
+  Hosting trackers specifically, but the bug was in the shared shell — every single-line
+  tracker had it. Fixed: the button now stays highlighted with a `✓` for as long as the
+  flag is armed, cleared only by RESET.
+
+**Fixed — "rev null" in the CREATE PROMPT header (`references/dashboard-reference.html`)**
+- The stamp and prompt-header revision logic checked `mt.revision !== undefined`, which is
+  `true` for an explicit `null` (the value every dashboard without a real revision number
+  actually has) — so "viewing SNAPSHOT rev null" rendered on any tracker that doesn't carry
+  a revision. Changed to `!= null`, which correctly treats both `undefined` and `null` as
+  "no revision to show."
+
+**Reconciliation note**: this patch was authored in a session that didn't know about
+1.11.1 landing concurrently in another session on the same repo. Both patches touch
+`dashboard-reference.html` and `facilitator-hub-reference.html`; 1.11.2 was rebased onto
+1.11.1's actual committed content (not the pre-1.11.1 copy this session started from) so
+neither patch's fixes were lost. Flagging the process gap, not just the fix: two sessions
+editing the same reference files with no shared lock is exactly the kind of drift this
+skill's own canon discipline exists to catch elsewhere — worth a coordination convention
+(e.g. checking git log before a reference-file edit round) rather than relying on luck.
+
 ## [1.11.1] - 2026-07-29
 
 **Fixed — found while regenerating the wiki screenshots, not part of the ask**

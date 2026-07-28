@@ -92,7 +92,10 @@ cannot mark anything is a worse fit for that moment than the standard tracker sh
 meant to simplify.
 
 **Carried, same as the shell**: the action trio, CREATE PROMPT and the prompt protocol
-(§5), the scheme switcher, the sticky control bar.
+(§5), REFRESH DATA, the scheme switcher, the sticky control bar. REFRESH BUILD and CANON
+SYNC do not carry over -- both are single-tracker build/canon actions with no meaning
+against a pooled view drawing from several trackers at once; a pooled REFRESH DATA line
+instead re-reads every source tracker the surface pools from.
 
 **Added, specific to a pooled surface**: a click-to-scope index (one row per tracker or
 per project line; click to filter every section below to it, click again to clear),

@@ -606,7 +606,7 @@ function syncMarks(){
   const d=state.stamp,p=x=>String(x).padStart(2,'0');
   /* spec 3.4: stamp states BOTH fetch moment and meta.generatedAt + rev; SNAPSHOT when not live */
   const mt=DATA.meta||{};
-  const src=mt.generatedAt?`source ${String(mt.generatedAt).slice(0,10)}${mt.revision!==undefined?' rev '+mt.revision:''}`:'source unknown';
+  const src=mt.generatedAt?`source ${String(mt.generatedAt).slice(0,10)}${mt.revision!=null?' rev '+mt.revision:''}`:'source unknown';
   const stale=(mt.generatedAt&&ageDays(mt.generatedAt)>7)?'<span class="stale">~ STALE</span>':'';
   document.getElementById('stampLbl').innerHTML=state.live
     ? `data as at ${p(d.getHours())}:${p(d.getMinutes())} · ${src}${stale}`
@@ -697,7 +697,15 @@ async function loadData(){
   }else{ DATA=EMBEDDED; normalise(); state.live=false; state.loadError='no TRACKER_SOURCE configured'; }
   state.stamp=new Date();
   applyMeta(); render(); banner();
-  if(b){b.textContent='↻ REFRESH DATA'; b.classList.remove('accent-on');}
+  /* keep the button visibly "on" while the flag is armed -- previously this always cleared
+     accent-on here, so a REFRESH DATA click gave a one-second flash and then looked exactly
+     like it had never been pressed, even though state.dataRefresh (and the prompt line it
+     produces) was still armed underneath. REFRESH BUILD/CANON SYNC never had this bug because
+     toggleFlag() sets 'on' from state and never clears it out from under itself. */
+  if(b){
+    if(state.dataRefresh){ b.textContent='↻ REFRESH DATA ✓'; b.classList.add('accent-on'); }
+    else { b.textContent='↻ REFRESH DATA'; b.classList.remove('accent-on'); }
+  }
 }
 
 function forceRefresh(){ state.dataRefresh=true; loadData().then(syncMarks); }
@@ -721,7 +729,7 @@ function createPrompt(){
   (DATA.feedback||[]).forEach(([ref,,,,mk])=>{
     if(state.marks[ref]!==undefined && state.marks[ref]!==mk) L.push(ref+' mark:'+MARK_TAG[state.marks[ref]]);
   });
-  const mt=DATA.meta||{}, rev=(mt.revision!==undefined?' rev '+mt.revision:''), viewing=(state.live?'live':'SNAPSHOT')+rev;
+  const mt=DATA.meta||{}, rev=(mt.revision!=null?' rev '+mt.revision:''), viewing=(state.live?'live':'SNAPSHOT')+rev;
   const line=(mt.line||'project');
   const head='Sync the '+line+' tracker ('+new Date().toISOString().slice(0,10)+', viewing '+viewing+'):';
   const t=L.length?head+'\n- '+L.join('\n- '):head+' no changes marked.';
