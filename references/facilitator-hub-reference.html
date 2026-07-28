@@ -121,7 +121,7 @@ button,textarea,select,input{font-family:inherit}
 
 /* ---- status marks: glyph + word + tint ---- */
 .chk{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;align-items:center}
-.mk{display:flex;align-items:center;justify-content:center;gap:3px;height:24px;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
+.mk{display:flex;align-items:center;justify-content:center;gap:3px;min-height:24px;white-space:nowrap;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
 .mk i{font-style:normal;font-size:13px}
 .mk.pad{padding:0 9px;gap:4px}
 .mk-pass{background:var(--passT);color:var(--pass)}
@@ -231,6 +231,9 @@ function setDetail(sec,ref,v){ state.details[sec+':'+ref]=v; }
 function toggleExpand(sec,ref){ const k=sec+':'+ref; state.expanded[k]=!state.expanded[k]; render(); }
 
 function triple(sec,r){
+  /* spec 3.7: a row without all three fields stays a flat note rather than a padded triple */
+  if(r.issue===undefined&&r.problem===undefined&&r.needed===undefined)
+    return `<div class="note">${esc(r.note||r.short||'')}</div>`;
   const k=sec+':'+r.ref; const open=state.allOpen||!!state.expanded[k];
   const cls=open?'line-open':'line-clamp';
   return `<div class="triple" style="display:flex;flex-direction:column;gap:5px">

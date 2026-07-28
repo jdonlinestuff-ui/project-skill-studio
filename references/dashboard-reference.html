@@ -128,7 +128,7 @@ button,textarea,select,input{font-family:inherit}
 
 /* ---- status marks: glyph + word + tint ---- */
 .chk{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;align-items:center}
-.mk{display:flex;align-items:center;justify-content:center;gap:3px;height:24px;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
+.mk{display:flex;align-items:center;justify-content:center;gap:3px;min-height:24px;white-space:nowrap;border-radius:3px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em}
 .mk i{font-style:normal;font-size:13px}
 .mk.pad{padding:0 9px;gap:4px}
 .mk-pass{background:var(--passT);color:var(--pass)}
@@ -302,7 +302,10 @@ const EMBEDDED={
 meta:{line:'example-line',title:'Digital Dev Tracker',sourceLabel:'05_TEAMS_APP_v0.6_SOURCE',
  eyebrow:'CYBER RISK ASSESSMENT · ONLINE DEV',
  checkNames:['Typecheck','Unit','Golden files','Multi-client','Code security','Privacy'],
- currency:'AUD',revision:0,generatedAt:'2026-07-25T00:00:00+10:00'},
+ currency:'AUD',revision:0,generatedAt:'2026-07-25T00:00:00+10:00',
+ trackerFunction:'Tracks every module on the digital delivery line: build state, six per-module checks, and the evidence each mark was derived from.',
+ trackerPurpose:'So no status can be read without the evidence behind it, and a mark derived from an older build says so instead of reading green.',
+ trackerOutcome:'Every module INTEGRATED with all six checks passing against the version currently shipping.'},
 modules:[
  ['deck-loader','card_data v6','INTEGRATED',['pass','pass','na','na','pending','na'],'deck.json (65 cards, 10/10/30/15) byte-verified vs canonical card_data.py; generate_deck.py assertions pass.'],
  ['deal','card_data v6','INTEGRATED',['pass','pass','na','pending','pending','pending'],'8-player deal resolves real card names in smoke test. Live multi-client deal never run (I6).'],
@@ -325,8 +328,8 @@ decisions:[
  ['D13','Register digital-only mechanics (E1/E2/E3)?','OPEN','Difficulty multiplier, budget economy, GM custom crisis — none exist in physical canon. Register / park behind config flag / revert.']
 ],
 issues:[
- ['I5','High','Web Card Assets v1 pack corrupted at source — blocks AP1.'],
- ['I6','Med','No live multi-client Teams/Fluid session has ever been run — why every privacy/multi-client mark sits pending.'],
+ ['I5','High',{issue:'The Web Card Assets v1 pack is corrupted at source — the archive will not extract cleanly.',problem:'AP1 cannot be proofed, so the app keeps rendering text-only cards and every asset-dependent mark stays pending.',needed:'Dan to re-export the pack from the design source and re-upload it to canon.'}],
+ ['I6','Med',{issue:'No live multi-client Teams/Fluid session has ever been run — only single-client and simulated multi-tab testing.',problem:'Every privacy and multi-client mark sits pending because a code review cannot evidence a runtime invariant across clients.',needed:'Run one logged multi-client rehearsal before any client session is booked.'}],
  ['I4','Med','print_ready_deck_v6.zip needs re-upload before WebP conversion.'],
  ['I3','Med','GOLD on CREAM likely fails WCAG contrast — part of P8 hardening.'],
  ['I7','Low','SESSION_STATE.md at canon root stale vs this tracker (last modified 2026-07-06).']
@@ -403,7 +406,12 @@ const acts=(sec,id)=>`<div class="acts noprint" data-k="${sec}:${id}">
  <div class="detail" data-d="${sec}:${id}"><textarea placeholder="Extra direction for this item…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
 
 /* ISSUE · PROBLEM · NEEDED triple, with a click-to-expand toggle (matches the Facilitator Hub pattern) */
-function triple(sec,id,issue,problem,needed){
+function triple(sec,id,a,b,c){
+  let issue=a,problem=b,needed=c;
+  if(a&&typeof a==='object'){issue=a.issue;problem=a.problem;needed=a.needed;}
+  if(typeof issue==='string'&&problem===undefined&&needed===undefined)
+    return `<div class="note">${esc(issue)}</div>`;
+  if(issue===undefined&&problem===undefined&&needed===undefined) return '<div class="note"></div>';
   const k=sec+':'+id, open=!!state.expanded[k];
   const cls=open?'tline line-open':'tline line-clamp';
   return `<div class="triple" data-t="${sec}:${id}">
@@ -461,7 +469,7 @@ function render(){
       <div class="stack"><div class="name">${esc(n)}</div><div class="ver">${esc(v)}</div></div>
       <div><span class="badge b-${b.toLowerCase()}">${b}</span></div>
       <div class="chk">${checks.map((c,j)=>`<span title="${CHECK_NAMES[j]}: ${WORD[c]}">${mark(c)}</span>`).join('')}</div>
-      ${triple('modules',n,t.issue,t.problem,t.needed)}
+      ${triple('modules',n,t)}
       ${acts('modules',n)}
     </div></div>`).join('');
 
@@ -475,14 +483,14 @@ function render(){
      <div class="row"><div class="cells gqueue">
        <div class="ref">${ref}</div>
        <div class="stack"><div class="rowtitle">${esc(name)}</div>${hide?'':`<div><span class="badge b-${badge.toLowerCase()}">${badge}</span></div>`}</div>
-       ${triple(sec,ref,tr.issue,tr.problem,tr.needed)}
+       ${triple(sec,ref,tr)}
        ${acts(sec,ref)}
      </div></div>`).join(''):noneRow(sec)}</div>`).join('');
 
   document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,t])=>`
    <div class="row"><div class="cells gissue" style="align-items:start">
      <div class="ref">${ref}</div>${mark(SEV[sev]).replace(WORD[SEV[sev]],sev.toUpperCase())}
-     ${triple('issues',ref,t.issue,t.problem,t.needed)}${acts('issues',ref)}
+     ${triple('issues',ref,t)}${acts('issues',ref)}
    </div></div>`).join('');
 
   document.getElementById('risks').innerHTML=DATA.risks.map(([ref,exp,title,cause,control])=>`
@@ -503,7 +511,7 @@ function render(){
        <div class="ref">${ref}</div>
        <div class="stack"><div class="rowtitle">${esc(item)}</div>
          <div class="barTrack mk-${k}"><div class="barFill" style="width:${Math.min(pct,100)}%;background:currentColor"></div></div>
-         ${triple('budget',ref,t.issue,t.problem,t.needed)}</div>
+         ${triple('budget',ref,t)}</div>
        <div class="money">${money(b)}</div><div class="money" style="color:var(--body)">${money(s)}</div>
        ${mark(k).replace(WORD[k],word)}${acts('budget',ref)}
      </div></div>`;}).join('')
@@ -519,13 +527,13 @@ function render(){
       <div class="rail"><div class="dot mk-${k}" style="border:2px solid currentColor;background:${st==='done'||st==='blocked'?'currentColor':'transparent'}"></div>${last?'':'<div class="conn"></div>'}</div>
       <div class="stack"><div style="display:flex;align-items:baseline;gap:8px"><div class="ref">${ref}</div>
         <div class="rowtitle" style="${st==='done'?'color:var(--muted)':''}">${esc(title)}</div></div>
-        ${triple('milestones',ref,t.issue,t.problem,t.needed)}</div>
+        ${triple('milestones',ref,t)}</div>
       ${mark(k).replace(WORD[k],word)}${acts('milestones',ref)}
     </div></div>`;}).join('');
 
   document.getElementById('nextActions').innerHTML=DATA.nextActions.map(([n,t,owner])=>`
    <div class="row"><div class="cells gnext" style="align-items:start">
-     <div class="ref">${n}</div>${triple('next','NA'+n,t.issue,t.problem,t.needed)}
+     <div class="ref">${n}</div>${triple('next','NA'+n,t)}
      <div class="meta" style="text-align:right">${owner}</div>${acts('next','NA'+n)}
    </div></div>`).join('');
 
