@@ -2,6 +2,40 @@
 
 All notable changes to this skill are documented here.
 
+## [1.13.0] - 2026-07-29
+
+Added a fifth colour scheme, Navy, and made it the new default scheme across
+every dashboard surface, per the owner's explicit instruction. Canon v6 stays
+available as a named scheme -- it is no longer what a dashboard opens to.
+
+**Added**
+- Navy token set (`['navy','NAVY','#0E1E3F','#2C5BA8','#EDF1F7']` in the JS
+  `SCHEMES` array; full CSS custom-property block in `:root`) in both
+  `references/dashboard-reference.html` and `references/facilitator-hub-reference.html`.
+- `references/DASHBOARD_SPEC.md` bumped to v3.5: Navy's exact token set and mark
+  tints added to §6, "four schemes" references in §1/§10.5/§11 updated to five,
+  default-scheme checklist item repointed from Canon v6 to Navy, version-history
+  table gained a v3.5 row.
+- `references/dashboard-set.md`: both "four schemes"/"four-scheme switcher"
+  mentions updated to five, Skill builder section notes Navy is now the default.
+
+**Changed**
+- `references/dashboard-reference.html` / `references/facilitator-hub-reference.html`:
+  the CSS `:root` block (previously Canon v6's unconditional default) now holds
+  Navy's token set; Canon v6's former `:root` values moved into an explicit
+  `[data-scheme="canon"]` block alongside Slate/Dark/Mono. JS `SCHEMES` array now
+  leads with `navy`. `state.scheme` default, `setScheme()`'s no-attribute
+  special-case, and `resetAll()`'s reset target all changed from `'canon'` to
+  `'navy'`. `dashboard-reference.html`'s footer line changed from "Canon v6
+  scheme" to "Navy default scheme".
+
+**Not changed**
+- Slate/Dark/Mono token sets and the mark-tint values for pass/fail/pending/
+  blocked/na on every existing scheme -- pixel-identical to v1.12.0.
+- The scheme-switcher control geometry, swatch-button markup, and the
+  five-button (was four-button) row itself -- only the array order and default
+  selection changed, not the control.
+
 ## [1.12.0] - 2026-07-28
 
 Formalised `task-orchestrator` from a soft "consider checking" reference into a

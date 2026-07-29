@@ -1,4 +1,4 @@
-# Status Dashboard Shell — reusable dashboard spec v3.4
+# Status Dashboard Shell — reusable dashboard spec v3.5
 
 Project-agnostic. This is the visual and data contract for every dashboard built with the
 `status-dashboard` skill. Sections 6–10 are literal and apply verbatim to any project.
@@ -30,6 +30,7 @@ The record, stated once so no section has to guess:
 | v3.2 | §4f Portfolio Roster + §4g People & Allocation — the second insertion, 14 sections → 16 |
 | v3.3 | §3.6 evidence baseline and §4h Defect & Task Register — the third insertion, 16 → 17 |
 | v3.4 | §3.7 the ISSUE·PROBLEM·NEEDED row triple and the header Function/Purpose/Objective block, both now standard; §13 reversed — Facilitator and Resources carry the action trio, CREATE PROMPT and the scheme switcher after all, plus a click-to-scope index and dropdown/search filtering unique to a pooled surface |
+| v3.5 | Navy added as a fifth colour scheme and promoted to the default (RESET/first-load) in place of Canon v6, which remains available as a named scheme; four schemes → five everywhere §6/§10.5/§11 reference a count |
 
 Things that went wrong the last time this was rebuilt, all now specified below:
 `rem`-based font sizes, glyph-only 14px status squares, square 4px action buttons,
@@ -43,7 +44,7 @@ FIXED (never re-invent per skill)
 - every value in sections 9–11: type scale, colours, spacing, radii, control geometry
 - section order, grid columns, prompt protocol
 - status vocabulary and the glyph+word+tint marks
-- the four colour schemes and the in-page scheme switcher
+- the five colour schemes and the in-page scheme switcher
 - print rules (`.noprint`, no controls on paper)
 
 SUPPLIED BY THE SKILL
@@ -553,9 +554,12 @@ no new HTML at all. That is the point of the split.
 
 ## 6. Colour schemes — exact values
 
-`Canon v6` is the default; RESET returns to it. Each scheme is a complete token set:
+`Navy` is the default; RESET returns to it. Each scheme is a complete token set:
 
 ```js
+'Navy':          { bg:'#EDF1F7', panel:'#F9FBFD', ink:'#0E1E3F', headerBg:'#0E1E3F', headerFg:'#EDF1F7',
+                   muted:'#5B6B8C', line:'#D7DEEA', zebra:'#F3F6FA', accent:'#2C5BA8', onAccent:'#FFFFFF',
+                   accentText:'#2C5BA8', body:'#324066', field:'#FFFFFF', tested:'#D7E1F0', testedFg:'#0E1E3F' }
 'Canon v6':      { bg:'#F6ECD6', panel:'#FFFAEE', ink:'#101D3D', headerBg:'#101D3D', headerFg:'#F6ECD6',
                    muted:'#7A6E55', line:'#E3D2A8', zebra:'#FBF4E3', accent:'#C9A961', onAccent:'#101D3D',
                    accentText:'#A8843C', body:'#4A4535', field:'#FFFDF7', tested:'#E7D9B4', testedFg:'#101D3D' }
@@ -572,15 +576,16 @@ no new HTML at all. That is the point of the split.
 
 Mark tints, per scheme (`{colour, tint}`):
 
-| mark | Canon v6 | Slate | Dark | Mono |
-|---|---|---|---|---|
-| pass | #1E7A45 / #E4F2E9 | #1F6B45 / #E1EFE7 | #4CC38A / #17301F | #111111 / #E6E6E4 |
-| fail | #B3261E / #FBE6E4 | #B4482F / #F9E7E2 | #F2665B / #331A19 | #111111 / #CFCFCD |
-| pending | #A97605 / #F8EED6 | #9A6B12 / #F6EEDD | #E0A93A / #332714 | #6E6E6E / #EDEDEB |
-| blocked | #141414 / #E8E4DA | #1B2227 / #E4E7E9 | #C3C8CD / #2A2F35 | #111111 / #C2C2C0 |
-| na | #9A8F75 / #F1EADA | #8D969B / #EEF1F2 | #6B7178 / #22272D | #9A9A98 / #F4F4F2 |
+| mark | Navy | Canon v6 | Slate | Dark | Mono |
+|---|---|---|---|---|---|
+| pass | #1E6B47 / #E3F0E7 | #1E7A45 / #E4F2E9 | #1F6B45 / #E1EFE7 | #4CC38A / #17301F | #111111 / #E6E6E4 |
+| fail | #B23A2E / #F9E5E2 | #B3261E / #FBE6E4 | #B4482F / #F9E7E2 | #F2665B / #331A19 | #111111 / #CFCFCD |
+| pending | #9A6B12 / #F5EEDD | #A97605 / #F8EED6 | #9A6B12 / #F6EEDD | #E0A93A / #332714 | #6E6E6E / #EDEDEB |
+| blocked | #0E1E3F / #E3E7F0 | #141414 / #E8E4DA | #1B2227 / #E4E7E9 | #C3C8CD / #2A2F35 | #111111 / #C2C2C0 |
+| na | #8A93AC / #EEF1F7 | #9A8F75 / #F1EADA | #8D969B / #EEF1F2 | #6B7178 / #22272D | #9A9A98 / #F4F4F2 |
 
-On Canon v6 accent TEXT is `#A8843C`, not `#C9A961` — gold on cream fails contrast (I3).
+On Navy accent TEXT is `#2C5BA8`, matching accent — verified AA on both bg and panel. On
+Canon v6 accent TEXT is `#A8843C`, not `#C9A961` — gold on cream fails contrast (I3).
 
 ---
 
@@ -747,9 +752,10 @@ Right cluster: marked-count and data stamp, both
 
 ### 10.5 Scheme switcher (in the bar, before the right cluster)
 Label `SCHEME` at `500 10px/1 IBM Plex Mono,monospace;letter-spacing:0.1em;color:var(--muted)`.
-Four buttons, one per scheme: `height:32px;padding:0 9px;border-radius:3px;border:1.5px solid var(--ink);font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:0.06em`,
+Five buttons, one per scheme: `height:32px;padding:0 9px;border-radius:3px;border:1.5px solid var(--ink);font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:0.06em`,
 transparent → ink-filled when active. Each shows three 9px circles (headerBg, accent, bg)
-overlapping by `margin-left:-3px`, then the label CANON / SLATE / DARK / MONO.
+overlapping by `margin-left:-3px`, then the label NAVY / CANON / SLATE / DARK / MONO, in that
+order (NAVY leads — it is the default).
 **A `<select>` is not an acceptable substitute.**
 
 ### 10.6 Status chip — the one visual that must never drift
@@ -885,12 +891,13 @@ Compare against the reference at 1080px wide. All must be true:
 - [ ] selection survives a re-render and the marked-count matches what is filled on screen
 - [ ] key panel shows all six controls with the exact circle fills of §10.3 (EXPLAIN pale
       with accent ring, PROCEED ink-filled, IMPROVE accent-filled)
-- [ ] scheme switcher is four swatch buttons, not a `<select>`
+- [ ] scheme switcher is five swatch buttons, not a `<select>`
 - [ ] containers radius 4px, chips/buttons 3px, badges 2px; no 8px radii
 - [ ] no borders on individual cells; rows separated by one 1px line
 - [ ] module grid columns `104/92/351/1fr/104`, min-width 848px, no sideways scroll at 900px
-- [ ] Canon v6 is the default scheme — used when no scheme is set, on first load, and
-      after RESET; the CANON switcher button renders active on open
+- [ ] Navy is the default scheme — used when no scheme is set, on first load, and
+      after RESET; the NAVY switcher button renders active on open (Canon v6 remains
+      available as a named scheme, no longer the default)
 - [ ] IMPROVE field spans the full row width and survives a re-render with its text intact
 - [ ] print preview: controls hidden, every mark still readable in greyscale
 - [ ] Create prompt copies the exact format in §5

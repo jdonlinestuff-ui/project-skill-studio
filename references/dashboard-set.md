@@ -16,7 +16,7 @@ so it exists before the surfaces that describe the work.
 ## 1. Skill builder — the existing behaviour
 
 The standard tracker shell, built to `DASHBOARD_SPEC.md` in full: live fetch, the module
-grid, the EXPLAIN/PROCEED/IMPROVE trio, CREATE PROMPT, the four schemes. Its rows are the
+grid, the EXPLAIN/PROCEED/IMPROVE trio, CREATE PROMPT, the five schemes (Navy default). Its rows are the
 studio's own skills — roster, class, install state, and a staleness verdict per skill.
 
 Nothing about this surface changes with this feature. It is listed here because a set of
@@ -83,7 +83,7 @@ machinery — this reverses the original "exempt from controls" rule below, kept
 the reason it changed rather than silently dropped:
 
 The original rule exempted both surfaces from the action trio, CREATE PROMPT and the
-prompt protocol, the four-scheme switcher, and the sticky control bar, reasoning that a
+prompt protocol, the five-scheme switcher, and the sticky control bar, reasoning that a
 surface with no write-back loop had no need for the machinery that serves one. Real use
 showed the opposite: marking rows pooled from every line and compiling them into one
 CREATE PROMPT hand-off is exactly what a facilitator or resourcing review is *for* — the

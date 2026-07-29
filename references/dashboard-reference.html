@@ -6,8 +6,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ---- tokens: Canon v6 is the default scheme (spec v2.0 §6) ---- */
+/* ---- tokens: Navy is the default scheme (spec v2.0 §6) ---- */
 :root{
+  --bg:#EDF1F7; --panel:#F9FBFD; --ink:#0E1E3F; --headerBg:#0E1E3F; --headerFg:#EDF1F7;
+  --muted:#5B6B8C; --line:#D7DEEA; --zebra:#F3F6FA; --accent:#2C5BA8; --onAccent:#FFFFFF;
+  --accentText:#2C5BA8; --body:#324066; --field:#FFFFFF; --tested:#D7E1F0; --testedFg:#0E1E3F;
+  --pass:#1E6B47; --passT:#E3F0E7; --fail:#B23A2E; --failT:#F9E5E2;
+  --pend:#9A6B12; --pendT:#F5EEDD; --block:#0E1E3F; --blockT:#E3E7F0;
+  --na:#8A93AC; --naT:#EEF1F7;
+}
+[data-scheme="canon"]{
   --bg:#F6ECD6; --panel:#FFFAEE; --ink:#101D3D; --headerBg:#101D3D; --headerFg:#F6ECD6;
   --muted:#7A6E55; --line:#E3D2A8; --zebra:#FBF4E3; --accent:#C9A961; --onAccent:#101D3D;
   --accentText:#A8843C; --body:#4A4535; --field:#FFFDF7; --tested:#E7D9B4; --testedFg:#101D3D;
@@ -282,7 +290,7 @@ button,textarea,select,input{font-family:inherit}
   <div style="display:flex;flex-direction:column;gap:2px" id="log"></div>
   </section>
 
-  <div class="foot">Canon v6 scheme · spec v2.0 · glyph + word + tint marks · print-safe · reusable shell: swap the DATA block only</div>
+  <div class="foot">Navy default scheme · spec v2.0 · glyph + word + tint marks · print-safe · reusable shell: swap the DATA block only</div>
 </div>
 
 <script>
@@ -391,9 +399,9 @@ const SEV={High:'fail',Med:'pending',Low:'na'};
 const FEEDBACK_CYCLE={pending:'pass',pass:'fail',fail:'pending'};
 const FEEDBACK_WORD={pass:'INTERESTED',pending:'UNDECIDED',fail:'NOT INTERESTED'};
 const PROJ_WORD={pass:'ON TRACK',pending:'AT RISK',blocked:'BLOCKED',fail:'CANCELLED',na:'NOT STARTED'};
-const SCHEMES=[['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
+const SCHEMES=[['navy','NAVY','#0E1E3F','#2C5BA8','#EDF1F7'],['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
                ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
-const state={choices:{},details:{},marks:{},expanded:{},refresh:false,canon:false,dataRefresh:false,scheme:'canon',
+const state={choices:{},details:{},marks:{},expanded:{},refresh:false,canon:false,dataRefresh:false,scheme:'navy',
   stamp:new Date(),live:false,fetchedAt:null,loadError:null};
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -710,9 +718,9 @@ async function loadData(){
 
 function forceRefresh(){ state.dataRefresh=true; loadData().then(syncMarks); }
 function setScheme(k){state.scheme=k;
-  if(k==='canon'){delete document.documentElement.dataset.scheme;} else {document.documentElement.dataset.scheme=k;}
+  if(k==='navy'){delete document.documentElement.dataset.scheme;} else {document.documentElement.dataset.scheme=k;}
   render();}
-function resetAll(){state.choices={};state.details={};state.refresh=false;state.canon=false;state.dataRefresh=false;state.scheme='canon';
+function resetAll(){state.choices={};state.details={};state.refresh=false;state.canon=false;state.dataRefresh=false;state.scheme='navy';
   delete document.documentElement.dataset.scheme;
   ['f-refresh','f-canon'].forEach(i=>document.getElementById(i).classList.remove('on'));
   document.getElementById('f-data').classList.remove('accent-on');
