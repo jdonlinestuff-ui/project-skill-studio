@@ -138,7 +138,7 @@ before any write, but newly available. Ask per surface (a project may want Resou
 shared and Facilitator local), record the answer as a logged decision, and treat "no"
 as a complete answer. Full wording and rationale in `dashboard-set.md`.
 
-Build the shell to **`references/DASHBOARD_SPEC.md` (v3.5)** — that file is the authority.
+Build the shell to **`references/DASHBOARD_SPEC.md` (v3.6)** — that file is the authority.
 Copy `references/dashboard-reference.html`, point `TRACKER_SOURCE` at the line's
 JSON, replace the `EMBEDDED` seed. Copying the reference is faster and far more
 accurate than building from the spec text.
@@ -192,6 +192,14 @@ The non-negotiables — these are what drift:
   reader can tell empty from missing.
 - **Print is a first-class output** — controls carry `noprint`, and the page must
   paginate cleanly and stay legible in greyscale.
+- **v3.6 additions** (spec §2/§4i/§10.8): the triple's third line renders as ASK; a
+  `[PARTIAL]` chip crosses with severity/rating rather than replacing it; a grey `[UNDEF]`
+  chip covers any row missing its severity/status/rating; Module Grid gets a filter-by-
+  BUILD-STATE and filter-by-check-state control; Next Actions carry an optional priority
+  chip plus a `hold`/`done` pair (`done` rows are pruned, not shown struck-through); the
+  Feedback section's "track something new" is a guided three-field form, not a freeform
+  box; every file citation is the full Drive URL, never a bare id; and the emitted CREATE
+  PROMPT text carries no restated EXPLAIN/PROCEED/IMPROVE legend.
 - One file, no dependencies: inline CSS and script, no build step, opens from
   `file://`, a Drive preview, or an artefact viewer.
 - **Deliver it as a real artifact, not a handed-over file** — that's what makes Publish/
@@ -232,7 +240,7 @@ Match the studio owner's cadence: terse, momentum-focused, selection prompts ove
 - `references/canon-first-workflow.md` — the mandatory search-canon-first sequence for generation requests; task-orchestrator and the project's own skills as the two checks before acting
 - `references/working-rules.md` — the generic working-rule set embedded in generated skills
 - `references/dashboard-set.md` — the three surfaces a run emits (Skill builder, Facilitator, Resources), what each derives, the pooled-view conformance rules, and the live-artifact consent step
-- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.4): data contract and load modes, evidence baseline, the ISSUE·PROBLEM·NEEDED row triple and header purpose block, status marks, defect register and ref-prefix registry, controls and prompt protocol, colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist, pooled-view rules
+- `references/DASHBOARD_SPEC.md` — **the dashboard authority** (v3.6): data contract and load modes, evidence baseline, the ISSUE·PROBLEM·ASK row triple and header purpose block, status marks (including the `[PARTIAL]` resolution chip and the grey `[UNDEF]` fallback), defect register and ref-prefix registry, controls and prompt protocol (no restated legend in the emitted prompt), colour schemes, full type inventory, literal CSS/markup recipes, conformance checklist, pooled-view rules
 - `references/dashboard-reference.html` — the working live-fetch build for a single-line tracker: copy this, don't build from prose
 - `references/facilitator-hub-reference.html` — the working build for the Facilitator and Resources surfaces: click-to-scope index, dropdown/search filtering, same action trio and CREATE PROMPT as the shell
 - `references/dashboard-standard.md` — pointer + record of what v3.0 changed from the superseded static-bake rules

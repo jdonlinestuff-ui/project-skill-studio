@@ -120,7 +120,7 @@ button,textarea,select,input{font-family:inherit}
 .gissue{grid-template-columns:40px 70px 1fr 96px}
 .gbudget{grid-template-columns:40px 1fr 72px 72px 72px 96px}
 .gmile{grid-template-columns:76px 18px 1fr 68px 96px}
-.gnext{grid-template-columns:28px 1fr 80px 96px}
+.gnext{grid-template-columns:28px 1fr 84px 80px 96px}
 .gfeedback{grid-template-columns:40px 1fr 84px 72px 76px 96px}
 .gproj{grid-template-columns:40px 1fr 96px 52px 52px 1fr}
 .gpeople{grid-template-columns:1fr 76px 56px 1fr}
@@ -144,7 +144,18 @@ button,textarea,select,input{font-family:inherit}
 .mk-pending{background:var(--pendT);color:var(--pend)}
 .mk-blocked{background:var(--blockT);color:var(--block)}
 .mk-na{background:var(--naT);color:var(--na)}
+.mk-undef{background:var(--line);color:var(--muted)}
+.mk-partial{background:var(--pendT);color:var(--pend)}
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.gridctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.gridctrl select{height:28px;padding:0 8px;border-radius:3px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font:600 11px/1 IBM Plex Mono,monospace}
+.checksnote{padding:9px 14px;font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--muted);border-top:1px solid var(--line);background:var(--zebra)}
+.newfeedback{padding:12px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.newfeedback input,.newfeedback select,.newfeedback textarea{width:100%;border-radius:3px;padding:8px 9px;font:400 12px/1.4 Helvetica Neue,Helvetica,Arial,sans-serif;background:var(--field);border:1.5px solid var(--line);color:var(--ink)}
+.newfeedback .fld{display:flex;flex-direction:column;gap:3px}
+.newfeedback .flbl{font:600 10px/1.3 IBM Plex Mono,monospace;letter-spacing:.08em;color:var(--accentText)}
+.retirebtn{flex:none;height:26px;padding:0 10px;border-radius:13px;font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:.04em;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.retirebtn.sel{background:var(--muted);color:var(--panel);border-color:var(--muted)}
 .badge{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:2px;font:600 12px/1 IBM Plex Mono,monospace;letter-spacing:.02em;border:1px solid var(--ink)}
 .b-integrated{background:var(--headerBg);color:var(--headerFg)}
 .b-tested{background:var(--tested);color:var(--testedFg);border-color:var(--tested)}
@@ -161,7 +172,7 @@ button,textarea,select,input{font-family:inherit}
 
 .nonerow{padding:10px 2px;font-weight:400;font-size:12px;line-height:1.45;
   font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--muted)}
-.gnone{grid-template-columns:1fr 96px}
+.gnone{grid-template-columns:1fr 148px}
 .triple{display:flex;flex-direction:column;gap:4px}
 .triple b{font:600 10px/1.5 IBM Plex Mono,monospace;letter-spacing:.06em;color:var(--accentText)}
 .tline{font:400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif;color:var(--body);text-wrap:pretty}
@@ -243,12 +254,14 @@ button,textarea,select,input{font-family:inherit}
   <section id="sec-modules">
   <div class="sechead"><h2>Module Grid</h2><div class="rule"></div><div class="secmeta" id="sourceLabel">05_TEAMS_APP_v0.6_SOURCE</div></div>
   <div class="legend" id="legend"></div>
+  <div class="gridctrl noprint" id="gridctrl"></div>
   <div class="scroller"><div class="inner">
     <div class="hdr gmod">
       <div>MODULE</div><div>BUILD STATE</div>
       <div class="chk" style="text-align:center" id="chkhdr"><div>TYP</div><div>UNI</div><div>GLD</div><div>MUL</div><div>SEC</div><div>PII</div></div>
       <div>EVIDENCE / GAP</div><div style="text-align:right">ACTION</div>
     </div>
+    <div class="checksnote" id="checksnote" hidden></div>
     <div id="modules"></div>
   </div></div>
   </section>
@@ -393,16 +406,27 @@ let CHECK_NAMES=(EMBEDDED.meta&&EMBEDDED.meta.checkNames)||['Typecheck','Unit','
 const CURRENCY_SYMBOL={AUD:'A$',USD:'US$',GBP:'£',EUR:'€',NZD:'NZ$'};
 let money=n=>(CURRENCY_SYMBOL[(DATA.meta&&DATA.meta.currency)||'AUD']||'')+Number(n).toLocaleString('en-AU');
 
-const GLYPH={pass:'✓',fail:'✕',pending:'~',blocked:'■',na:'–'};
-const WORD={pass:'PASS',fail:'FAIL',pending:'PEND',blocked:'BLOCK',na:'N/A'};
+const GLYPH={pass:'✓',fail:'✕',pending:'~',blocked:'■',na:'–',undef:'?',partial:'~'};
+const WORD={pass:'PASS',fail:'FAIL',pending:'PEND',blocked:'BLOCK',na:'N/A',undef:'UNDEF',partial:'PARTIAL'};
 const SEV={High:'fail',Med:'pending',Low:'na'};
+/* severity/rating/priority chip — the one family allowed to go glyph-only under meta.compactChips (spec §2) */
+function sevChip(sevWord){
+  const key=SEV[sevWord]||'undef';
+  const word=key==='undef'?'UNDEF':String(sevWord||'').toUpperCase();
+  const compact=!!(DATA.meta&&DATA.meta.compactChips);
+  return `<div class="mk mk-${key}" title="${esc(word)}"><i>${GLYPH[key]}</i>${compact?'':word}</div>`;
+}
+function partialChip(){ return `<div class="mk mk-partial" title="PARTIAL"><i>~</i>PARTIAL</div>`; }
 const FEEDBACK_CYCLE={pending:'pass',pass:'fail',fail:'pending'};
 const FEEDBACK_WORD={pass:'INTERESTED',pending:'UNDECIDED',fail:'NOT INTERESTED'};
 const PROJ_WORD={pass:'ON TRACK',pending:'AT RISK',blocked:'BLOCKED',fail:'CANCELLED',na:'NOT STARTED'};
 const SCHEMES=[['navy','NAVY','#0E1E3F','#2C5BA8','#EDF1F7'],['canon','CANON','#101D3D','#C9A961','#F6ECD6'],['slate','SLATE','#1B2227','#2F7D74','#EEF0F1'],
                ['dark','DARK','#242B33','#E0A93A','#14171B'],['mono','MONO','#111111','#111111','#F2F2F0']];
 const state={choices:{},details:{},marks:{},expanded:{},refresh:false,canon:false,dataRefresh:false,scheme:'navy',
-  stamp:new Date(),live:false,fetchedAt:null,loadError:null};
+  stamp:new Date(),live:false,fetchedAt:null,loadError:null,
+  moduleFilter:{badge:'ALL',check:'ALL'},newFeedbackOpen:false,newFeedback:{text:'',source:'',measuredBy:''},retire:{}};
+function setModuleFilter(axis,v){ state.moduleFilter[axis]=v; render(); }
+const CHECK_STATES=['pass','fail','pending','blocked','na'];
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const mark=(k,extra='')=>`<div class="mk ${extra} mk-${k}"><i>${GLYPH[k]}</i>${WORD[k]}</div>`;
@@ -413,7 +437,8 @@ const acts=(sec,id)=>`<div class="acts noprint" data-k="${sec}:${id}">
  </div>
  <div class="detail" data-d="${sec}:${id}"><textarea placeholder="Extra direction for this item…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
 
-/* ISSUE · PROBLEM · NEEDED triple, with a click-to-expand toggle (matches the Facilitator Hub pattern) */
+/* ISSUE · PROBLEM · ASK triple, with a click-to-expand toggle (matches the Facilitator Hub pattern).
+   JSON field stays `needed` (no canon migration); only the rendered label is ASK (spec v3.6). */
 function triple(sec,id,a,b,c){
   let issue=a,problem=b,needed=c;
   if(a&&typeof a==='object'){issue=a.issue;problem=a.problem;needed=a.needed;}
@@ -425,9 +450,42 @@ function triple(sec,id,a,b,c){
   return `<div class="triple" data-t="${sec}:${id}">
     <div class="${cls}"><b>ISSUE </b>${esc(issue)}</div>
     <div class="${cls}"><b>PROBLEM </b>${esc(problem)}</div>
-    <div class="${cls}"><b>NEEDED </b>${esc(needed)}</div>
+    <div class="${cls}"><b>ASK </b>${esc(needed)}</div>
     <div class="expandtoggle noprint" onclick="toggleExpand('${sec}','${id}')">${open?'– collapse':'… expand'}</div>
   </div>`;
+}
+const MEASURED_BY=['milestone','budget','risk','brainstorming','code review','design review'];
+function setNewFeedback(field,v){ state.newFeedback[field]=v; }
+function toggleNewFeedback(){ state.newFeedbackOpen=!state.newFeedbackOpen; render(); }
+/* guided "track something new" add-row flow (spec §4e v3.6) — stages a NEW FEEDBACK line
+   in the next CREATE PROMPT rather than writing a row directly; Claude adds the real row
+   with a fresh ref on the next canon write. */
+function renderNewFeedback(){
+  if(!state.newFeedbackOpen) return `<div class="row"><div class="cells" style="grid-template-columns:1fr 96px;align-items:center">
+    <div class="nonerow">Track something new — what, where it comes from, how it's measured.</div>
+    <div class="noprint" style="display:flex;justify-content:flex-end"><button class="abtn plus" title="Track something new" onclick="toggleNewFeedback()">+</button></div>
+  </div></div>`;
+  const nf=state.newFeedback, ready=nf.text.trim()&&nf.source.trim()&&nf.measuredBy;
+  return `<div class="newfeedback">
+    <div class="fld"><div class="flbl">WHAT TO TRACK</div><input value="${esc(nf.text)}" oninput="setNewFeedback('text',this.value)" placeholder="the suggestion, question or thing to watch"></div>
+    <div class="fld"><div class="flbl">SOURCE — WHERE THIS COMES FROM</div><input value="${esc(nf.source)}" oninput="setNewFeedback('source',this.value)" placeholder="e.g. sprint retro, Dan in chat, commit log"></div>
+    <div class="fld"><div class="flbl">MEASURED BY</div><select onchange="setNewFeedback('measuredBy',this.value)">
+      <option value="">choose one…</option>
+      ${MEASURED_BY.map(o=>`<option value="${o}" ${nf.measuredBy===o?'selected':''}>${o}</option>`).join('')}
+    </select></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn ghost" onclick="toggleNewFeedback()">CANCEL</button>
+      <button class="btn" ${ready?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="stageNewFeedback()">STAGE ROW</button>
+    </div>
+  </div>`;
+}
+function stageNewFeedback(){
+  const nf=state.newFeedback;
+  if(!(nf.text.trim()&&nf.source.trim()&&nf.measuredBy)) return;
+  state.choices['newfeedback:pending']='proceed';
+  state.details['newfeedback:pending']=nf.text.trim()+' | source: '+nf.source.trim()+' | measured by: '+nf.measuredBy;
+  state.newFeedback={text:'',source:'',measuredBy:''}; state.newFeedbackOpen=false;
+  render();
 }
 function toggleExpand(sec,id){
   const k=sec+':'+id;
@@ -442,14 +500,18 @@ function toggleExpand(sec,id){
    syncMarks() keeps working; EXPLAIN/PROCEED are present but hidden since neither makes sense
    on an empty section. */
 function actsEmpty(sec){
-  const id='empty';
-  return `<div class="acts noprint" data-k="${sec}:${id}">
-  <button class="abtn" style="display:none" title="Explain" onclick="pick('${sec}','${id}','explain')">!</button>
-  <button class="abtn" style="display:none" title="Proceed" onclick="pick('${sec}','${id}','proceed')">✓</button>
-  <button class="abtn plus" title="Improve" onclick="pick('${sec}','${id}','improve')">+</button>
+  const id='empty', retired=!!state.retire[sec];
+  return `<div class="noprint" style="display:flex;gap:6px;justify-content:flex-end;align-items:center">
+  <button class="retirebtn${retired?' sel':''}" title="Retire this section — it will drop from future renders once Claude adds it to meta.retiredSections" onclick="toggleRetire('${sec}')">${retired?'RETIRE ✓':'RETIRE'}</button>
+  <div class="acts noprint" data-k="${sec}:${id}">
+   <button class="abtn" style="display:none" title="Explain" onclick="pick('${sec}','${id}','explain')">!</button>
+   <button class="abtn" style="display:none" title="Proceed" onclick="pick('${sec}','${id}','proceed')">✓</button>
+   <button class="abtn plus" title="Improve" onclick="pick('${sec}','${id}','improve')">+</button>
+  </div>
  </div>
  <div class="detail" data-d="${sec}:${id}"><textarea placeholder="What should go here…" oninput="setDetail('${sec}','${id}',this.value)"></textarea></div>`;
 }
+function toggleRetire(sec){ if(!state.retire) state.retire={}; state.retire[sec]=!state.retire[sec]; render(); }
 
 function render(){
   const m=DATA.modules, cnt=s=>m.filter(r=>r[2]===s).length;
@@ -471,7 +533,23 @@ function render(){
 
   document.getElementById('legend').innerHTML=['pass','fail','pending','blocked','na'].map(k=>mark(k,'pad')).join('');
 
-  document.getElementById('modules').innerHTML=m.map(([n,v,b,checks,t],i)=>`
+  const badgeOpts=Array.from(new Set(m.map(r=>r[2])));
+  document.getElementById('gridctrl').innerHTML=`
+    <select onchange="setModuleFilter('badge',this.value)">
+      <option value="ALL">ALL BUILD STATES</option>
+      ${badgeOpts.map(b=>`<option value="${esc(b)}" ${state.moduleFilter.badge===b?'selected':''}>${esc(b)}</option>`).join('')}
+    </select>
+    <select onchange="setModuleFilter('check',this.value)">
+      <option value="ALL">ALL CHECK STATES</option>
+      ${CHECK_STATES.map(c=>`<option value="${c}" ${state.moduleFilter.check===c?'selected':''}>${WORD[c]}</option>`).join('')}
+    </select>`;
+  const mFiltered=m.filter(r=>
+    (state.moduleFilter.badge==='ALL'||r[2]===state.moduleFilter.badge) &&
+    (state.moduleFilter.check==='ALL'||r[3].includes(state.moduleFilter.check)));
+  const cnEl=document.getElementById('checksnote'), cn=(DATA.meta&&DATA.meta.checksNote)||'';
+  if(cnEl){ cnEl.hidden=!cn; cnEl.textContent=cn; }
+
+  document.getElementById('modules').innerHTML=(mFiltered.length?mFiltered:[]).map(([n,v,b,checks,t],i)=>`
    <div class="row${i%2?' zebra':''}">
     <div class="cells gmod">
       <div class="stack"><div class="name">${esc(n)}</div><div class="ver">${esc(v)}</div></div>
@@ -479,7 +557,8 @@ function render(){
       <div class="chk">${checks.map((c,j)=>`<span title="${CHECK_NAMES[j]}: ${WORD[c]}">${mark(c)}</span>`).join('')}</div>
       ${triple('modules',n,t)}
       ${acts('modules',n)}
-    </div></div>`).join('');
+    </div></div>`).join('')
+   || (m.length?`<div class="row"><div class="cells" style="grid-template-columns:1fr"><div class="nonerow">— no modules match this filter —</div></div></div>`:'');
 
   document.getElementById('queues').innerHTML=[
     ['Asset Proof Queue',DATA.proofs.length+' OPEN','proofs',DATA.proofs,false],
@@ -495,15 +574,15 @@ function render(){
        ${acts(sec,ref)}
      </div></div>`).join(''):noneRow(sec)}</div>`).join('');
 
-  document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,t])=>`
+  document.getElementById('issues').innerHTML=DATA.issues.map(([ref,sev,t,resolution])=>`
    <div class="row"><div class="cells gissue" style="align-items:start">
-     <div class="ref">${ref}</div>${mark(SEV[sev]).replace(WORD[SEV[sev]],sev.toUpperCase())}
+     <div class="ref">${ref}</div><div class="stack" style="gap:3px">${resolution==='partial'?partialChip():''}${sevChip(sev)}</div>
      ${triple('issues',ref,t)}${acts('issues',ref)}
    </div></div>`).join('');
 
   document.getElementById('risks').innerHTML=DATA.risks.map(([ref,exp,title,cause,control])=>`
    <div class="row"><div class="cells gissue">
-     <div class="ref">${ref}</div>${mark(SEV[exp]).replace(WORD[SEV[exp]],exp.toUpperCase())}
+     <div class="ref">${ref}</div>${sevChip(exp)}
      ${triple('risks',ref,title,cause,control)}
      ${acts('risks',ref)}
    </div></div>`).join('');
@@ -539,9 +618,11 @@ function render(){
       ${mark(k).replace(WORD[k],word)}${acts('milestones',ref)}
     </div></div>`;}).join('');
 
-  document.getElementById('nextActions').innerHTML=DATA.nextActions.map(([n,t,owner])=>`
+  /* done rows are pruned entirely, not struck-through (spec §4i) */
+  document.getElementById('nextActions').innerHTML=DATA.nextActions.filter(r=>!r[5]).map(([n,t,owner,priority,hold])=>`
    <div class="row"><div class="cells gnext" style="align-items:start">
      <div class="ref">${n}</div>${triple('next','NA'+n,t)}
+     <div class="stack" style="gap:3px">${priority?sevChip(priority):''}${hold?`<div class="mk mk-blocked" title="HOLD"><i>■</i>HOLD</div>`:''}</div>
      <div class="meta" style="text-align:right">${owner}</div>${acts('next','NA'+n)}
    </div></div>`).join('');
 
@@ -584,7 +665,7 @@ function render(){
       <div class="meta">${owner?esc(owner):''}</div>
       <div class="stack"><div class="note">${priority?esc(priority):''}</div><div class="note" style="color:var(--muted)">${timeline?esc(timeline):''}</div></div>
       ${acts('feedback',ref)}
-    </div></div>`;}).join('');
+    </div></div>`;}).join('') + renderNewFeedback();
 
   document.getElementById('log').innerHTML=DATA.log.map(([w,t])=>
     `<div class="logrow"><div class="logwhen">${esc(w)}</div><div class="note">${esc(t)}</div></div>`).join('');
@@ -643,8 +724,9 @@ function noneRow(sec){
 }
 function markEmpty(k){
   const wrap=document.getElementById('sec-'+k), panel=document.getElementById(k);
-  if(wrap) wrap.hidden = !!state.absent[k];
-  if(state.absent[k]) return;
+  const retired=((DATA.meta&&DATA.meta.retiredSections)||[]).includes(k) && !DATA[k].length;
+  if(wrap) wrap.hidden = !!state.absent[k] || retired;
+  if(state.absent[k] || retired) return;
   if(panel && !DATA[k].length) panel.innerHTML=noneRow(k);
 }
 function applyEmptyStates(){
@@ -731,7 +813,10 @@ function createPrompt(){
   if(state.dataRefresh)L.push('REFRESH DATA: re-read '+srcName+' plus any module changelogs, re-derive every status from current evidence, and re-issue this dashboard with a new data stamp.');
   if(state.refresh)L.push('REFRESH BUILD: run the full clean pipeline across ALL modules ('+CHECK_NAMES.join(', ')+'), report per-module results, and stamp the new baseline.');
   if(state.canon)L.push('CANON SYNC: pull current canon versions from the source of truth, diff every module\u2019s built_against, re-run data-dependent tests for stale modules, update marks.');
-  Object.keys(state.choices).forEach(k=>{const id=k.split(':')[1],d=(state.details[k]||'').trim();
+  Object.keys(state.retire||{}).forEach(sec=>{ if(state.retire[sec]) L.push('RETIRE '+sec+': add to meta.retiredSections so it stops rendering "\u2014 none \u2014" every time.'); });
+  Object.keys(state.choices).forEach(k=>{
+    if(k==='newfeedback:pending'){ L.push('NEW FEEDBACK: '+(state.details[k]||'').trim()); return; }
+    const id=k.split(':')[1],d=(state.details[k]||'').trim();
     L.push(id+' '+state.choices[k]+(d?': '+d:''));});
   const MARK_TAG={pass:'interested',fail:'not-interested',pending:'undecided'};
   (DATA.feedback||[]).forEach(([ref,,,,mk])=>{

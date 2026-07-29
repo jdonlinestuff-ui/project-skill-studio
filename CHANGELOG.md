@@ -2,6 +2,74 @@
 
 All notable changes to this skill are documented here.
 
+## [1.15.0] - 2026-07-29
+
+Dashboard shell v3.5 → v3.6, a 15-item batch the owner compiled from a live review of the
+CRA dashboards over several messages before giving the go-ahead in one pass. Everything
+below is a shell/spec change — it cascades to every dashboard on next rebuild, it does not
+touch any tracker's data.
+
+**Added — `references/DASHBOARD_SPEC.md` and both reference builds**
+- `[UNDEF]` grey chip: any row missing its severity/status/rating renders `? UNDEF`, never
+  the literal string "undefined" and never a silently blank cell (§2).
+- `[PARTIAL]` resolution chip, crossing with severity/rating rather than replacing it —
+  `[~ PARTIAL][✕ HIGH]` etc. — via an optional `resolution:"partial"` field (§2).
+- Module Grid: a filter-by-BUILD-STATE and filter-by-check-state control, composable, with
+  the header metric strip staying computed over the unfiltered set (§10.8). Also
+  `meta.checksNote` — a line rendered under the grid explaining what would populate it,
+  for an instance whose grid is a cross-line synthesis with no real six-check data.
+- `meta.retiredSections` — an empty section gains a RETIRE ghost control beside its
+  existing lone `(+)`; pressing it stages a `RETIRE <section>` line for the next canon
+  write, after which that section is omitted like an absent one instead of showing
+  `— none —` forever (§3.4).
+- Next Actions (new §4i): optional `priority` chip (High/Med/Low, same three words as
+  everywhere else) and a `hold`/`done` pair — `hold:true` renders a separate `■ HOLD`
+  badge rather than inventing a fourth priority word; `done:true` rows are pruned from the
+  render entirely, not shown struck-through.
+- Feedback & Suggestions: a guided "+ NEW" three-field form (what to track / source /
+  measured-by, the last a fixed six-value choice: milestone, budget, risk, brainstorming,
+  code review, design review) replaces a bare freeform box for adding a new row (§4e).
+- `meta.compactChips` opt-in: severity/rating/priority chips MAY render glyph-only when a
+  section's own legend states the mapping. Off by default; the core five status marks
+  (PASS/FAIL/PEND/BLOCK/N/A) are excluded from this flag and always carry the word — the
+  greyscale/colour-blind rule in §2's first bullet is not weakened by this addition.
+- File citations require the full Drive URL (`.../file/d/<id>/view`), never a bare id (§3.5).
+
+**Changed**
+- The ISSUE·PROBLEM·NEEDED triple's third line now renders **ASK**. The JSON field name
+  stays `needed` — this is a display-label rename only, no tracker migration needed (§3.7).
+- `references/facilitator-hub-reference.html`'s `buildPrompt()` no longer prepends the
+  EXPLAIN/PROCEED/IMPROVE legend and "refs only" disclaimer to the emitted prompt text —
+  `dashboard-reference.html` never had this text; the spec now states explicitly (§5) that
+  the emitted prompt carries no restated legend, so this can't regress again on either shell.
+- Module Grid's legend rule is now explicit that a legend only ever attaches directly
+  beneath the section header it belongs to (§10.8) — the one legend this spec defines is
+  Module Grid's; no other section renders a floating, unheaded status-vocabulary key.
+- Facilitator Hub's REFRESH DATA prompt line now also requests each source tracker's own
+  dashboard be refreshed and regenerated, not just this pooled view re-read (§13/prompt
+  text) — matches the owner's ask that a Facilitator Hub refresh cascades to the whole set.
+  `cra-facilitator-hub`'s own SKILL.md still needs a matching update to its "does not write
+  back / only pools" framing — flagged, not yet done in this pass (that skill is delivered
+  separately from this repo).
+
+**Fixed (found while editing)**
+- SKILL.md Phase 4 still cited `DASHBOARD_SPEC.md (v3.5)` and the pre-rename `ISSUE·
+  PROBLEM·NEEDED` triple in two places — both corrected to v3.6/ASK.
+- `references/dashboard-reference.html`'s empty-section RETIRE control was first wired
+  inside the same `.acts` div as the EXPLAIN/PROCEED/IMPROVE trio, which shifted
+  `syncMarks()`'s positional `children[i]` lookup and threw on load; moved RETIRE outside
+  `.acts` as a sibling control. The Feedback section's collapsed "+ NEW" trigger was
+  wrongly tagged `.acts` with only one child button for the same reason — retagged.
+  Both caught by a Playwright console-error pass before delivery, not by inspection alone.
+
+**Not done in this pass, flagged for the owner**
+- §2's glyph-only exception (`meta.compactChips`) was implemented at the conservative
+  scope discussed but not confirmed before this batch shipped: severity/rating/priority
+  chips only, core status marks unaffected. Flagging in case the intent was broader.
+- This changed the shell/spec only. The 9 live CRA Cowork dashboards still render the
+  pre-v3.6 shell until they're rebuilt against it — that's a separate "rebuild the
+  dashboards" pass, not part of "update canon".
+
 ## [1.14.0] - 2026-07-29
 
 Made task-orchestrator a standard inclusion for Phase 4 (the dashboard-set

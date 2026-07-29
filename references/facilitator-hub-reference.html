@@ -188,6 +188,7 @@ button,textarea,select,input{font-family:inherit}
 .pill0{background:var(--naT);color:var(--na)}
 .pillhot{background:var(--failT);color:var(--fail)}
 .pillwarm{background:var(--pendT);color:var(--pend)}
+.pillundef{background:var(--line);color:var(--muted)}
 .line-clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .line-open{display:block}
 .triple b{font:600 10px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--accentText)}
@@ -239,7 +240,8 @@ function setDetail(sec,ref,v){ state.details[sec+':'+ref]=v; }
 function toggleExpand(sec,ref){ const k=sec+':'+ref; state.expanded[k]=!state.expanded[k]; render(); }
 
 function triple(sec,r){
-  /* spec 3.7: a row without all three fields stays a flat note rather than a padded triple */
+  /* spec 3.7: a row without all three fields stays a flat note rather than a padded triple.
+     JSON field stays `needed`; only the rendered label is ASK (spec v3.6). */
   if(r.issue===undefined&&r.problem===undefined&&r.needed===undefined)
     return `<div class="note">${esc(r.note||r.short||'')}</div>`;
   const k=sec+':'+r.ref; const open=state.allOpen||!!state.expanded[k];
@@ -247,7 +249,7 @@ function triple(sec,r){
   return `<div class="triple" style="display:flex;flex-direction:column;gap:5px">
     <div class="${cls}"><b>ISSUE </b>${esc(r.issue)}</div>
     <div class="${cls}"><b>PROBLEM </b>${esc(r.problem)}</div>
-    <div class="${cls}"><b>NEEDED </b>${esc(r.needed)}</div>
+    <div class="${cls}"><b>ASK </b>${esc(r.needed)}</div>
   </div>`;
 }
 function trio(sec,r){
@@ -322,7 +324,7 @@ function renderGeneral(){
 
 function buildPrompt(){
   const L=[];
-  if(state.dataRefresh) L.push('- REFRESH DATA: re-read DESIGN_TRACKER.json and ONLINE_DEV_TRACKER.json fresh from canon, re-derive every open decision/issue/next-action, and re-pool this hub with a new data stamp.');
+  if(state.dataRefresh) L.push('- REFRESH DATA: re-read every source tracker fresh from canon, re-derive every open decision/issue/next-action, refresh and regenerate each source tracker\'s own dashboard (not just this pooled view), then re-pool this hub with a new data stamp.');
   const block=(label,rows,sec)=>{ rows.forEach(r=>{ const c=state.choices[sec+':'+r.ref]; if(!c) return;
     const extra=(state.details[sec+':'+r.ref]||'').trim();
     L.push('- ['+c.toUpperCase()+'] '+label+' '+r.ref+' ('+tname(r.tracker)+', owner '+(r.owner||'Unassigned')+')'
@@ -332,9 +334,7 @@ function buildPrompt(){
   DATA.hubGeneral.forEach(g=>{ const c=state.choices['general:'+g.tracker]; const note=(g.note||'').trim();
     if(!note && !c) return;
     gen.push('- '+(c?'['+c.toUpperCase()+'] ':'')+tname(g.tracker)+(note?'\n    '+note:'')); });
-  const head='Facilitator Hub review \u2014 '+(DATA.meta.generatedAt||'')+(state.filterTracker!=='ALL'?' \u2014 scoped to '+tname(state.filterTracker):'')
-    +'\nEXPLAIN = tell me more before I decide. PROCEED = implement as written. IMPROVE = follow the extra direction.\n'
-    +'(Refs only \u2014 Claude already has the full Issue/Problem/Needed text from canon; re-read it there rather than from this prompt.)\n';
+  const head='Facilitator Hub review \u2014 '+(DATA.meta.generatedAt||'')+(state.filterTracker!=='ALL'?' \u2014 scoped to '+tname(state.filterTracker):'')+':';
   if(!L.length && !gen.length) return head+'\nNothing marked.';
   return head+(L.length?'\nMARKED ITEMS\n'+L.join('\n'):'')+(gen.length?'\n\nGENERAL UPDATE\n'+gen.join('\n'):'');
 }
@@ -362,7 +362,7 @@ function render(){
         ['!','explain','EXPLAIN','Ask Claude to walk through this item in more detail before deciding.'],
         ['\u2713','proceed','PROCEED','Implement this item as written.'],
         ['+','improve','IMPROVE','Add your own extra direction \u2014 a text field opens below the row.'],
-        ['\u2026','','EXPAND','Show the full ISSUE \u00b7 PROBLEM \u00b7 NEEDED text instead of the one-line clamp.']
+        ['\u2026','','EXPAND','Show the full ISSUE \u00b7 PROBLEM \u00b7 ASK text instead of the one-line clamp.']
       ].map(([g,c,n,d])=>`<div class="keyitem"><div class="circ ${c}">${g}</div><div class="stack"><div class="keyname">${n}</div><div class="keydesc">${d}</div></div></div>`).join('')}</div>
     </div>
     <div class="noprint" style="position:sticky;top:0;z-index:20;margin-top:16px;padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg);border-bottom:1px solid var(--line)">
@@ -394,19 +394,19 @@ function render(){
 
     <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Decisions Pending</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:460px">
-      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 ASK</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
       <div id="decBody"></div>
     </div></div>
 
     <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Open Issues</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:500px">
-      <div class="hdr ghubR"><div>TRACKER</div><div>REF</div><div>RATING</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div class="hdr ghubR"><div>TRACKER</div><div>REF</div><div>RATING</div><div>ISSUE \u00b7 PROBLEM \u00b7 ASK</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
       <div id="issBody"></div>
     </div></div>
 
     <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px"><div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Next Actions</div><div style="flex:1;height:1px;background:var(--line)"></div></div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto"><div style="min-width:460px">
-      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 WHAT IS NEEDED</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
+      <div class="hdr ghub"><div>TRACKER</div><div>REF</div><div>ISSUE \u00b7 PROBLEM \u00b7 ASK</div><div>OWNER</div><div style="text-align:right">ACTIONS</div></div>
       <div id="actBody"></div>
     </div></div>
 
@@ -420,7 +420,12 @@ function render(){
    </div>`;
   renderIndex();
   renderSection('decBody','decisions',DATA.hubDecisions,'ghub');
-  renderSection('issBody','issues',DATA.hubIssues,'ghubR', r=>`<div class="pill ${r.rating==='High'?'pillhot':r.rating==='Med'?'pillwarm':'pill0'}">${esc(r.rating)}</div>`);
+  renderSection('issBody','issues',DATA.hubIssues,'ghubR', r=>{
+    const known=r.rating==='High'||r.rating==='Med'||r.rating==='Low';
+    const rateChip=`<div class="pill ${r.rating==='High'?'pillhot':r.rating==='Med'?'pillwarm':known?'pill0':'pillundef'}">${known?esc(r.rating):'UNDEF'}</div>`;
+    const partialChip=r.resolution==='partial'?`<div class="pill pillwarm" style="margin-bottom:3px">PARTIAL</div>`:'';
+    return `<div class="stack" style="gap:3px">${partialChip}${rateChip}</div>`;
+  });
   renderSection('actBody','actions',DATA.hubActions,'ghub');
   renderGeneral();
 }

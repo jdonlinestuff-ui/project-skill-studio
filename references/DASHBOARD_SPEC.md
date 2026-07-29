@@ -31,6 +31,7 @@ The record, stated once so no section has to guess:
 | v3.3 | §3.6 evidence baseline and §4h Defect & Task Register — the third insertion, 16 → 17 |
 | v3.4 | §3.7 the ISSUE·PROBLEM·NEEDED row triple and the header Function/Purpose/Objective block, both now standard; §13 reversed — Facilitator and Resources carry the action trio, CREATE PROMPT and the scheme switcher after all, plus a click-to-scope index and dropdown/search filtering unique to a pooled surface |
 | v3.5 | Navy added as a fifth colour scheme and promoted to the default (RESET/first-load) in place of Canon v6, which remains available as a named scheme; four schemes → five everywhere §6/§10.5/§11 reference a count |
+| v3.6 | Owner batch (2026-07-29): the ISSUE·PROBLEM·NEEDED triple's third line renders as **ASK**, `needed` stays the JSON field name; a `[PARTIAL]` resolution chip crosses with severity (§2); a grey `[UNDEF]` mark covers any row missing its severity/status/rating (§2); the CREATE PROMPT legend/disclaimer block is banned from emitted prompt text (§5); Module Grid gets a filter-by-state control (§10.8); empty sections gain a `meta.retiredSections` opt-out (§3.4); Next Actions gain an optional `priority` chip and a `hold`/`done` pair that prunes completed rows (§4 Next Actions); Feedback & Suggestions gains a guided "track something new" add-row flow (§4e); file citations require the full Drive URL, never a bare id (§3.5); Module Grid columns with no data for this instance carry a `meta.checksNote` explaining what would populate them (§3.3); severity/rating/priority chips may render glyph-only under an explicit `meta.compactChips` opt-in, off by default — the core five status marks keep glyph+word+tint always, no exception (§2) |
 
 Things that went wrong the last time this was rebuilt, all now specified below:
 `rem`-based font sizes, glyph-only 14px status squares, square 4px action buttons,
@@ -63,6 +64,7 @@ SUPPLIED BY THE SKILL
 | `pending` | ~ | PEND | not yet run / not yet evidenced |
 | `blocked` | ■ | BLOCK | cannot run until an upstream issue clears |
 | `na` | – | N/A | does not apply to this row |
+| `undef` | ? | UNDEF | the field this row needs (severity/status/rating) is missing from canon |
 
 Rules
 - **Glyph AND word AND tint always travel together.** A bare glyph, a bare colour square,
@@ -71,10 +73,30 @@ Rules
 - Build-state badges are a separate axis: `INTEGRATED / TESTED / BUILDING / PROTOTYPE`
   (`PROPOSED / PENDING` in queues). No new badge words without a canon decision.
 - Severity and exposure reuse the marks: High → ✕, Med → ~, Low → –.
+- **A row with no severity/status/rating value renders `? UNDEF`, grey, never a raw
+  `undefined` string and never a silently blank cell.** This is a template guard, not a
+  canon shortcut — a row that hits `UNDEF` still needs its real value chased down in the
+  source tracker; the chip exists so a rendering gap can never masquerade as a real status.
+- **`[PARTIAL]` is a resolution state, not a fourth severity word — it crosses with
+  severity/rating rather than replacing High/Med/Low.** An optional `resolution` field
+  (`"partial"`, the only value defined so far) on an Open Issues or Defect row renders a
+  second small chip, `~ PARTIAL`, immediately before the severity/rating chip:
+  `[~ PARTIAL][✕ HIGH]`, `[~ PARTIAL][~ MED]`, `[~ PARTIAL][– LOW]`. Omit the field
+  entirely for a row that is simply open or simply resolved — `PARTIAL` only appears when
+  a row is genuinely both severity-rated and partially, not fully, closed.
 - Rows open by definition (decisions) carry NO status badge.
 - A mark is normally evidence-derived and read-only in the browser. §4e's feedback mark is
   the one deliberate exception — facilitator-set, not evidence-derived — and it says so in
   its own prose rather than quietly breaking the read-only rule everywhere else.
+- **Severity/rating/priority chips may drop the word under an explicit opt-in, the core
+  five status marks never do.** Set `meta.compactChips:true` on a tracker instance and its
+  severity, rating and priority chips render glyph-only (`✕` not `✕ HIGH`) — legal ONLY
+  because the section carries its own legend (§10.6) spelling out the glyph-to-word mapping
+  once, in that section's header. Default is `false`/absent, meaning glyph+word as
+  everywhere else; the six-check Module Grid marks, the build-state badges and every other
+  status chip in this spec are excluded from `compactChips` and always carry the word —
+  this flag touches severity/rating/priority chips only, never the marks the greyscale/
+  colour-blind rule in the first bullet exists to protect.
 
 ---
 
@@ -133,7 +155,10 @@ metric strip:
     "maintainer": "Claude",            // who writes this file
     "evidenceBaseline": "v0.6",        // the version the marks below were derived FROM
     "subjectVersion": "v0.20",         // the version actually shipping NOW
-    "baselinedAt": "2026-07-25"        // when evidenceBaseline was last re-derived
+    "baselinedAt": "2026-07-25",       // when evidenceBaseline was last re-derived
+    "retiredSections": [],             // section keys opted out of "-- none --" forever (§3.4)
+    "checksNote": "",                  // why the Module Grid has no six-check data here, and what would populate it (§10.8)
+    "compactChips": false              // glyph-only severity/rating/priority chips, opt-in only (§2)
   },
   "modules":     [[name, builtAgainst, badge, [6 status keys], evidenceNote], …],
   "proofs":      [[ref, name, badge, note], …],
@@ -144,7 +169,7 @@ metric strip:
   "risks":       [[ref, "High"|"Med"|"Low", title, cause, control], …],
   "budget":      [[ref, lineItem, budgetAmount, spentAmount, note], …],
   "milestones":  [[ref, "YYYY-MM-DD", title, "done"|"next"|"pending"|"blocked", note], …],
-  "nextActions": [[n, action, owner], …],
+  "nextActions": [[n, action, owner, priority?, hold?, done?], …],  // priority/hold/done optional, §4i
   "feedback":    [[ref, raisedBy, text, targetRef, mark, owner, priority, timeline, note], …],
   "projects":    [[ref, name, status, people, tasks, thisWeek], …],
   "people":      [[name, projectRef, tasks, note], …],
@@ -183,6 +208,11 @@ see §3.6.
 - `evidenceNote` states the evidence or names the gap with ids (`(I6)`, `(S8)`). No note = no claim.
 - Totals, percentages and metric counts are DERIVED at render, never stored.
 - Statuses change only when evidence changes, and every change adds a `log` entry.
+- **A file citation is the full Drive URL, never a bare file id.** Any row or log entry
+  that names a specific file for the reader to act on (open, review, delete) writes
+  `https://drive.google.com/file/d/<FILE_ID>/view` in full — a bare id like `1WvrbBno85…`
+  is not clickable and forces the reader to hand-build the link themselves. This applies to
+  every register (Issues, Defects, Decisions, log), not just one section.
 
 ### 3.6 Evidence baseline — the version the marks describe
 
@@ -250,7 +280,7 @@ instead of a flat `note`:
 |---|---|
 | `issue` | what is this, stated as a fact, not a question |
 | `problem` | why it matters — the consequence of leaving it as-is |
-| `needed` | what has to happen, and who from, to close it |
+| `needed` | what has to happen, and who from, to close it — **rendered as ASK**, not NEEDED (v3.6); the JSON field name stays `needed` so existing tracker data does not need a migration, only the on-page label changed |
 
 This is an authoring step, not a string-splitting trick — no heuristic reliably turns one
 paragraph into three parts that actually answer three different questions. A row missing
@@ -258,8 +288,8 @@ any of the three does not get a partial triple; write it as a flat `note` instea
 it back to the source tracker as incomplete.
 
 **Rendering.** Each line is prefixed with its label in the accent colour
-(`<b>ISSUE </b>`, 10px, letter-spacing .06em, matching `.ref`), body text at the standard
-12px note size below it. All three lines clamp to one line each by default
+(`<b>ISSUE </b>`, `<b>PROBLEM </b>`, `<b>ASK </b>` — 10px, letter-spacing .06em, matching
+`.ref`), body text at the standard 12px note size below it. All three lines clamp to one line each by default
 (`-webkit-line-clamp:1`) with a `… expand` / `– collapse` toggle per row, so a dense
 section stays scannable and a reader who needs the full text gets it without leaving the
 page. `EXPAND ALL` in the control bar (§10.4) toggles every row's clamp at once.
@@ -269,6 +299,19 @@ page. `EXPAND ALL` in the control bar (§10.4) toggles every row's clamp at once
 row (EXPLAIN and PROCEED present but hidden, since neither means anything on an empty
 section) — so a facilitator can still open a field and say what should go there, instead
 of an empty section being a dead end.
+
+**A persistently empty section can be retired instead of shown `— none —` forever.**
+Next to that lone `(+)`, an empty section's row also carries a `RETIRE` ghost control.
+Pressing it stages `RETIRE <section>` on the next CREATE PROMPT rather than mutating
+anything client-side (the dashboard still never writes canon directly, per §5). On the
+next canon write, Claude adds the section's key to `meta.retiredSections` (an array of
+section keys, e.g. `["risks","budget"]`) — a tracker instance checks this array beside the
+existing absent/empty distinction (§3.4) as a third state: **absent** (never had the
+section) is omitted silently; **empty** (`[]`) shows `— none —`; **retired** (empty AND
+listed in `meta.retiredSections`) is omitted exactly like absent, but is a deliberate,
+logged decision rather than the section never having existed. Un-retiring is the same
+path in reverse — remove the key from `meta.retiredSections` on a future sync — never a
+client-side toggle, so retiring a section is always a canon-visible, auditable act.
 
 **The header purpose block.** Immediately below the title/eyebrow and above the
 how-this-works panel (§10.3), an optional three-column block states what this specific
@@ -395,6 +438,19 @@ list — and building it here would turn a "simple feedback action" into an agil
 clone. If a project genuinely needs that, it's its own section and its own decision, not
 a quiet extension of this one.
 
+**Track something new (v3.6).** Below the last row, a `+ NEW` control opens a small guided
+form rather than a single freeform box — the point being that "track something new" is an
+under-specified ask until the reader says what, where the number/status will come from, and
+what "done" or "measured" means for it. Three fields, all required before the row can be
+added: **what to track** (free text — becomes the row's `text`), **source** (free text —
+where this data comes from, e.g. "sprint retro", "Dan in chat", "commit log"), **measured
+by** — a fixed choice, not free text, one of `milestone` / `budget` / `risk` /
+`brainstorming` / `code review` / `design review`. The completed form does not write a row
+to canon directly (§5's rule holds here too) — it stages a `NEW FEEDBACK` line in the next
+CREATE PROMPT, and Claude appends the real row (with a fresh `ref`) to `feedback` on the
+next write. `note` on the resulting row records the measurement type so a reader scanning
+the tracker later can see why the row exists without re-asking.
+
 ---
 
 ### 4f. Portfolio Roster — status across every project, not one line's detail
@@ -505,6 +561,33 @@ quietly resolved:
 Neither is worth a migration on its own. Both are worth writing down, because the failure
 mode is a prompt line that two registers both think is theirs.
 
+### 4i. Next Actions — priority and pruning (v3.6)
+
+**Fields**: `n` (row number, not a programme-wide ref — Next Actions is a per-tracker
+scratch list, not a permanent register) · `action` (or the ISSUE·PROBLEM·ASK triple, §3.7,
+for anything with real context to carry) · `owner` · `priority` (optional — `High`/`Med`/
+`Low`, the same three words as §4e's, no fourth priority word) · `hold` (optional boolean)
+· `done` (optional boolean).
+
+**Priority chip.** When `priority` is set, render it exactly like a severity chip
+(`✕ HIGH`/`~ MED`/`– LOW`, §2, subject to the same `compactChips` opt-in). Omitted
+`priority` renders no chip at all — not every action needs one ranked.
+
+**`hold` is a status, not a fourth priority word.** A row can be `priority:"High", hold:true`
+— still the most important thing on the list, just deliberately not being worked right now.
+Render `hold:true` as a separate `■ HOLD` badge (the `blocked` mark) beside the priority
+chip rather than inventing a `priority:"Hold"` value, which would be exactly the
+"no fourth priority vocabulary" violation §4e already rules out. A held row still counts
+in the section's total; it is paused, not gone.
+
+**`done` rows are pruned, not displayed struck-through.** The moment a Next Action is
+marked done, it drops out of the rendered list entirely on the next regeneration — Next
+Actions is a to-do list, not an audit trail, and a growing tail of completed rows defeats
+the point of a scratch list a facilitator scans in seconds. The completion itself still
+gets a `log` entry (§3.5's "every change adds a log entry" rule is not waived here); the
+row's disappearance from Next Actions is how "handled" is communicated on this page, the
+log is where it is proven.
+
 ---
 
 ## 5. Controls and the prompt protocol
@@ -538,6 +621,14 @@ A feedback row's mark is compiled as its own line, separate from the ordinary
 `!`/`✓`/`+` choice line — a row can carry both (e.g. mark:interested AND an IMPROVE
 detail) in the same prompt. `undecided` is only emitted if the mark was previously
 something else and got cleared back; the default state is never emitted as a no-op line.
+
+**The emitted prompt is exactly the block above — nothing else gets prepended.** In
+particular: no restated EXPLAIN/PROCEED/IMPROVE legend and no "refs only, re-read the full
+text from canon" disclaimer. Both were tried on the Facilitator Hub build and cut in v3.6
+— the how-this-works panel (§10.3) already teaches the trio once, on the page, and
+repeating it inside the copied prompt just spends the paste target's space restating
+something the reader already saw seconds earlier. The prompt is refs, choices and typed
+directions — nothing framing them.
 
 The revision number matters: it tells Claude which version of the source the user was
 looking at, so a write can be refused or re-based if the source moved on.
@@ -846,6 +937,30 @@ nested `repeat(6,1fr)` with `gap:3px` of §10.6
 chips. Evidence `400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif`,
 `color:var(--body)`, `text-wrap:pretty`.
 Legend sits ABOVE the container, `display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px`.
+**A legend only ever attaches directly beneath the `sechead` of the section it explains —
+Module Grid's is the one legend this spec defines, and no other section renders a floating
+status-vocabulary key with no section title above it.** A section that wants to remind the
+reader what its own domain words mean (Portfolio Roster's `ON TRACK`/`AT RISK`/…, for
+instance) states that in the section's own `secmeta` strap or inline per-row, not as a
+second detached legend block — one legend, one owning header, no orphans.
+
+**Filter by state (v3.6).** Beside the legend, two dropdowns: filter by BUILD STATE badge
+(`ALL` / `INTEGRATED` / `TESTED` / `BUILDING` / `PROTOTYPE`, populated from whatever
+badges actually appear in `modules`) and filter by check state (`ALL` / `PASS` / `FAIL` /
+`PEND` / `BLOCK` / `N/A`, matching against any of the six check columns on a row — a row
+passes the filter if ANY of its six checks equals the selected state). The two filters
+compose (AND); clearing either returns to `ALL`. Filtering is client-side over the already-
+loaded `modules` array — it never triggers a re-fetch — and the metric strip counts (§4,
+top of page) stay computed over the FULL unfiltered set, so filtering the grid never makes
+the header metrics look wrong.
+
+**A grid with no check data for this instance says why, instead of rendering blank
+cells.** When `meta.checksNote` is set (a tracker instance whose Module Grid is a
+cross-line synthesis rather than a real build-check report, e.g. a programme-level rollup),
+render it as a single line directly under the grid's header row, in the note-text style,
+before the first data row: *what this grid actually shows, and what would need to run to
+populate real TYP/UNI/GLD/MUL/SEC/PII data instead.* Absent `meta.checksNote` changes
+nothing — this is additive, not a new required field.
 
 ### 10.9 Section heading (every section below the grid)
 ```html
@@ -864,7 +979,7 @@ Legend sits ABOVE the container, `display:flex;flex-wrap:wrap;gap:8px;margin-bot
 | Risk Register | `52px 84px 1fr 116px` | third cell stacks title, cause, then `CONTROL` label (`600 12px/1.45 IBM Plex Mono,monospace`, accentText) + control text (`400 12px/1.45` sans, muted) |
 | Budget | `52px 1fr 96px 96px 92px 116px` | ink header band; 5px spend bar (`radius 3px`, track = mark tint, fill = mark colour); total row `border-top:2px solid var(--ink)` |
 | Milestones | `92px 22px 1fr 84px 116px` | date · rail · title+note · state chip · actions. Rail = 11px dot (filled when done, ring otherwise, `2px solid` mark colour) + 2px connector `var(--line)` that stops on the last row |
-| Next Actions | `34px 1fr 104px 116px` | n · action · owner · actions |
+| Next Actions | `34px 1fr 88px 104px 116px` | n · action · priority chip (+ `HOLD` badge if held) · owner · actions — `done` rows are pruned, not rendered (§4i) |
 | Feedback & Suggestions | `52px 1fr 108px 92px 96px 116px` | ref · text (raisedBy + targetRef stacked beneath, muted mono) · mark chip (clickable — see §4e) · owner · priority+timeline stacked · actions |
 | Portfolio Roster | `52px 1fr 128px 76px 76px 1fr` | ref · name · status chip · people count · tasks count · thisWeek |
 | People & Allocation | `1fr 96px 76px 1fr` | name (repeat rows for multi-project people) · projectRef · tasks · note |
@@ -938,6 +1053,21 @@ Compare against the reference at 1080px wide. All must be true:
 - [ ] both row shapes render correctly in the same section without layout divergence
 - [ ] the longest status alias in use renders on one line at the narrowest column it appears
       in — no mid-word wrap or clip (§10.6 `white-space:nowrap`)
+- [ ] a row with a missing severity/status/rating value renders `? UNDEF` grey, never the
+      literal string "undefined" and never a blank cell
+- [ ] a `resolution:"partial"` row renders `[~ PARTIAL]` beside, not instead of, its
+      severity/rating chip
+- [ ] the emitted CREATE PROMPT text contains no EXPLAIN/PROCEED/IMPROVE legend and no
+      "refs only" disclaimer — compare byte-for-byte against the §5 block
+- [ ] Module Grid's BUILD STATE and check-state filters compose correctly and the header
+      metric strip stays computed over the unfiltered set while the grid is filtered
+- [ ] a section listed in `meta.retiredSections` is omitted exactly like an absent section,
+      not shown as `— none —`
+- [ ] a Next Action with `done:true` does not render; one with `hold:true` shows the
+      `■ HOLD` badge beside its priority chip if it has one
+- [ ] Feedback & Suggestions' `+ NEW` control requires all three fields (what/source/
+      measured by) before it stages a row, and `measured by` is the fixed six-value choice,
+      never free text
 
 ---
 
