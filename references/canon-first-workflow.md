@@ -49,6 +49,41 @@ Two checks before acting, every time:
   (`project-skill-studio`) itself is one of these for scaffolding and tracker
   duties; it does not replace a project's own canon or line skills once built.
 
+## task-orchestrator integration (standing dependency, not optional)
+
+`task-orchestrator` is a formal dependency of this studio and of every skill it
+generates, not a skill this studio should ever re-implement (Phase 2's reuse
+rule applies to it same as any other installed skill). Confirm it is installed
+during Phase 0 intake (`intake.md`'s Tools section) — if it is absent, flag the
+gap as an open question and note in the roster proposal that bundled/repeated
+work will run serially until it's installed, rather than silently degrading.
+
+Concrete trigger points where this studio itself routes through it:
+
+- **Phase 3 (author the skills)** — authoring three or more independent skills
+  in one pass (a canon skill plus several line/ops skills) is bundled,
+  independent work: dispatch per-skill authoring through task-orchestrator
+  rather than writing each one serially.
+- **Phase 4 (the dashboard set)** — building or verifying the three dashboard
+  surfaces is a repeated subtask across independent outputs; route through it
+  once more than one surface needs building or re-verifying in the same pass.
+- **Maintenance sweeps** — an end-of-session sweep or a suite-version bump that
+  touches multiple generated skills (revise-and-repackage across the roster) is
+  exactly the "repeats a subtask across many items" case task-orchestrator
+  exists for.
+- **A generated skill's own DRAFT step** — when a generated skill's work loop
+  hits a subtask repeated across many items (per-row tracker updates, per-card
+  content passes, per-module verification checks), that skill should route
+  through task-orchestrator rather than looping serially in one context. This
+  is why `generated-skill-template.md` carries a Dependencies block naming it
+  explicitly, instead of leaving it to be inferred from this file alone.
+
+A single, simple, one-step request stays serial — task-orchestrator's own
+trigger rule ("skip for a single, simple, one-step ask") governs whether a
+given request in the moment actually warrants dispatch; the points above name
+where in this studio's own workflow that judgment call recurs, not a rule to
+dispatch unconditionally.
+
 ## Conflict, not invention
 
 When canonical assets disagree — two trackers with different revisions of the

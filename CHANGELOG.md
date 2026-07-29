@@ -2,6 +2,40 @@
 
 All notable changes to this skill are documented here.
 
+## [1.12.0] - 2026-07-28
+
+Formalised `task-orchestrator` from a soft "consider checking" reference into a
+concrete, checked dependency, per the owner's explicit instruction to integrate
+it into the studio.
+
+**Added**
+- `references/canon-first-workflow.md`: new "task-orchestrator integration"
+  section naming concrete trigger points where this studio itself should route
+  through task-orchestrator (Phase 3 multi-skill authoring, Phase 4 multi-surface
+  dashboard builds, maintenance sweeps touching multiple generated skills, and a
+  generated skill's own DRAFT step when it repeats a subtask across many items).
+- `references/generated-skill-template.md`: new `## Dependencies` block in the
+  generated-skill template, declaring task-orchestrator explicitly instead of
+  leaving it implied by the canon-first-workflow reference alone.
+- `references/intake.md`: Tools section now asks Phase 0 to confirm
+  task-orchestrator is installed, flagging its absence as an open question
+  rather than silently generating skills that reference a missing dependency.
+- `SKILL.md`: Phase 0 intake table gets a Dependencies row; Phase 2 roster
+  rules clarify that task-orchestrator is a standing dependency, not a roster
+  candidate — distinct from (and composable with) a project's own class
+  orchestrator skill, which routes between that project's own skills rather
+  than handling arbitrary bundled/repeated work.
+- `README.md`: `task-orchestrator` added to Requires, alongside `skill-creator`.
+
+**Changed**
+- `references/skill-baseline.md` checklist point 2 cross-references the new
+  Dependencies block — a skill whose DRAFT step repeats a subtask across many
+  items and doesn't declare task-orchestrator as a dependency now fails this
+  checklist point explicitly, rather than the check being implicit.
+
+No dashboard shell, prompt protocol, or tracker schema changed in this release
+— this is a workflow/documentation integration only.
+
 ## [1.11.2] - 2026-07-28
 
 Four more bugs found live-testing the reference programme's (CRA) dashboards, on top of

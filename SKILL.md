@@ -37,6 +37,7 @@ Before writing anything, establish the project profile. Extract as much as possi
 | Active delivery lines | e.g. physical print, Teams app — only lines that are real today |
 | Studio-ops needed | tracker (always), QA, playtest/validation, client engagement, tuning |
 | Tool constraints | connector quirks discovered on this project (upload limits, no-delete, permission checks) |
+| Dependencies | confirm `task-orchestrator` is installed — a standing dependency of every generated skill, not optional tooling (see `references/canon-first-workflow.md`) |
 | Open questions | anything unconfirmed — these get flagged in skills, never invented |
 
 If the user says "same as my last project" or references an existing studio, search past conversations and Drive for that studio's conventions and carry them over explicitly, listing what was inherited.
@@ -66,6 +67,7 @@ Propose the roster as a table (skill name, class, scope, build order) and confir
 - The tracker skill is built **second** (or first task of a new class) — tracking exists before the work it tracks.
 - Line skills only for active lines. Speculative platforms go in the tracker backlog with a decision gate, not the roster.
 - Reuse before writing: check installed plugin/public skills (engineering:*, design:*, docx/pptx/xlsx/pdf, frontend-design). Generated skills should *call* those, not duplicate them. Write new skills only for genuine gaps.
+- `task-orchestrator` is a standing dependency, not a roster candidate: never propose an in-roster "orchestrator" skill that duplicates its job. A studio-scale orchestrator skill (per Core model's "Large classes get an orchestrator skill") routes between *this project's own* class members; task-orchestrator routes *any* bundled/repeated work regardless of project. They compose — a class orchestrator can itself dispatch through task-orchestrator — they don't substitute for each other.
 
 ### Phase 3 — Author the skills
 

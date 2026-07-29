@@ -31,6 +31,11 @@ Goal: fill the profile with minimum owner burden. Order of evidence:
 - QA/review loop? Playtest/validation loop? Client engagement lifecycle? Tuning/balancing?
 
 **Tools**
+- Confirm `task-orchestrator` is installed — it's a standing dependency of every
+  generated skill (`canon-first-workflow.md`'s task-orchestrator integration
+  section), not optional tooling. If absent, flag it as an open question in the
+  roster proposal rather than silently generating skills that reference a
+  dependency the owner doesn't have.
 - Which connectors does the project use, and what quirks have been learned? Seed defaults for Google Drive if used:
   - `textContent` reliable to ~17 KB; `base64Content` truncates ~5 KB (unusable for binaries)
   - Binary delivery via present_files zips, not Drive upload

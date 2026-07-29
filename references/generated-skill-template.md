@@ -30,6 +30,16 @@ description: <what it does> + pushy trigger contexts specific to this project
 <Project-discovered connector quirks, phrased defensively: if a tool isn't
 connected, ask the owner to reconnect rather than proceeding from memory.>
 
+## Dependencies
+- `task-orchestrator` — standing dependency for bundled or repeated work (see
+  `canon-first-workflow.md`'s task-orchestrator integration section). Route any
+  DRAFT step that repeats a subtask across many items (per-row tracker
+  updates, per-card content passes, per-module verification checks) through it
+  rather than looping serially in one context. If not installed, note the gap
+  here rather than silently omitting it.
+- <any other standing dependencies this skill has — installed public skills it
+  orchestrates rather than duplicates, e.g. pdf, xlsx, frontend-design.>
+
 ## Canon-first workflow
 <Verbatim from canon-first-workflow.md: search canon before generating anything;
 the six-step sequence (search, summarise, identify missing, plan, tasks,

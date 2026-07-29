@@ -54,7 +54,11 @@ prompt — ships with all five:
    follows the six-step canon-first sequence in `canon-first-workflow.md` —
    search, summarise, identify missing, plan, tasks, produce-after-approval —
    and checks task-orchestrator plus the project's own installed skills before
-   writing anything new.
+   writing anything new. Declares task-orchestrator explicitly in a
+   Dependencies block (`generated-skill-template.md`) rather than relying on
+   this checklist item alone — a skill whose DRAFT step repeats a subtask
+   across many items and doesn't name task-orchestrator as a dependency fails
+   this checklist point.
 3. **Work loop & MCP use** section (§1 and §2 above).
 4. **Dashboard integration**: its outputs raise decision cards or suggested
    activities carrying the EXPLAIN/PROCEED/IMPROVE trio, and it registers itself

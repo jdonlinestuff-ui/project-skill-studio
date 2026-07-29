@@ -131,6 +131,7 @@ project-skill-studio/
 ## Requires
 
 - Anthropic's `skill-creator` skill (for authoring/packaging test cases and `.skill` files) — install it alongside this one.
+- Anthropic's `task-orchestrator` skill (dispatches bundled or repeated work — see [`references/canon-first-workflow.md`](references/canon-first-workflow.md)) — install it alongside this one; every generated skill names it as a standing dependency.
 
 ## License
 
