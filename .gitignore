@@ -2,3 +2,5 @@
 *.skill
 __pycache__/
 *.pyc
+.privacy-guard/denylist.local.json
+.privacy-guard/findings.json

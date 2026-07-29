@@ -1,0 +1,32 @@
+name: privacy-guard
+
+# Server-side backstop. Local hooks are fast feedback but are bypassed by GitHub web
+# edits, other machines, and --no-verify. This check is the one that must stay green
+# before anything is trusted as safe-to-be-public.
+#
+# The confidential denylist is NOT stored in this repo (that would publish the list of
+# confidential terms). To give CI full PII/vocabulary coverage, add a repo secret named
+# PRIVACY_DENYLIST containing the base64 of your denylist.local.json:
+#     base64 -w0 .privacy-guard/denylist.local.json   # copy into the secret
+# Without the secret, CI still scans with the generic rules (secrets, emails, Drive IDs,
+# local paths) — the catastrophic classes — and local hooks cover the vocabulary.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Restore confidential denylist (if configured)
+        env:
+          DENY: ${{ secrets.PRIVACY_DENYLIST }}
+        run: if [ -n "$DENY" ]; then echo "$DENY" | base64 -d > .privacy-guard/denylist.local.json; fi
+      - name: Scan for personal / confidential / secret data
+        run: node .privacy-guard/scan.mjs scan --all --config .privacy-guard/patterns.json

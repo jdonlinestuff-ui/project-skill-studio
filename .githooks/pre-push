@@ -1,0 +1,24 @@
+#!/bin/sh
+# privacy-guard pre-push — the last local gate before data leaves the machine.
+# Scans the commits actually being pushed. Bypassable with --no-verify; CI is the backstop.
+root="$(git rev-parse --show-toplevel)"
+scan="$root/.privacy-guard/scan.mjs"
+cfg="$root/.privacy-guard/patterns.json"
+[ -f "$scan" ] || exit 0
+z=0000000000000000000000000000000000000000
+status=0
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$z" ] && continue                      # branch deletion
+  if [ "$remote_sha" = "$z" ]; then
+    node "$scan" scan --all --config "$cfg" || status=1     # new branch: scan whole tree
+  else
+    node "$scan" scan --range "$remote_sha..$local_sha" --config "$cfg" || status=1
+  fi
+done
+if [ "$status" -ne 0 ]; then
+  echo ""
+  echo "privacy-guard: push blocked — findings above would become public. Scrub or allowlist, then re-push."
+  echo "  override this one push only: git push --no-verify"
+  exit 1
+fi
+exit 0

@@ -1,0 +1,22 @@
+{
+  "_readme": "PUBLIC-SAFE config — safe to commit. Contains only generic regex detectors and an allowlist; NO sensitive vocabulary. The confidential denylist (real names, project/programme names) is loaded from a sibling `denylist.local.json` that is GITIGNORED (see denylist.local.example.json). Local hooks read it from disk; CI restores it from a repo secret. This split keeps the list of confidential terms out of the public repo.",
+
+  "rules": [
+    { "id": "email", "category": "PII", "regex": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "replace": "user@example.com",
+      "allow": ["re:@example\\.(com|org|net)$", "re:noreply", "re:users\\.noreply\\.github\\.com"] },
+    { "id": "private-key", "category": "secret", "regex": "-----BEGIN [A-Z ]*PRIVATE KEY-----", "replace": "[REDACTED-PRIVATE-KEY]" },
+    { "id": "api-token", "category": "secret", "regex": "(?:gh[opsru]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|sk-(?:proj-|live-)?[A-Za-z0-9]{20,})", "replace": "[REDACTED-TOKEN]" },
+    { "id": "gdrive-id-param", "category": "confidential", "regex": "id=[A-Za-z0-9_\\-]{25,}", "replace": "id=<FILE_ID>" },
+    { "id": "gdrive-id-path", "category": "confidential", "regex": "/d/[A-Za-z0-9_\\-]{25,}", "replace": "/d/<FILE_ID>" },
+    { "id": "local-path", "category": "local-path", "regex": "(?:[A-Za-z]:\\\\Users\\\\[^\\s\"'<>|]+|/(?:Users|home|mnt|sessions)/[^\\s\"'<>|]+)", "replace": "<PATH>",
+      "allow": ["re:/mnt/user-data", "re:/home/user\\b"] }
+  ],
+
+  "denylist": [],
+
+  "allowlist": [
+    "<FILE_ID>",
+    "example.com",
+    "user@example.com"
+  ]
+}

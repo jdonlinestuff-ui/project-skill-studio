@@ -1,0 +1,16 @@
+#!/bin/sh
+# privacy-guard pre-commit — fast local warning before data enters history.
+# Bypassable with `git commit --no-verify`; the CI workflow is the real backstop.
+root="$(git rev-parse --show-toplevel)"
+scan="$root/.privacy-guard/scan.mjs"
+cfg="$root/.privacy-guard/patterns.json"
+[ -f "$scan" ] || exit 0   # guard not installed here
+if ! node "$scan" scan --staged --config "$cfg"; then
+  echo ""
+  echo "privacy-guard: commit blocked — personal/confidential/secret data in staged changes (above)."
+  echo "  • fix it, or"
+  echo "  • allowlist a legit match in .privacy-guard/patterns.json, or"
+  echo "  • run the pre-publish-privacy-guard scrub workflow, then re-stage."
+  echo "  • override this one commit only: git commit --no-verify"
+  exit 1
+fi
