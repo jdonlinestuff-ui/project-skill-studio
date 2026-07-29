@@ -2,6 +2,34 @@
 
 All notable changes to this skill are documented here.
 
+## [1.14.0] - 2026-07-29
+
+Made task-orchestrator a standard inclusion for Phase 4 (the dashboard-set
+generation phase), not just a general standing dependency -- per the owner's
+explicit instruction, tied to the CREATE PROMPT protocol specifically.
+
+**Added**
+- `SKILL.md` Phase 4: new paragraph stating that building/refreshing the
+  dashboard set (three core surfaces, or more once a studio outgrows one line
+  per tracker -- this project runs eight) is independent, same-shell,
+  different-DATA work per dashboard, and routes through task-orchestrator by
+  default rather than a serial per-dashboard loop. Any CREATE PROMPT sync that
+  lands work against more than one dashboard/tracker in the same pass, and any
+  full-suite rebuild, is in scope -- subject to the shared-write rule added to
+  task-orchestrator's own Step 2 (v1.13.0 of that skill): parallel reads of one
+  source tracker are fine, but writes back to the same tracker from two
+  dashboard rebuilds must be sequenced or merged, never dispatched independently.
+- `references/DASHBOARD_SPEC.md` §5 (Controls and the prompt protocol): new
+  paragraph cross-referencing the same rule -- a pasted sync prompt that fans out
+  across multiple dashboards/trackers routes through task-orchestrator; a prompt
+  scoped to one dashboard's own rows executes directly as before.
+
+**Fixed (found while editing Phase 4)**
+- `SKILL.md` Phase 4's own non-negotiables recap still said "Four schemes" and
+  cited `DASHBOARD_SPEC.md (v3.4)" -- both stale since v1.13.0 added the Navy
+  scheme and bumped the spec to v3.5. Corrected to five schemes (Navy default)
+  and v3.5.
+
 ## [1.13.0] - 2026-07-29
 
 Added a fifth colour scheme, Navy, and made it the new default scheme across

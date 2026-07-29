@@ -97,6 +97,18 @@ A studio run emits **three dashboards, not one** — three audiences reading the
 trackers. `references/dashboard-set.md` is the authority on what each contains and how
 the two pooled surfaces filter and scope; build in this order:
 
+**task-orchestrator is a standard inclusion for this phase, not an optional speed-up.**
+Building or refreshing the dashboard set — three core surfaces, or more once a studio has
+grown past one line per tracker (this project runs eight) — is independent, same-shell,
+different-DATA work per dashboard: exactly the shape task-orchestrator exists to route. Any
+CREATE PROMPT sync (§5 of `DASHBOARD_SPEC.md`) that lands work against more than one
+dashboard/tracker in the same pass, and any full-suite rebuild, dispatches through
+task-orchestrator rather than looping the builds serially — subject to Step 2's
+shared-write rule: two dashboards reading the same source tracker in parallel is fine, but
+if a sync prompt's row choices resolve into a write back to that same tracker, sequence
+those writes or merge them before dispatching the rebuilds, never let two parallel
+subtasks write the same tracker JSON independently.
+
 1. **Skill builder** (skills-creation) — the full tracker shell, rows are the studio's
    own skills: roster, class, install state, staleness verdict. Existing behaviour.
 2. **Facilitator** — the live-operation briefing: operating sequence, the rules people
@@ -126,7 +138,7 @@ before any write, but newly available. Ask per surface (a project may want Resou
 shared and Facilitator local), record the answer as a logged decision, and treat "no"
 as a complete answer. Full wording and rationale in `dashboard-set.md`.
 
-Build the shell to **`references/DASHBOARD_SPEC.md` (v3.4)** — that file is the authority.
+Build the shell to **`references/DASHBOARD_SPEC.md` (v3.5)** — that file is the authority.
 Copy `references/dashboard-reference.html`, point `TRACKER_SOURCE` at the line's
 JSON, replace the `EMBEDDED` seed. Copying the reference is faster and far more
 accurate than building from the spec text.
@@ -156,8 +168,8 @@ The non-negotiables — these are what drift:
   per row; tapping again clears. IMPROVE opens a full-width field.
 - **Five bar flags**: CREATE PROMPT (the single sync action), RESET, REFRESH
   BUILD, CANON SYNC, ↻ REFRESH DATA. Never a separate Save/Export.
-- **Four schemes** as swatch buttons, never a `<select>`; selection in state, not
-  the DOM. Radii 4/3/2/50%, never 8px.
+- **Five schemes** (Navy default as of v1.13.0) as swatch buttons, never a
+  `<select>`; selection in state, not the DOM. Radii 4/3/2/50%, never 8px.
 - **Freshness is visible**: stamp states both fetch time and `meta.generatedAt`
   with revision; `generatedAt` over 7 days adds a `~ STALE` chip, over 30 days
   escalates to the banner.

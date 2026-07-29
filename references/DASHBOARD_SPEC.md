@@ -545,6 +545,14 @@ looking at, so a write can be refused or re-based if the source moved on.
 The dashboard never mutates canon — the pasted prompt is the only channel back to Claude,
 and the how-this-works panel says so on every dashboard.
 
+**Multi-dashboard prompts route through task-orchestrator.** A pasted sync prompt that
+resolves into work against more than one dashboard or tracker in the same pass — a
+full-suite REFRESH BUILD, a CANON SYNC that cascades stale flags across several trackers,
+or any studio-wide regeneration — is standard-inclusion territory for task-orchestrator
+(`project-skill-studio` SKILL.md Phase 4), not a serial loop over each dashboard. A prompt
+scoped to one dashboard's own rows executes directly as before; orchestration is for when
+the paste fans out.
+
 **Write path.** Claude edits `DESIGN_TRACKER.json` (bump `meta.revision`, set
 `meta.generatedAt`, append a `log` entry), uploads it to the canon folder, and tells the
 user what changed. The HTML is only re-issued when the SHELL changes — a data change needs
