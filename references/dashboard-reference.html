@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CRA Digital Dev Tracker</title>
+<title>Web App Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -203,10 +203,10 @@ button,textarea,select,input{font-family:inherit}
 
   <div class="head">
     <div style="display:flex;flex-direction:column;gap:6px">
-      <div class="eyebrow">CYBER RISK ASSESSMENT · ONLINE DEV</div>
-      <div class="title">Digital Dev Tracker</div>
+      <div class="eyebrow">ACME NOTES · WEB APP</div>
+      <div class="title">Web App Tracker</div>
     </div>
-    <div class="headmeta">Teams app source v0.6<br>baselined 2026-07-25 · maintained by Claude</div>
+    <div class="headmeta">source v2.3<br>baselined 2026-07-25 · maintained by Claude</div>
   </div>
 
   <div class="purpose" id="purpose" hidden>
@@ -269,7 +269,7 @@ button,textarea,select,input{font-family:inherit}
   <div id="queues"></div>
 
   <section id="sec-issues">
-  <div class="sechead"><h2>Open Issues</h2><div class="rule"></div><div class="secmeta">TOUCHING THE DIGITAL LINE</div></div>
+  <div class="sechead"><h2>Open Issues</h2><div class="rule"></div><div class="secmeta">OPEN ON THIS LINE</div></div>
   <div class="panel" id="issues"></div>
   </section>
 
@@ -319,85 +319,7 @@ const DASHBOARD_SOURCE=TRACKER_SOURCE;   /* alias: SKILL.md uses this name */
 /* ============ EMBEDDED — last known-good snapshot, fallback only ============
    This is NOT the source of truth. Live data replaces it wholesale at run time.
    A skill replaces this block only to seed a first build.                       */
-const EMBEDDED={
-meta:{line:'example-line',title:'Digital Dev Tracker',sourceLabel:'05_TEAMS_APP_v0.6_SOURCE',
- eyebrow:'CYBER RISK ASSESSMENT · ONLINE DEV',
- checkNames:['Typecheck','Unit','Golden files','Multi-client','Code security','Privacy'],
- currency:'AUD',revision:0,generatedAt:'2026-07-25T00:00:00+10:00',
- trackerFunction:'Tracks every module on the digital delivery line: build state, six per-module checks, and the evidence each mark was derived from.',
- trackerPurpose:'So no status can be read without the evidence behind it, and a mark derived from an older build says so instead of reading green.',
- trackerOutcome:'Every module INTEGRATED with all six checks passing against the version currently shipping.'},
-modules:[
- ['deck-loader','card_data v6','INTEGRATED',['pass','pass','na','na','pending','na'],'deck.json (65 cards, 10/10/30/15) byte-verified vs canonical card_data.py; generate_deck.py assertions pass.'],
- ['deal','card_data v6','INTEGRATED',['pass','pass','na','pending','pending','pending'],'8-player deal resolves real card names in smoke test. Live multi-client deal never run (I6).'],
- ['roles-insider','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'Targeted signals, decoy padding, FORBIDDEN_KEYS tripwire built (v0.6). Privacy invariant cannot pass on code review alone (I6).'],
- ['sabotage','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'Window auto-close on timeout and facilitator arbitration built. Live multi-client rehearsal outstanding (I6).'],
- ['scoring','card_data v6 · scoring_matrix v3.0','BUILDING',['pass','pass','fail','na','pending','na'],'scoring.ts + stateMachine.ts built; smoke_game.mjs 8 checks + 26 assertions pass. Golden-file tests vs Scoring_Matrix v3.0 tier benchmarks NOT run — P3’s one open gap (S8).'],
- ['timers','(none)','PROTOTYPE',['na','na','na','na','pending','na'],'Sabotage countdown lives inside the sabotage module. General round-pacing timers (US4.3) not evidenced in v0.4–v0.6 changelogs — do not assume built.'],
- ['tables','card_data v6','TESTED',['pass','pass','na','pending','pending','pending'],'2-table split verified with independent scores (v0.4). Single simulated session only, not a real Teams/Fluid meeting (I6).'],
- ['voting','card_data v6','BUILDING',['pass','pending','na','pending','pending','pending'],'Secret-ballot signal pattern in use (P5) but response-capture completeness vs Workshop Manual v1.2 unconfirmed — hold at building.'],
- ['reveal','card_data v6','PROTOTYPE',['na','na','na','na','pending','pending'],'No dedicated reveal-ceremony evidence (score → sabotage log → Insider → outcome, US3.3.1). Possibly covered by P6 console work; flagged, not assumed.'],
- ['debrief','card_data v6 · scoring_matrix v3.0','PROTOTYPE',['na','na','na','na','pending','na'],'Not started. P7 debrief gap-analysis queued — no implementation in v0.4–v0.6 source.'],
- ['export','scoring_matrix v3.0','PROTOTYPE',['na','na','na','na','pending','na'],'Not started. P7 branded PDF/XLSX export queued — no implementation found.']
-],
-proofs:[['AP1','Digital card assets v1','PROPOSED','WebP thumb/full + deck_manifest.json · designer skill cra-card-design. Blocked upstream by I5 (asset pack corrupted at source) and I4 (v6 print zip re-upload). App still renders text-only branded cards.']],
-gates:[['PG1','teams-tab','PENDING','P8 manifest hardening / WCAG audit / 10-client load test not evidenced; no cra-platform-compliance run logged against this build.']],
-decisions:[
- ['D10','Accept SOC 2 Light Pack v0.1-draft','OPEN','6 cards + crosswalk + insert + overlay delivered; accent glyph call pending.'],
- ['D11','Confirm risk-maturity scoring recommendation','OPEN','Separate-score basis drafted 2026-07-25 (S3); confirm to lock.'],
- ['D12','Board supplement v1.0 — register?','OPEN','PDF rendered at v6 geometry; accept to lock v1.0 in the manual registry.'],
- ['D13','Register digital-only mechanics (E1/E2/E3)?','OPEN','Difficulty multiplier, budget economy, GM custom crisis — none exist in physical canon. Register / park behind config flag / revert.']
-],
-issues:[
- ['I5','High',{issue:'The Web Card Assets v1 pack is corrupted at source — the archive will not extract cleanly.',problem:'AP1 cannot be proofed, so the app keeps rendering text-only cards and every asset-dependent mark stays pending.',needed:'Dan to re-export the pack from the design source and re-upload it to canon.'}],
- ['I6','Med',{issue:'No live multi-client Teams/Fluid session has ever been run — only single-client and simulated multi-tab testing.',problem:'Every privacy and multi-client mark sits pending because a code review cannot evidence a runtime invariant across clients.',needed:'Run one logged multi-client rehearsal before any client session is booked.'}],
- ['I4','Med','print_ready_deck_v6.zip needs re-upload before WebP conversion.'],
- ['I3','Med','GOLD on CREAM likely fails WCAG contrast — part of P8 hardening.'],
- ['I7','Low','SESSION_STATE.md at canon root stale vs this tracker (last modified 2026-07-06).']
-],
-risks:[
- ['R1','High','Live workshop run before any multi-client rehearsal','A paid session would be the first real Fluid test; a sync or privacy failure is client-visible.','No client booking until the I6 rehearsal passes.'],
- ['R2','High','Insider signals leak through a Teams client','FORBIDDEN_KEYS tripwire is code-reviewed only; no runtime proof across clients.','Privacy invariant marked pass only after a logged multi-client session.'],
- ['R3','Med','Digital-only mechanics drift from physical canon','E1/E2/E3 exist in the app with no canon decision (D13).','Config flag, default off, until D13 is called.'],
- ['R4','Med','Card asset pipeline blocks the app build','Source pack corrupted (I5) and v6 print zip outstanding (I4).','App ships text-rendered cards; asset swap kept to a manifest change.'],
- ['R5','Med','Teams / store validation rejects the tab app','P8 hardening, WCAG (I3) and load test unevidenced.','Run cra-platform-compliance before any submission date is promised.'],
- ['R6','Low','Tracker drifts from canon state','SESSION_STATE.md already stale vs this tracker (I7).','↻ REFRESH DATA before every session; log every change.']
-],
-budget:[
- ['B1','Print proofs — cards, manuals, box',900,620,'Two v6 proof rounds ordered; third expected after the publisher template pass.'],
- ['B2','Publisher setup & template conversion',400,0,'Not committed until a publisher is chosen (cra-game-publishing).'],
- ['B3','Teams app tooling & Azure sandbox',1200,180,'Sandbox only. Real hosting spend deferred by the local-first rule.'],
- ['B4','Claude usage — build, content, QA',800,465,'Tracks against the cost/token discipline in cra-game-design.'],
- ['B5','Playtest sessions — print, venue, catering',600,240,'Two sessions run; multi-client rehearsal (I6) not yet costed.'],
- ['B6','Fonts, stock and asset licensing',300,300,'Closed — v6 brand set licensed.']
-],
-milestones:[
- ['M1','2026-06-30','v6 canon locked','done','Card data, manuals and brand system frozen at v6; all downstream work builds against it.'],
- ['M2','2026-07-25','Teams app v0.6 baseline','done','Source re-baselined and every module status re-derived from the v0.4–v0.6 changelogs.'],
- ['M3','2026-08-08','Scoring golden files vs matrix v3.0','next','P3’s one open gap (S8). Nothing downstream can be called verified until this passes.'],
- ['M4','2026-08-22','Live multi-client rehearsal','pending','Clears I6 and unlocks every privacy / multi-client mark sitting pending.'],
- ['M5','2026-09-05','Digital card assets v1 integrated','blocked','Held by I5 (corrupted source pack) and I4 (v6 print zip re-upload).'],
- ['M6','2026-09-19','P8 hardening + compliance gate','pending','Manifest, WCAG (I3) and 10-client load test, then a live cra-platform-compliance run.'],
- ['M7','2026-10-10','First paid workshop delivered','pending','Gated on M4. No client date is promised before the rehearsal passes.'],
- ['M8','2026-11-07','Publisher proof approved','pending','Physical line: proof reviewed against canon before any production run.']
-],
-nextActions:[
- ['1','Decide D10 / D11 / D12 / D13','Dan'],
- ['2','Re-export Web Card Assets v1 — source files corrupted (I5)','Dan'],
- ['3','Re-upload print_ready_deck_v6.zip (I4)','Dan'],
- ['4','P3: scoring golden files vs Scoring_Matrix v3.0 tier benchmarks (S8)','Claude'],
- ['5','Live multi-client rehearsal before any real workshop (I6)','Dan + Claude']
-],
-feedback:[
- ['F1','','Could the sabotage countdown also show on the facilitator\u2019s phone, not just the shared screen?','sabotage','pending','','Med',''  ,'Raised in the 2026-07-24 walkthrough, unattributed note'],
- ['F2','Priya','Worth a difficulty toggle for exec-only sessions \u2014 fewer, simpler Events','','pass','Priya','Low','Sprint 14','Interested; self-assigned, sized ~M, pulled into Sprint 14'],
- ['F3','','Consider a printed one-pager for participants who don\u2019t want the Teams tab open','P6','fail','','','','Table discussed, facilitator recorded as not a priority for now']
-],
-log:[
- ['2026-07-25 · rebuild from spec v2.0','Dashboard regenerated from TRACKER_SHELL_SPEC v2.0 — literal component recipes for chips, action circles, scheme switcher and row grids. No status advanced.'],
- ['2026-07-25 · re-baseline','Teams app v0.2 → v0.6; phase status re-derived from v0.4/v0.5/v0.6 changelogs; digital-only mechanics registered as E1–E3 pending D13; issues I5–I7 added.'],
- ['2026-07-25 · tracker first run','Digital section added to DESIGN_TRACKER.json. No status advanced beyond evidence.']
-]};
+const EMBEDDED={"meta":{"line":"web-app","title":"Web App Tracker","sourceLabel":"acme-notes/WEB_APP_TRACKER.json","eyebrow":"ACME NOTES · WEB APP","checkNames":["Typecheck","Unit","Integration","End-to-end","Security","Accessibility"],"checkAbbr":["TYP","UNIT","INT","E2E","SEC","A11Y"],"currency":"USD","revision":12,"generatedAt":"2026-07-29T09:00:00+10:00","trackerFunction":"Tracks every module on the web-app line: build state, six per-module checks, and the evidence each mark was derived from.","trackerPurpose":"So no status can be read without the evidence behind it, and a mark derived from an older build says so instead of reading green.","trackerOutcome":"Every module INTEGRATED with all six checks passing against the version currently shipping."},"modules":[["auth","app v2.3","INTEGRATED",["pass","pass","pass","pass","pass","na"],"Email + OAuth sign-in; 41 unit + 12 integration tests green, e2e login flow passing in CI."],["editor","app v2.3","INTEGRATED",["pass","pass","pass","pending","na","pass"],"Rich-text editor with autosave; a11y audit clean. E2E across browsers not yet run."],["sync","app v2.3","TESTED",["pass","pass","pending","pending","pending","na"],"Offline queue + conflict merge built; single-client verified. Multi-device sync never run live (I2)."],["search","app v2.3","BUILDING",["pass","pass","fail","na","pending","na"],"Full-text index built; integration test against large corpus failing on ranking (I3)."],["export","app v2.3","PROTOTYPE",["na","na","na","na","pending","na"],"PDF / Markdown export scaffolded only; no implementation evidenced this release."],["settings","app v2.3","TESTED",["pass","pass","pass","pending","na","pass"],"Preferences + theme switch; a11y and unit green. E2E pending the editor pass."]],"decisions":[["D4","Adopt the new sync conflict-resolution model?","OPEN","Last-writer-wins vs field-merge drafted; confirm before the multi-device rehearsal."],["D5","Ship export in this release or defer?","OPEN","Prototype only; deferring keeps the release date but drops a roadmap item."]],"issues":[["I2","High",{"issue":"Multi-device sync has never been exercised with two real clients at once — only single-client and simulated tests.","problem":"Every sync and conflict-merge mark stays pending because a runtime invariant can't be evidenced from one client.","needed":"Run one logged two-device sync rehearsal before sync is called verified."}],["I3","Med",{"issue":"Search integration test fails on result ranking against the large corpus.","problem":"Search can't move past BUILDING, and the release notes can't claim relevance quality.","needed":"Fix the ranking weights and re-run the integration suite."}],["I4","Low","SESSION_STATE.md at canon root is stale versus this tracker (last touched two weeks ago)."]],"risks":[["R1","High","Release ships before a two-device sync rehearsal","Sync marks are code-reviewed only; a real conflict-loss would be user-visible.","No release cut until the I2 rehearsal passes."],["R2","Med","Search ranking regresses on real data","Integration test failing on the large corpus (I3).","Hold search at BUILDING until the suite is green."],["R3","Low","Tracker drifts from canon state","SESSION_STATE.md already stale versus this tracker (I4).","Refresh data before each session; log every change."]],"budget":[["B1","Hosting & infrastructure",1200,480,"Staging + preview environments; production spend deferred until release."],["B2","Third-party APIs (search, email)",600,210,"Search index tier + transactional email; usage-based."],["B3","Design & accessibility audit",800,800,"Closed — external a11y audit completed this cycle."],["B4","QA & test tooling",400,145,"CI minutes and cross-browser test grid."]],"milestones":[["M1","2026-06-15","v2 canon locked","done","Data model, design system and API contract frozen at v2; downstream work builds against it."],["M2","2026-07-25","Web app v2.3 baseline","done","Every module status re-derived from the v2.1–v2.3 change history."],["M3","2026-08-08","Search ranking suite green","next","Clears I3 — nothing downstream is called verified until this passes."],["M4","2026-08-22","Two-device sync rehearsal","pending","Clears I2 and unlocks every sync mark sitting pending."],["M5","2026-09-05","Export module integrated","blocked","Held behind D5 (ship-or-defer decision)."],["M6","2026-09-19","Public v2.3 release","pending","Gated on M4. No release date promised before the sync rehearsal passes."]],"nextActions":[["1","Decide D4 / D5","Alex"],["2","Fix search ranking weights and re-run integration suite (I3)","Claude"],["3","Schedule the two-device sync rehearsal (I2)","Alex + Claude"],["4","Refresh SESSION_STATE.md against this tracker (I4)","Claude"]],"feedback":[["F1","","Could sync status also surface in the mobile app, not just the web app?","sync","pending","","Med","","Raised in the last review, unattributed note"],["F2","Sam","A dark-mode toggle for the editor would help late-night writing","","pass","Sam","Low","Sprint 8","Interested; self-assigned, sized ~S, pulled into Sprint 8"]],"log":[["2026-07-29 · rebuild from the shell spec","Dashboard regenerated from the shell spec — literal component recipes for chips, action circles, scheme switcher and row grids. No status advanced."],["2026-07-25 · re-baseline","Web app v2.1 → v2.3; module status re-derived from the v2.1–v2.3 change history."],["2026-07-20 · tracker first run","Web-app section added to the project tracker. No status advanced beyond evidence."]]};
 
 /* ============ shell — do not edit per skill ============ */
 /* live payload: EMBEDDED until a fetch succeeds (spec 3.2) */
@@ -468,7 +390,7 @@ function renderNewFeedback(){
   const nf=state.newFeedback, ready=nf.text.trim()&&nf.source.trim()&&nf.measuredBy;
   return `<div class="newfeedback">
     <div class="fld"><div class="flbl">WHAT TO TRACK</div><input value="${esc(nf.text)}" oninput="setNewFeedback('text',this.value)" placeholder="the suggestion, question or thing to watch"></div>
-    <div class="fld"><div class="flbl">SOURCE — WHERE THIS COMES FROM</div><input value="${esc(nf.source)}" oninput="setNewFeedback('source',this.value)" placeholder="e.g. sprint retro, Dan in chat, commit log"></div>
+    <div class="fld"><div class="flbl">SOURCE — WHERE THIS COMES FROM</div><input value="${esc(nf.source)}" oninput="setNewFeedback('source',this.value)" placeholder="e.g. sprint retro, a teammate in chat, commit log"></div>
     <div class="fld"><div class="flbl">MEASURED BY</div><select onchange="setNewFeedback('measuredBy',this.value)">
       <option value="">choose one…</option>
       ${MEASURED_BY.map(o=>`<option value="${o}" ${nf.measuredBy===o?'selected':''}>${o}</option>`).join('')}
@@ -563,7 +485,7 @@ function render(){
   document.getElementById('queues').innerHTML=[
     ['Asset Proof Queue',DATA.proofs.length+' OPEN','proofs',DATA.proofs,false],
     ['Platform Gate Status',DATA.gates.length+' PENDING','gates',DATA.gates,false],
-    ['Decisions Pending (Dan)',DATA.decisions.length+' TO CALL','decisions',DATA.decisions,true]
+    ['Decisions Pending',DATA.decisions.length+' TO CALL','decisions',DATA.decisions,true]
   ].filter(([,,sec])=>!state.absent[sec]).map(([t,c,sec,rows,hide])=>`
    <div class="sechead"><h2>${t}</h2><div class="rule"></div><div class="secmeta">${c}</div></div>
    <div class="panel">${rows.length?rows.map(([ref,name,badge,tr])=>`
