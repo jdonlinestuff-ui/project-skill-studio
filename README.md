@@ -4,6 +4,14 @@ A meta-skill for Claude that turns any project into a **skill studio**: a versio
 
 Generalised from a real production pattern (a card-game design studio that grew to 20+ skills across three classes). The pattern, not any one project, is what's encoded here.
 
+> **Status — v2.0.0 Full release (final Skills-form).** This repo is frozen as the reference
+> implementation of the studio as an Agent Skill. Active development has moved to a separate
+> private repository where the studio is repackaged as a **Claude Code plugin** (bundling the
+> tracker/dashboard shell and the pre-publish privacy guard as sibling skills; `task-orchestrator`
+> and `skill-creator` stay recommended, version-checked dependencies) and where new features —
+> a tabbed Facilitator hub and real-time tracking — are built.
+> This repo stays usable and is not deprecated; it simply isn't the active line anymore.
+
 ## What it does
 
 Point it at a project and it will:

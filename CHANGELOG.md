@@ -2,6 +2,19 @@
 
 All notable changes to this skill are documented here.
 
+## [2.0.0] - 2026-07-31 — Full release (final Skills-form)
+
+Milestone lock. This release freezes `project-skill-studio` in its **Skills form** — a single
+Agent Skill (`SKILL.md` + `references/`) packaged as a `.skill` file. It carries no functional
+change over 1.15.0; the version bump marks the point at which this shape is considered complete.
+
+**Further development continues in a separate private repository**, where the studio is
+repackaged as a **Claude Code plugin** — bundling the meta-skill, the tracker/dashboard shell,
+and the pre-publish privacy guard as sibling skills, with `task-orchestrator` and `skill-creator`
+kept as recommended, version-checked dependencies rather than vendored in — and where the first
+new feature (a tabbed Facilitator hub) and the real-time tracking architecture are being built. This public repo remains the reference for the Skills-form and is not deprecated,
+but is no longer the line of active development.
+
 ## [1.15.0] - 2026-07-29
 
 Dashboard shell v3.5 → v3.6, a 15-item batch the owner compiled from a live review of the
