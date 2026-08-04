@@ -1,9 +1,9 @@
-# Status Dashboard Shell — reusable dashboard spec v3.5
+# Status Dashboard Shell — reusable dashboard spec v3.12
 
 Project-agnostic. This is the visual and data contract for every dashboard built with the
 `status-dashboard` skill. Sections 6–10 are literal and apply verbatim to any project.
 Where the text says "canon", read "the project's source-of-truth folder"; where it names a
-`cra-*` skill, read "the skill that owns that delivery line". Section 8 is an EXAMPLE
+`proj-*` skill, read "the skill that owns that delivery line". Section 8 is an EXAMPLE
 roster from the project this shell was designed on — replace it with the host project's own lines, keeping the pattern (one JSON source per line, six check columns, six sizes).
 
 Reference implementation: `online-dev-tracker-dashboard_v8.html` (live-fetch build) and
@@ -32,6 +32,18 @@ The record, stated once so no section has to guess:
 | v3.4 | §3.7 the ISSUE·PROBLEM·NEEDED row triple and the header Function/Purpose/Objective block, both now standard; §13 reversed — Facilitator and Resources carry the action trio, CREATE PROMPT and the scheme switcher after all, plus a click-to-scope index and dropdown/search filtering unique to a pooled surface |
 | v3.5 | Navy added as a fifth colour scheme and promoted to the default (RESET/first-load) in place of Canon v6, which remains available as a named scheme; four schemes → five everywhere §6/§10.5/§11 reference a count |
 | v3.6 | Owner batch (2026-07-29): the ISSUE·PROBLEM·NEEDED triple's third line renders as **ASK**, `needed` stays the JSON field name; a `[PARTIAL]` resolution chip crosses with severity (§2); a grey `[UNDEF]` mark covers any row missing its severity/status/rating (§2); the CREATE PROMPT legend/disclaimer block is banned from emitted prompt text (§5); Module Grid gets a filter-by-state control (§10.8); empty sections gain a `meta.retiredSections` opt-out (§3.4); Next Actions gain an optional `priority` chip and a `hold`/`done` pair that prunes completed rows (§4 Next Actions); Feedback & Suggestions gains a guided "track something new" add-row flow (§4e); file citations require the full Drive URL, never a bare id (§3.5); Module Grid columns with no data for this instance carry a `meta.checksNote` explaining what would populate them (§3.3); severity/rating/priority chips may render glyph-only under an explicit `meta.compactChips` opt-in, off by default — the core five status marks keep glyph+word+tint always, no exception (§2) |
+
+| v3.7 | Owner batch (2026-08-03): **the queue is a second channel back to Claude** — where a project runs the Mode D replica (§3.2D), a dashboard may POST a request to the Worker's `/api/queue`, and §5's "the pasted prompt is the only channel" is relaxed to "the only channel that reaches canon". The queue holds *requests*, never canon rows; the §5 write path is still the only thing that edits a tracker, so "the dashboard never mutates canon" is unchanged. A queue-backed dashboard must still offer the paste, because the queue depends on a Worker that a `file://` copy cannot reach. §4e's "track something new" form is promoted from a Feedback-only flow to **the last row of every pane** — same three required fields (what to track · source · measured by), scoped to the pane's tracker or project, and subject to the same §11 rule that its text survives a re-render; §10.7's "always three" gains its one exception — a form row carries a single `+` submit, same geometry, no selected state, because there is no existing row for `!`/`✓` to act on |
+
+| v3.8 | Owner batch (2026-08-03): **the display serif is retired**. Libre Baskerville is replaced by **IBM Plex Mono** for the dashboard title, metric figures and section titles (§7) — two families instead of three, and one fewer webfont request. The font URL must ask for `700`, which it previously did not, or bold titles are synthesised rather than drawn; display sizes take `letter-spacing:-.01em` because mono is wide. **The size scale is unchanged** — 27/26/15 stay as they are, so §11's type audit is untouched |
+
+| v3.9 | Owner batch (2026-08-03): **the nav becomes stacked dividers.** The three-row indented tab tree is replaced by nested surfaces — each level's active tab opens the surface holding the next level's strip, so containment is drawn rather than indented. The folder-tab shape (`border-bottom:none`, top-only radius) was previously applied to rows that sat above other nav rows, where nothing closed them; it is now used only where a surface closes it. Four tokens per scheme are added to §6 (`nav1`, `nav1Line`, `nav2`, `nav2Line`, twenty literal values). Level 3 stops being a tab and becomes an underline strip — lines within one tracker are siblings, not containers. Tab radius goes 4px → 5px (tab corners sit outside their surface). The twist controls and `state.navOpen` are removed: selection reveals the level below, so folding is redundant. Level 1 carries a synthetic `PROJECTS` container tab, which returns to the last project viewed rather than always the first. Geometry, type, tokens and markup are exactly the `Handover - 1c nav tab structure` reference — all nineteen selectors, every declaration. **One addition it does not cover:** levels 2 and 3 now render inside `#panes`, which is not `.noprint`, so the strips and their surfaces are explicitly hidden in `@media print` — without that, printing gained nav chrome it never had. **Known limit:** the strips wrap per §4, and below ~480px a wrapped row's tabs have no surface beneath them, which is the §7 containment rule breaking at phone width; not addressed here. **The type scale is unchanged** — §11's type audit is untouched |
+
+| v3.10 | Owner batch (2026-08-04): **Canon v6 returns as the default scheme**, reversing v3.5's promotion of Navy. Navy remains a named scheme and keeps its leading position in the §10.5 switcher — the switcher order is now explicitly fixed rather than derived from which scheme is default. The `:root` block must mirror the default scheme's literal token set, not merely resemble it: it is the pre-script paint, so a `:root` holding a different scheme's values makes every first load flash. §11's checklist item is inverted accordingly |
+
+| v3.11 | Owner batch (2026-08-04), thirteen changes. **Navy is the default scheme again**, reversing v3.10 one day on; `:root` is regenerated from the `Navy` SCHEMES entry, so the rule that `:root` mirrors the default survives the reversal. **A new `--rule` token per scheme** (five literal values) separates table rows: `--line` is a divider *on* a panel and reads too faint as a row rule. §9 is unchanged — still one 1px line, still no border on individual cells, only the colour moves. **Every section is a `<details>`** (§10.9): populated open, empty and the update log closed, and the count rides on the summary so a shut section still reports — `RISKS 3`, `BUDGET EMPTY`. Section order within a tracker is now populated → module grid → People → **empty** → **update log last**; empty sections above populated ones pushed real work down the page, and history above anything actionable did the same. **An empty section carries a `+`** so the reader can ask for what is missing instead of reading '— none —' with no way to act. **Per-tracker statistics (§10.2b)**: four equal centred blocks — Status, Trackers, Rows, Fail-or-blocked — belonging to the *tracker*, where the strip above previously reported project-wide figures over one line's sections. **IMPROVE is a real dialog (§5b)**, multi-line, reviewable before it is queued; `window.prompt()` gave one line and no way to see what you had typed. Plain text on purpose — the tray payload is plain text all the way to Claude. **`.act` is geometry, not a role**: `wireActions` now binds `.act[data-action]`. Three different controls wear the §10.7 circle, and the bare selector bound the row-action handler to all of them, so the 'anything else to track' + fired twice and queued an item with no ref and no action. **That form now marks into the tray** rather than POSTing straight to `/api/queue` — SEND TO DISPATCHER is again the only thing that transmits. **People (§10.10) is derived from row owners**, not authored: no tracker has ever carried a `person` row, but the rows carry owners, so the section lists each person and their row count, splits compound owners (`Alex + Claude`, `Claude/Code`) into real people, and appears on the overview too. A name is a **filter** — selecting one narrows every tracker and pooled cut to their rows behind a loud banner, because a filtered view that looks unfiltered is how a reader concludes work has vanished. Authored `person` rows still win where they exist. **A Mark column carries a legend** built from the marks actually present (§10.6b): a legend listing marks that are not on the page is worse than none |
+
+| v3.12 | Owner batch (2026-08-04): **the programme hub becomes a specified surface, and an assisted maintenance pass is admitted to canon.** New §14 covers the hub: a fixed tab order (`OVERVIEW · DECISIONS · RISK · PEOPLE · PROJECTS · ORPHANED · DONE`) that does not follow which tab is default — BUDGET was specified and then dropped the same day, with `budget_line` leaving `ALWAYS_SECTIONS` too, because one tracker of nine carries any budget data and a cut that is empty almost everywhere teaches the reader to stop opening it, the same way §10.5 fixes the scheme-switcher order; one pooled table across all trackers carrying `Project | Tracker | Ref | Mark | Details | Owner | actions` in place of the old per-tracker grouping; DECISIONS pooling `decision` + `decision_required`; ORPHANED with its three scan sources; DONE gathering locked, retired and archived; the ADMIN surface; and the refresh scan. **DONE reverses commit `2011e55`** — locked and retired lines were deliberately put on the Overview so they stayed reported; they now report on DONE and appear nowhere on the Overview, and `archivedHTML()` moves with them. **The evidence rules in §2 and §3.5 are relaxed for a maintenance pass**, and this is the change most likely to be regretted, so it is stated here rather than left in a subsection: a pass may now advance a mark from evidence it read in that pass, including to `pass`, which §2 previously forbade on code review alone. The pass runs from a CLI session with the owner present, which is what makes it tolerable. The residual risk is still real — a pass can advance a mark on evidence a human would have judged insufficient, and the `log` entry is the only record of why — so every such mark change must name the evidence it used and which pass wrote it. **§5 gains a third channel**: the queue is now *drained*, by a **Claude Code CLI session** — the owner's decision of 2026-08-04, which replaced an earlier plan for an unattended hourly consumer. The v3.11 sentence "nothing consumes the queue on its own; there is no daemon watching the table" therefore stays true of unattended processes and is kept rather than deleted. What changed is that the consumer may write canon, and that a human is present for every write — the material safety property, and the reason the evidence relaxations above are tolerable at all. The dashboard button reads **SEND TO CLI** |
 
 Things that went wrong the last time this was rebuilt, all now specified below:
 `rem`-based font sizes, glyph-only 14px status squares, square 4px action buttons,
@@ -85,9 +97,20 @@ Rules
   entirely for a row that is simply open or simply resolved — `PARTIAL` only appears when
   a row is genuinely both severity-rated and partially, not fully, closed.
 - Rows open by definition (decisions) carry NO status badge.
-- A mark is normally evidence-derived and read-only in the browser. §4e's feedback mark is
-  the one deliberate exception — facilitator-set, not evidence-derived — and it says so in
-  its own prose rather than quietly breaking the read-only rule everywhere else.
+- A mark is normally evidence-derived and **read-only in the browser**. That half of the rule
+  is unchanged by v3.12: no chip is clickable except §4e's feedback mark, which is
+  facilitator-set rather than evidence-derived and says so in its own prose rather than
+  quietly breaking the read-only rule everywhere else.
+- **A maintenance pass under §14.6 may advance a mark**, including to `pass`,
+  from evidence it read in that pass. This is a v3.12 relaxation of the older rule that a
+  mark is never advanced on code review alone, and it is a deliberate trade the owner made
+  with the conflict named. The pass runs from a **Claude Code CLI session** with the owner
+  present — not an unattended job — which is what makes the relaxation tolerable.
+  **State the residual risk rather than discovering it later:** a pass can still advance a
+  mark on evidence a human would have judged insufficient, and nothing on the page
+  distinguishes such a mark from a considered one afterwards. The `log` entry is the only
+  record. So: every mark a maintenance pass changes **must** write a `log` entry naming the
+  evidence it used. A mark change with no such entry is a defect, not a status.
 - **Severity/rating/priority chips may drop the word under an explicit opt-in, the core
   five status marks never do.** Set `meta.compactChips:true` on a tracker instance and its
   severity, rating and priority chips render glyph-only (`✕` not `✕ HIGH`) — legal ONLY
@@ -138,6 +161,27 @@ metric strip:
 `600 12px/1.45 IBM Plex Mono,monospace` on the `fail` tint, and the header stamp must read
 `SNAPSHOT` rather than a fetch time. Never render snapshot data as if it were live.
 
+**D — Hosted replica (optional, added 2026-08-02).** Where the project mirrors its trackers
+into a database behind a Worker, `TRACKER_SOURCE` may point at
+`<worker>/api/tracker/<tracker-id>`, which returns the payload of §3.3 verbatim. Nothing else
+in the dashboard changes — same parse, same render, same `EMBEDDED` fallback. This exists
+because a local path cannot be read from a phone and `file://` blocks `fetch()` outright, so
+a double-clicked dashboard degrades to its snapshot with no network involved at all.
+
+**The replica is never the source of truth.** The tracker JSON of §3.1 still is. The replica
+re-syncs from the file; the file is never regenerated from the replica, and no write-back
+path exists — §5's CREATE PROMPT protocol remains the only channel back. If the two
+disagree, the file wins.
+
+Mode D does not retire A or C. The fetch can still fail and the banner rules apply unchanged,
+and because a replica read is not a canon read, **the stamp must distinguish them** — show
+the replica's own `synced_at` alongside `meta.generatedAt`, since they answer different
+questions: when the replica last caught up, versus when Claude last wrote the file. A replica
+that is fresh about a file that is stale is the §3.6 trap one layer further out.
+
+Full schema, the `<project>.<line>` id convention, the shape-C record for lines carrying only
+narrative canon, sync options and the mixed-row-form extraction trap: `d1-replica.md`.
+
 ### 3.3 Source payload shape
 
 ```jsonc
@@ -145,7 +189,7 @@ metric strip:
   "meta": {
     "line": "online-dev",
     "title": "Digital Dev Tracker",
-    "eyebrow": "CYBER RISK ASSESSMENT · ONLINE DEV",   // small caps strap above the title
+    "eyebrow": "Example Project · ONLINE DEV",   // small caps strap above the title
     "sourceLabel": "ONLINE_DEV_TRACKER.json",
     "checkNames": ["Typecheck","Unit","Golden files","Multi-client","Code security","Privacy"],
     "checkAbbr":  ["TYP","UNI","GLD","MUL","SEC","PII"], // exactly 6, or the shell abbreviates
@@ -207,7 +251,10 @@ see §3.6.
 
 - `evidenceNote` states the evidence or names the gap with ids (`(I6)`, `(S8)`). No note = no claim.
 - Totals, percentages and metric counts are DERIVED at render, never stored.
-- Statuses change only when evidence changes, and every change adds a `log` entry.
+- Statuses change only when evidence changes, **or when a §14.6 maintenance pass re-derives
+  them**, and every change adds a `log` entry. The re-derived case additionally records which
+  pass wrote it, so a reader can tell a bulk re-derivation from a considered judgement at a
+  glance instead of having to reconstruct it.
 - **A file citation is the full Drive URL, never a bare file id.** Any row or log entry
   that names a specific file for the reader to act on (open, review, delete) writes
   `https://drive.google.com/file/d/<FILE_ID>/view` in full — a bare id like `1WvrbBno85…`
@@ -443,7 +490,7 @@ form rather than a single freeform box — the point being that "track something
 under-specified ask until the reader says what, where the number/status will come from, and
 what "done" or "measured" means for it. Three fields, all required before the row can be
 added: **what to track** (free text — becomes the row's `text`), **source** (free text —
-where this data comes from, e.g. "sprint retro", "Dan in chat", "commit log"), **measured
+where this data comes from, e.g. "sprint retro", "Alex in chat", "commit log"), **measured
 by** — a fixed choice, not free text, one of `milestone` / `budget` / `risk` /
 `brainstorming` / `code review` / `design review`. The completed form does not write a row
 to canon directly (§5's rule holds here too) — it stages a `NEW FEEDBACK` line in the next
@@ -538,7 +585,7 @@ about which register it came from:
 | `I` | Issues (§4, Open Issues) |
 | `D` | Decisions (queues) |
 | `AP` | Asset proofs (queues) |
-| `PG` | Platform / compliance gates (queues) |
+| `PG` | Platform / Compliance Lines (queues) |
 | `S` | Suggested activities (queues) |
 | `Q` | Open questions |
 | `E` | Epics and registered enhancements |
@@ -633,8 +680,41 @@ directions — nothing framing them.
 The revision number matters: it tells Claude which version of the source the user was
 looking at, so a write can be refused or re-based if the source moved on.
 
-The dashboard never mutates canon — the pasted prompt is the only channel back to Claude,
+The dashboard never mutates canon — the pasted prompt is the only channel that reaches canon,
 and the how-this-works panel says so on every dashboard.
+
+**Second channel, v3.7 — the queue (Mode D only).** Where the project runs a hosted replica
+(§3.2D), the dashboard may POST to the Worker's `/api/queue`: the tray's SEND TO CLI,
+and the §4e track-something-new form on every pane. This does not weaken the rule above. A
+queue row is a **request**, sitting in its own table with a `status` of `ready` → `in_review`
+→ `needs_review`; canon changes only when someone works that request through the §5 write
+path. Two constraints follow, both load-bearing:
+
+- **The paste never goes away.** The queue needs a Worker, and a `file://` copy cannot reach
+  one. COPY TRAY TEXT is the fallback whenever the POST fails, and the failure message must
+  say so rather than leaving the user stranded.
+- **The queue is drained by a CLI session, not by a daemon (v3.12).** The owner's decision of
+  2026-08-04 sends everything the dashboard queues to a **Claude Code CLI session** rather than
+  to an unattended scheduled job. So the v3.11 sentence — "nothing consumes the queue on its
+  own; there is no daemon watching the table" — remains **true of unattended processes**, and
+  is restated here rather than deleted, because an earlier draft of v3.12 removed it and that
+  draft was wrong.
+- **What did change is that the consumer may now write canon.** A CLI session draining the
+  queue edits **the tracker JSON on Drive** — the §5 write path — and re-runs the sync. Writing
+  D1 directly and treating that as canon remains forbidden (`d1-replica.md`).
+- **A human is present for every write.** This is the material safety property and it is worth
+  naming: the queue is worked in an interactive session where the owner can see, question and
+  stop what is being changed. An unattended hourly consumer with the same powers was specified
+  and then rejected. Do not reintroduce one without re-deciding this in the log.
+- **The delay IS the review window — do not engineer it away.** Earlier drafts of this section
+  treated the gap between SEND and apply as an awkwardness to be honest about. It is the
+  opposite: because nothing drains automatically, a request sent by mistake can be recalled
+  before it touches canon. The owner may ask a session to **drain and verify** (report only),
+  **drain and apply**, or **drain and delete**. An unattended consumer would have applied the
+  mistake before anyone saw it, and that — not throughput — is what was bought by removing it.
+- **The UI still says "queued", never "sent" or "saved".** The session runs when the owner
+  starts it, not on the click, so nothing a reader types appears in the data until then. A
+  surface that implies immediacy is lying about a delay the reader cannot see.
 
 **Multi-dashboard prompts route through task-orchestrator.** A pasted sync prompt that
 resolves into work against more than one dashboard or tracker in the same pass — a
@@ -696,9 +776,9 @@ size that does not appear in this table.
 
 | element | exact declaration |
 |---|---|
-| dashboard title | `700 27px/1.15 Libre Baskerville,Georgia,serif` |
-| metric number | `700 26px/1 Libre Baskerville,Georgia,serif` |
-| section title | `700 15px/1.2 Libre Baskerville,Georgia,serif` |
+| dashboard title | `700 27px/1.15 IBM Plex Mono,monospace` + `letter-spacing:-.01em` |
+| metric number | `700 26px/1 IBM Plex Mono,monospace` + `letter-spacing:-.01em` |
+| section title | `700 15px/1.2 IBM Plex Mono,monospace` |
 | key-panel circle glyph | `600 14px/1 IBM Plex Mono,monospace` |
 | in-row action glyph (`!`, `✓`) | `600 13px/1 IBM Plex Mono,monospace` |
 | in-row action glyph (`+` only) | `600 15px/1 IBM Plex Mono,monospace` |
@@ -717,7 +797,19 @@ size that does not appear in this table.
 | empty-section `— none —` | `400 12px/1.45 Helvetica Neue,Helvetica,Arial,sans-serif` |
 | eyebrow, header meta, metric label, SCHEME label, scheme buttons, marked-count, data stamp, section right-label, footer | `400–600 10px/1–1.5 IBM Plex Mono,monospace` |
 
-So the whole page uses exactly six sizes: **27, 26, 15** (serif titles only), **14/15/13**
+**v3.8 (2026-08-03): the display serif is gone.** Titles, metric figures and section heads are
+set in **IBM Plex Mono**, the face already carrying the chrome. Two families now, not three, and
+the Libre Baskerville request drops out of the page entirely. Georgia/serif remains only as a
+fallback in files not yet re-issued. Two things this changes and one it does not:
+
+- **Request `700`.** Plex Mono was being loaded at `400;500;600`, so a bold title was
+  synthesised by the browser rather than drawn. The font URL now asks for `700`.
+- **Pull the tracking in** by `-.01em` at 26–27px. Mono is wide, and at display sizes its
+  default tracking reads loose beside 12px body text.
+- **Sizes do not move.** 27/26/15 are still 27/26/15 — this is a face change, not a scale
+  change, and §11's audit is unaffected.
+
+So the whole page uses exactly six sizes: **27, 26, 15** (display sizes, mono), **14/15/13**
 (control and chip glyphs only), **12** (everything with words in it), **10** (small-caps
 chrome). There is no 11px, no 11.5px, no 13px text, no `rem`.
 
@@ -727,12 +819,15 @@ Rules
   A family-less shorthand is invalid CSS and silently renders at 16px. This has been the
   single biggest cause of drift; when in doubt write `font-size` + `font-family`
   separately rather than the shorthand.
-- Three families only. Body prose: `Helvetica Neue,Helvetica,Arial,sans-serif`.
-  Ids/labels/chips/buttons: `IBM Plex Mono,monospace`. Titles and metric numbers:
-  `Libre Baskerville,Georgia,serif`.
+- **Two families only** (v3.8 — was three). Body prose:
+  `Helvetica Neue,Helvetica,Arial,sans-serif`. Everything else — ids, labels, chips,
+  buttons **and the display sizes** (title, metric figures, section heads):
+  `IBM Plex Mono,monospace`.
 - Weight vocabulary: 400 body, 500 meta, 600 labels/chips/titles-in-rows, 700 buttons and
-  serif titles. No 300, no 800.
-- Load: `https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap`
+  display titles. No 300, no 800.
+- Load: `https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap`
+  **The `700` is load-bearing.** Without it the browser synthesises every bold title
+  instead of drawing it — which is exactly what shipped before v3.8.
 
 ---
 
@@ -746,30 +841,30 @@ your own lines.
 
 | skill | title | source JSON | a row is | `meta.checkNames` | sections that matter |
 |---|---|---|---|---|---|
-| cra-online-dev-tracker | Digital Dev Tracker | ONLINE_DEV_TRACKER.json | an app module | TYP · UNI · GLD · MUL · SEC · PII | all (reference build) |
-| cra-design-tracker | Programme Tracker | DESIGN_TRACKER.json | a delivery line | CANON · DRAFT · REVIEW · QA · PRINT · SHIP | metrics, queues, risks, budget, milestones |
-| cra-card-design | Card Deck Tracker | card_data.py v6 | a card set | DATA · ART · TYPE · PROOF · WEBP · CANON | grid, proofs, issues |
-| cra-manual-design | Manual Registry | manual registry v6 | a manual / cheatsheet / supplement | COPY · LAYOUT · RULES QA · VERSION · PDF · REGISTERED | grid, decisions, milestones |
-| cra-box-design | Packaging Tracker | v6 brand system | a packaging part | COPY · ART · DIELINE · BLEED · PROOF · CANON | grid, proofs, budget |
-| cra-print-production | Print Pack Tracker | print_ready_deck_v6 | an artefact heading to the printer | BLEED · TRIM · COLOUR · FONTS · RENDER · PACKAGED | grid, issues, budget, milestones |
-| cra-game-publishing | Publishing Tracker | publisher brief | a publisher / channel / proof round | TEMPLATE · UPLOAD · PROOF · APPROVAL · FULFIL · CONTRACT | grid, decisions, budget, milestones |
-| cra-game-marketing | Commercial Tracker | pricing model v1 | a channel or collateral piece | POSITION · COPY · ASSET · PRICE · LIVE · MEASURED | grid, budget, milestones |
-| cra-client-engagement | Engagement Tracker | engagement record | a booked or proposed engagement | SCOPED · QUOTED · BOOKED · PREPPED · DELIVERED · REPORTED | grid, milestones, budget, risks |
-| cra-workshop-design | Workshop Build Tracker | Workshop Manual v1.2 | a workshop module or framework pack | DESIGN · TIMING · MATERIALS · MAPPING · PILOTED · SIGNED OFF | grid, decisions, milestones |
-| cra-playtest | Playtest Tracker | playtest log | a session | PLANNED · RUN · CAPTURED · ANALYSED · FED BACK · CLOSED | grid, issues, milestones |
-| cra-balance-tuning | Balance Tracker | Scoring_Matrix v3.0 | a tuning question | SIM · EVIDENCE · RECO · REVIEWED · DECIDED · APPLIED | grid, decisions, risks |
-| cra-rules-qa | Rules QA Tracker | canon rules set | a consistency sweep area | CARDS · MANUALS · CHEATSHEETS · SCORING · PACKS · DIGITAL | grid, issues, milestones |
-| cra-expansion-design | Expansion Tracker | base 65-card canon | an expansion pack | SCOPE · MAPPING · CARDS · FACILITATION · QA · RELEASED | grid, decisions, budget |
-| cra-platform-compliance | Compliance Gate Tracker | live platform policies | a platform | POLICY READ · MANIFEST · A11Y · PRIVACY · TEST · SUBMITTED | gates, issues, risks, milestones |
-| cra-teams-app-dev | (uses the online-dev tracker) | — | — | — | — |
-| cra-hosting-ops | Hosting Tracker | deployment plan | an environment or pipeline stage | IAC · BUILD · DEPLOY · MONITOR · BACKUP · COST | grid, risks, budget (planning only) |
-| cra-mobile-dev | Mobile Tracker | GATED — awaiting Q10 | a mobile surface | — | milestones + risks only |
-| cra-collab-integrations | Surface Tracker | integration brief | a collaboration surface | SPEC · AUTH · BOT · PRIVACY · TEST · SHIPPED | grid, gates, risks |
+| proj-online-dev-tracker | Digital Dev Tracker | ONLINE_DEV_TRACKER.json | an app module | TYP · UNI · GLD · MUL · SEC · PII | all (reference build) |
+| proj-design-tracker | Programme Tracker | DESIGN_TRACKER.json | a delivery line | CANON · DRAFT · REVIEW · QA · PRINT · SHIP | metrics, queues, risks, budget, milestones |
+| proj-card-design | Card Deck Tracker | content-source.py v6 | a card set | DATA · ART · TYPE · PROOF · WEBP · CANON | grid, proofs, issues |
+| proj-manual-design | Manual Registry | manual registry v6 | a manual / cheatsheet / supplement | COPY · LAYOUT · RULES QA · VERSION · PDF · REGISTERED | grid, decisions, milestones |
+| proj-box-design | Packaging Tracker | v6 brand system | a packaging part | COPY · ART · DIELINE · BLEED · PROOF · CANON | grid, proofs, budget |
+| proj-print-production | Print Pack Tracker | print_ready_deck_v6 | an artefact heading to the printer | BLEED · TRIM · COLOUR · FONTS · RENDER · PACKAGED | grid, issues, budget, milestones |
+| proj-game-publishing | Publishing Tracker | publisher brief | a publisher / channel / proof round | TEMPLATE · UPLOAD · PROOF · APPROVAL · FULFIL · CONTRACT | grid, decisions, budget, milestones |
+| proj-game-marketing | Commercial Tracker | pricing model v1 | a channel or collateral piece | POSITION · COPY · ASSET · PRICE · LIVE · MEASURED | grid, budget, milestones |
+| proj-client-engagement | Engagement Tracker | engagement record | a booked or proposed engagement | SCOPED · QUOTED · BOOKED · PREPPED · DELIVERED · REPORTED | grid, milestones, budget, risks |
+| proj-workshop-design | Workshop Build Tracker | facilitator-guide v1.2 | a workshop module or framework pack | DESIGN · TIMING · MATERIALS · MAPPING · PILOTED · SIGNED OFF | grid, decisions, milestones |
+| proj-playtest | Playtest Tracker | playtest log | a session | PLANNED · RUN · CAPTURED · ANALYSED · FED BACK · CLOSED | grid, issues, milestones |
+| proj-balance-tuning | Balance Tracker | scoring-source v3.0 | a tuning question | SIM · EVIDENCE · RECO · REVIEWED · DECIDED · APPLIED | grid, decisions, risks |
+| proj-rules-qa | Rules QA Tracker | canon rules set | a consistency sweep area | CARDS · MANUALS · CHEATSHEETS · SCORING · PACKS · DIGITAL | grid, issues, milestones |
+| proj-expansion-design | Expansion Tracker | base 65-card canon | an expansion pack | SCOPE · MAPPING · CARDS · FACILITATION · QA · RELEASED | grid, decisions, budget |
+| proj-platform-compliance | Compliance Line Tracker | live platform policies | a platform | POLICY READ · MANIFEST · A11Y · PRIVACY · TEST · SUBMITTED | gates, issues, risks, milestones |
+| proj-teams-app-dev | (uses the online-dev tracker) | — | — | — | — |
+| proj-hosting-ops | Hosting Tracker | deployment plan | an environment or pipeline stage | IAC · BUILD · DEPLOY · MONITOR · BACKUP · COST | grid, risks, budget (planning only) |
+| proj-mobile-dev | Mobile Tracker | GATED — awaiting Q10 | a mobile surface | — | milestones + risks only |
+| proj-collab-integrations | Surface Tracker | integration brief | a collaboration surface | SPEC · AUTH · BOT · PRIVACY · TEST · SHIPPED | grid, gates, risks |
 
 Fewer than six checks is fine — drop columns rather than invent gates nobody runs. Refs
 stay unique programme-wide — the full prefix registry, and the two known collisions, are
 in §4h. Gated skills show the gate, not a build grid pretending work is underway.
-cra-design-tracker's rows are the other trackers.
+proj-design-tracker's rows are the other trackers.
 
 The `source JSON` column names one file per delivery line (§3.1). A source label naming a
 source *folder* or a build zip — `05_TEAMS_APP_v0.6_SOURCE` and the like — is the old
@@ -802,8 +897,8 @@ by a single `border-top:1px solid var(--line)` and nothing else.
 <div style="padding-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;
             justify-content:space-between;gap:12px;border-bottom:3px solid var(--ink)">
   <div style="display:flex;flex-direction:column;gap:6px">
-    <div style="font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:0.18em;color:var(--accentText)">CYBER RISK ASSESSMENT · ONLINE DEV</div>
-    <div style="font:700 27px/1.15 Libre Baskerville,Georgia,serif;letter-spacing:-0.01em">Digital Dev Tracker</div>
+    <div style="font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:0.18em;color:var(--accentText)">Example Project · ONLINE DEV</div>
+    <div style="font:700 27px/1.15 IBM Plex Mono,monospace;letter-spacing:-0.01em">Digital Dev Tracker</div>
   </div>
   <div style="font:400 10px/1.5 IBM Plex Mono,monospace;text-align:right;color:var(--muted)">source v0.6<br>baselined 2026-07-25</div>
 </div>
@@ -812,7 +907,7 @@ by a single `border-top:1px solid var(--line)` and nothing else.
 ### 10.2 Metric strip
 Grid `repeat(auto-fit,minmax(120px,1fr))`, gap 10px, margin-top 18px.
 Card: panel + 1px line + radius 4px, `padding:12px 12px 11px`, column flex, gap 4px.
-Number `700 26px/1 Libre Baskerville,Georgia,serif`; label `500 10px/1.3 IBM Plex Mono,monospace; letter-spacing:0.1em; color:var(--muted)`.
+Number `700 26px/1 IBM Plex Mono,monospace;letter-spacing:-0.01em`; label `500 10px/1.3 IBM Plex Mono,monospace; letter-spacing:0.1em; color:var(--muted)`.
 
 ### 10.3 How-this-works panel
 Container: panel, `border:1px solid var(--line)`, `border-left:4px solid var(--accent)`,
@@ -854,7 +949,8 @@ Label `SCHEME` at `500 10px/1 IBM Plex Mono,monospace;letter-spacing:0.1em;color
 Five buttons, one per scheme: `height:32px;padding:0 9px;border-radius:3px;border:1.5px solid var(--ink);font:600 10px/1 IBM Plex Mono,monospace;letter-spacing:0.06em`,
 transparent → ink-filled when active. Each shows three 9px circles (headerBg, accent, bg)
 overlapping by `margin-left:-3px`, then the label NAVY / CANON / SLATE / DARK / MONO, in that
-order (NAVY leads — it is the default).
+order. The order is fixed and does not follow the default — NAVY leads the row whichever
+scheme is current (v3.10 made Canon v6 the default again without reordering the switcher).
 **A `<select>` is not an acceptable substitute.**
 
 ### 10.6 Status chip — the one visual that must never drift
@@ -873,7 +969,18 @@ stays 24px; the chip grows only if a longer alias needs it. Legend chips are ide
 `height:24px;padding:0 8px;border-radius:2px;font:600 12px/1 IBM Plex Mono,monospace;
 letter-spacing:0.02em` with the badge colours of §6.
 
-### 10.7 Action buttons — 30px circles, always three
+### 10.7 Action buttons — 30px circles, always three on an actionable row
+
+**One exception, v3.7: the §4e form row carries a single `+`.** The trio is a *choice about
+an existing row* — explain it, proceed with it, improve it. The track-something-new row has
+no row to choose about; it is a form, and its `+` is a submit. Rendering `!` and `✓` beside
+it would offer two controls that cannot mean anything, which is worse than the asymmetry.
+
+The geometry does not change: same 30px circle, same 2px ink border, same outline-by-default,
+and it sits in the same `.acts` cluster at the row's right edge so it reads as one family.
+What it does not do is carry selected state — a submit either fires or reports why it did
+not, so there is no fill to invert and nothing for `state.choices` to remember. Everything
+below applies to the trio on actionable rows.
 ```html
 <div class="noprint" style="display:flex;gap:6px;justify-content:flex-end">
   <button title="Explain" style="width:30px;height:30px;border-radius:50%;cursor:pointer;
@@ -965,7 +1072,7 @@ nothing — this is additive, not a new required field.
 ### 10.9 Section heading (every section below the grid)
 ```html
 <div style="display:flex;align-items:baseline;gap:12px;margin:30px 0 10px">
-  <div style="font:700 15px/1.2 Libre Baskerville,Georgia,serif">Risk Register</div>
+  <div style="font:700 15px/1.2 IBM Plex Mono,monospace">Risk Register</div>
   <div style="flex:1;height:1px;background:var(--line)"></div>
   <div style="font:400 10px/1 IBM Plex Mono,monospace;letter-spacing:0.1em;color:var(--accentText)">EXPOSURE · CAUSE · CONTROL</div>
 </div>
@@ -1003,11 +1110,12 @@ Compare against the reference at 1080px wide. All must be true:
       the §7 table — audit with:
       `[...new Set([...document.querySelectorAll('*')].filter(e=>e.children.length===0&&e.textContent.trim()).map(e=>getComputedStyle(e).fontSize))]`
 - [ ] no `rem`/`em` font sizes anywhere; every `font:` shorthand ends with a family
-- [ ] all table text measures 12px; chrome labels 10px; titles 27/15/26px serif; no 11px,
+- [ ] all table text measures 12px; chrome labels 10px; titles 27/15/26px **mono**; no 11px,
       no 11.5px, no 13px text (13/14/15px exist only as control and chip glyphs)
 - [ ] status marks show glyph + word + tint, 24px tall, radius 3px — no bare glyphs
 - [ ] action buttons are 30px circles with 2px borders, three per actionable row, outline
-      until selected, then ink-filled
+      until selected, then ink-filled — the §4e form row is the one exception (§10.7): a
+      single `+` submit, same circle, no selected state
 - [ ] tapping a row control inverts it to a solid ink fill; tapping it again clears it;
       selecting another moves the fill (only one selected per row) — verified on touch,
       with no hover involved
@@ -1018,11 +1126,42 @@ Compare against the reference at 1080px wide. All must be true:
 - [ ] containers radius 4px, chips/buttons 3px, badges 2px; no 8px radii
 - [ ] no borders on individual cells; rows separated by one 1px line
 - [ ] module grid columns `104/92/351/1fr/104`, min-width 848px, no sideways scroll at 900px
-- [ ] Navy is the default scheme — used when no scheme is set, on first load, and
-      after RESET; the NAVY switcher button renders active on open (Canon v6 remains
-      available as a named scheme, no longer the default)
+- [ ] Navy is the default scheme (v3.11, reverting v3.10) — used when no scheme is set,
+      on first load, and after RESET; the NAVY switcher button renders active on open, and
+      the `:root` block carries Navy's literal values so first paint never flashes another
+      scheme. Whichever scheme is default, `:root` must mirror it
+- [ ] table rows separate on `--rule`, not `--line`; `--rule` exists in all five schemes
+- [ ] every section is a `<details>`; empty ones and the update log start closed, the rest
+      open; the row count is on the summary and stays legible while shut
+- [ ] within a tracker: populated sections, module grid, People, empty sections, update log
+- [ ] each empty section offers a `+`; each tracker opens with four equal stat blocks
+- [ ] "rows" excludes the update log EVERYWHERE it is counted — nav tab badge, overview
+      column and per-tracker stat block must agree. The log is history, not tracked work,
+      and a page showing 31 in one place and 25 in another is describing two different
+      things with one word
+- [ ] IMPROVE opens a multi-line dialog, not `window.prompt()`; every `+` on the page ends
+      in the tray and nothing but SEND TO CLI transmits
+- [ ] People is present wherever any row has an owner: on the PEOPLE tab and on each
+      tracker. It was ALSO on the Overview until v3.12 gave it a tab — the Overview copy
+      could only count trackers already fetched, so it carried a "covers N of M lines
+      opened so far" caveat that the tab does not need. Two answers to one question, one
+      of them conditionally wrong, is worse than one answer
+- [ ] selecting a name filters every tracker behind a visible banner
 - [ ] IMPROVE field spans the full row width and survives a re-render with its text intact
 - [ ] print preview: controls hidden, every mark still readable in greyscale
+
+**Programme hub only (§14):**
+- [ ] the tabs render in the §14.1 order, and the order does not follow the default tab
+- [ ] a pooled tab renders ONE table carrying Project and Tracker columns, not one per tracker
+- [ ] a `Details` cell with a full triple renders four labelled lines; one with a flat string
+      renders a single note line, not four `undefined` lines
+- [ ] ADMIN is a ghost bar button, not a §10.7 circle, and does not bind the row-action handler
+- [ ] ADMIN reports "queued", never "saved", and the tracker's title does not change on screen
+      until the next sync
+- [ ] a locked, retired or archived line appears on DONE and nowhere on the Overview
+- [ ] an orphan finding carries the source that found it (2.a / 2.b / 2.c)
+- [ ] a 2.c finding renders as a decision requiring an answer, not as a note
+- [ ] every mark advanced by an automated pass carries a `log` entry naming the evidence used
 - [ ] Create prompt copies the exact format in §5
 - [ ] the Feedback mark is the ONLY clickable status chip in the dashboard; every other
       chip is read-only and evidence-derived — verify no other section lets a click change
@@ -1068,6 +1207,145 @@ Compare against the reference at 1080px wide. All must be true:
 - [ ] Feedback & Suggestions' `+ NEW` control requires all three fields (what/source/
       measured by) before it stages a row, and `measured by` is the fixed six-value choice,
       never free text
+
+---
+
+## 14. The programme hub — a fourth surface
+
+`dashboard-set.md` documents three surfaces: skill-builder, facilitator, resources. The
+**programme hub** is a fourth. It is pooled across every project and answers one question
+the other three cannot: *what is true across all lines at once.* It gets its own section
+because its tab grammar is not §4's and not §10's — scattering it through those would
+tangle a multi-line surface with rules written for a single-line tracker.
+
+Protect HQ is the reference implementation.
+
+### 14.1 Tab set and fixed order
+
+After `OVERVIEW`, in this order and no other:
+
+```
+OVERVIEW · DECISIONS · RISK · PEOPLE · PROJECTS · ORPHANED · DONE
+```
+
+**The order is fixed and does not follow which tab is default**, exactly as §10.5 fixes the
+scheme-switcher order independently of the default scheme. A reader navigates by position;
+an order that reshuffles itself around state is an order they cannot learn.
+
+**RESOURCES became PEOPLE the same day (2026-08-04, owner).** RESOURCES pooled the `person`
+kind, and no tracker in the estate has ever carried a `person` row — it was an empty tab, the
+same fault BUDGET was removed for hours earlier and missed here because it sat between two
+tabs that were being built. The data was never absent, only stored elsewhere: every row
+carries an owner. **PEOPLE is therefore DERIVED, not pooled** — there is no kind to gather —
+which makes it the fullest cut on the hub rather than the emptiest. It has two states: a
+roster answering "who is carrying what", and, with a name selected, the §14.2 pooled table of
+that person's rows across every line. It also reports how many rows name **nobody**, which is
+the number worth reducing.
+
+**BUDGET was specified here and removed the same day (2026-08-04, owner).** One tracker of
+nine carried any `budget_line` rows, so the tab was empty for the whole estate bar one line,
+and `budget_line` left `ALWAYS_SECTIONS` with it — an EMPTY Budget section on eight lines
+claimed "nobody has filled this in" about lines that were never going to have a budget. The
+kind stays in `SECTION_ORDER`, so a tracker that carries budget rows still renders them.
+**Removing a pooled tab is not the same as hiding the data.** A hub should not carry a cut
+that is empty almost everywhere: a tab that is nearly always blank teaches the reader to stop
+opening it, which is how the one line that does have a budget stops being seen.
+
+`PROJECTS` is the synthetic container tab (v3.9): not a destination, active whenever the
+selected tab is a project key, and the thing the per-project level hangs from.
+
+### 14.2 The pooled single table
+
+A pooled tab renders **one table across all trackers**, with columns exactly:
+
+```
+Project | Tracker | Ref | Mark | Details | Owner | actions
+```
+
+`Details` renders the §3.7 triple. Where a row has no triple it renders the flat note it
+always was — a partial triple is worse than a plain sentence (§3.7), and four `undefined`
+lines are worse than either.
+
+This **replaces** the per-tracker grouping used up to v3.11, where a pooled view emitted one
+table per tracker with the tracker's name as the heading. Grouping answered "what does this
+line carry"; the hub's question is "where is this across everything", and that needs the
+project and tracker as *columns you can scan*, not headings you scroll between.
+
+Applies to **pooled tabs only**. Per-project sections keep their own row grids (§10.10). Do
+not widen the per-project section renderer to serve both: the columns differ, and one
+function serving two column sets is how a change to one silently breaks the other.
+
+### 14.3 DECISIONS
+
+Pools kinds `decision` **and** `decision_required`, summarised per project. The two belong
+on one surface because the question is the same — what has been settled, and what is waiting
+on someone — and separating them hides the second behind the first.
+
+### 14.4 ORPHANED
+
+Work that exists but is not tracked. **A tracker is orphaned when it has no
+`meta.trackerFunction`, no `meta.trackerPurpose`, and no row carries an owner** — all three,
+because any one alone catches lines that are merely incomplete rather than unowned.
+
+Three scan sources, and a finding **must carry the source that found it**, so a reader can
+tell a missing tracker from a missing repo:
+
+- **2.a — orphaned projects.** A tracker meeting the test above.
+- **2.b — git repos with no tracker.** A live repo whose Drive project has no tracker JSON.
+- **2.c — local items not in git.** Work on disk under no version control at all.
+
+A **2.c finding becomes a `decision_required` row**, phrased as a choice — *"No repo sync —
+keep it local, or sync it"* — never a silent note. The point of surfacing untracked work is
+to force the decision, and a note nobody must answer is not a decision.
+
+### 14.5 DONE
+
+Lifecycle `locked` + `retired` + archived, together, on one tab.
+
+This **reverses commit `2011e55`**, which deliberately put locked and retired lines on the
+Overview so that setting work down never looked like losing it. That reasoning still holds —
+they are **reported, never deleted, and restorable** — but the Overview is the "what needs
+attention" surface, and finished work sitting in it competes with work that is live. DONE
+keeps the guarantee and moves the location.
+
+A locked, retired or archived line appears on DONE and **nowhere** on the Overview.
+
+### 14.6 ADMIN
+
+The surface for editing tracker metadata: `title`, `trackerFunction`, `trackerPurpose`,
+`trackerOutcome`, `lifecycle`, and the registry's `project` binding.
+
+**ADMIN is not a §10.7 action circle.** It is a ghost bar button beside the tracker stats,
+the same family as `ARCHIVE`. v3.11 records exactly what happens when the circle family is
+over-bound: `.act` is *geometry* worn by three different controls, a bare `.act` selector
+bound the row-action handler to all of them, and the track-more `+` fired twice and queued a
+row with no `ref` and no `action`. Do not put a fourth control into that family.
+
+**ADMIN writes to the queue only.** It does not touch the replica and it does not touch
+canon. The dialog reports **"queued"** — never "saved" — and the tracker's title does not
+change on screen until the next sync. Changes are picked up by the next **Claude Code CLI
+session**, so a UI implying immediacy would be describing a write that has not happened.
+
+> **Named alternative, considered and not built:** replica-immediate writes, following the
+> `/api/archive` precedent, where the change lands in D1 at once *and* queues a row so canon
+> catches up. It is recorded here so the next reader knows it was a choice rather than an
+> oversight.
+
+### 14.7 The refresh scan
+
+The Overview's refresh does two things: re-fetches live data for the reader, **and** queues a
+`REFRESH SCAN` job for the next CLI session.
+
+That session may change **tracker metadata only** — the tracker JSON on Drive, via the §5 write
+path, followed by a re-sync. It may **never** change application code, the Worker, or Access
+configuration. The boundary is enforced by this spec and by the owner reading the session, not
+by a tool allowlist; that is a weaker guarantee than a machine-enforced one and is written down
+as such. What makes it tolerable is that the session is interactive — the owner sees each write
+as it is proposed, which an unattended job would not have offered.
+
+What a scan must report: what it changed and why, per tracker; what it found and did not
+change; and every mark it advanced together with the evidence used (§2). A scan that reports
+only successes is indistinguishable from a scan that did nothing.
 
 ---
 

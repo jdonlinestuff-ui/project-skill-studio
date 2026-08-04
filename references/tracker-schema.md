@@ -136,6 +136,59 @@ projects. Two known collisions (`P` also used for build phases, `E` covering bot
 enhancements and epics) are documented in `DASHBOARD_SPEC.md` §4h; pick a convention and
 record it rather than renumbering refs already cited in changelogs.
 
+## The registry — `_registry.json`
+
+**Which trackers exist is data, not code.** The registry lives at
+`<canon root>\trackers\_registry.json` and the sync script reads it. It used to be a
+hardcoded Python list inside `sync_trackers_to_d1.py`, which meant that binding a tracker
+to a project — or adding a line at all — was a code edit. That is incompatible with any
+surface that lets an owner move a line between projects (§14.6), so the list moved out.
+
+```json
+{
+  "trackers": [
+    { "id": "abgi.discovery", "project": "abgi", "line": "discovery",
+      "shape": "A", "path": "abgi\\trackers\\abgr_tr_discovery.json" }
+  ]
+}
+```
+
+**The registry is load-bearing in a way that bites.** The sync does
+`DELETE FROM rows_` before reinserting, so a tracker missing from the registry does not
+fail — it silently loses every row it had. A registry that fails to load, or loads short,
+empties the database quietly. Two consequences, both non-negotiable:
+
+- The sync **must refuse to run** on a registry it cannot parse, rather than proceeding
+  with an empty or partial list.
+- After any registry change, **compare per-tracker row counts before and after**. This has
+  already gone wrong once: `skillvault.product` came through as 15 rows instead of 24
+  because it was registered under the wrong shape.
+
+## The orphans tracker — `protect_tr_orphans.json`
+
+Shape A. One row per finding from the §14.4 scan. `kind` carries which scan source found
+it, because a missing tracker and a missing repo need different answers and a reader must
+be able to tell them apart:
+
+| `kind` | Source | Means |
+|---|---|---|
+| `orphan_project` | 2.a | A tracker with no function, no purpose and no owned row |
+| `orphan_repo` | 2.b | A live git repo whose Drive project has no tracker JSON |
+| `decision_required` | 2.c | Work on disk under no version control — rendered as a choice |
+
+A 2.c finding is a `decision_required` row on purpose. Surfacing untracked work is only
+worth doing if somebody has to answer for it; a note nobody must action is not a decision.
+
+## Fields ADMIN may change
+
+The §14.6 ADMIN surface may queue changes to exactly these, and nothing else:
+
+`title` · `trackerFunction` · `trackerPurpose` · `trackerOutcome` · `lifecycle` ·
+and the registry's `project` binding.
+
+Rows, marks, evidence and `revision` are **not** in that list. ADMIN edits what a tracker
+*is*, never what it *reports*.
+
 ## Write discipline
 
 - **One named file per line at canon root.** A second copy of the same name is how a

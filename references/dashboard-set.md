@@ -1,17 +1,28 @@
-# The dashboard set — three surfaces, one source
+# The dashboard set — four surfaces, one source
 
-A studio run emits **three dashboards, not one**. They are three audiences reading the
-same trackers, not three copies of the data: every surface derives from the per-line
-tracker JSONs described in `tracker-schema.md`, and none of them is a source of truth.
+A studio run emits **three dashboards per project**, and a programme carrying more than one
+project gets a **fourth surface above them**. They are audiences reading the same trackers,
+not copies of the data: every surface derives from the per-line tracker JSONs described in
+`tracker-schema.md`, and none of them is a source of truth.
 
-| # | Surface | Answers | Read by |
-|---|---|---|---|
-| 1 | **Skill builder** (skills-creation) | what skills exist, which are stale, what installs next | whoever maintains the studio |
-| 2 | **Facilitator** | how do I run the thing right now, and what's broken today | whoever is operating the project live |
-| 3 | **Resources** | what exists, what state is it in, where does it live | anyone orienting on the project |
+| # | Surface | Answers | Read by | Scope |
+|---|---|---|---|---|
+| 1 | **Skill builder** (skills-creation) | what skills exist, which are stale, what installs next | whoever maintains the studio | one project |
+| 2 | **Facilitator** | how do I run the thing right now, and what's broken today | whoever is operating the project live | one project |
+| 3 | **Resources** | what exists, what state is it in, where does it live | anyone orienting on the project | one project |
+| 4 | **Programme hub** | what is true across all lines at once | whoever is carrying the programme | every project |
 
-Build them in that order. The Skill builder is the one that tracks the studio's own growth,
+Build 1–3 in that order. The Skill builder is the one that tracks the studio's own growth,
 so it exists before the surfaces that describe the work.
+
+**The programme hub (surface 4) is specified in `DASHBOARD_SPEC.md` §14**, not here, because
+its tab grammar is its own. It shipped before it was named in canon — Protect HQ was live at
+a private hostname on 2026-08-02/03 while this file still said the set was three surfaces —
+and this row exists so the next reader does not conclude it was undocumented drift. It is the
+reference implementation of §14.
+
+A hub is only worth building for a programme with several projects. One project needs
+surfaces 1–3 and nothing above them.
 
 ## 1. Skill builder — the existing behaviour
 
